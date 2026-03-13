@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class RAM-ifications</title>
+    <style>
+        body { 
+            background: #0a0a0a; 
+            color: #00ff00; 
+            font-family: 'Courier New', Courier, monospace;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 0;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            border: 4px solid #333;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+        canvas { background: #000; cursor: crosshair; }
+        .crt-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+        #ui-layer {
+            width: 800px; padding: 10px; display: flex; justify-content: space-between; flex-wrap: wrap;
+        }
+        .rainbow-text {
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+        #tower-select {
+            display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;
+        }
+        .tower-btn {
+            background: #111; color: #00ff00; border: 2px solid #333;
+            padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 12px;
+        }
+        .tower-btn:hover { border-color: #00ff00; }
+        .tower-btn.selected { border-color: #00ffff; background: #002200; }
+    </style>
+</head>
+<body>
+    <h1>CLASS <span class="rainbow-text">RAM-IFICATIONS</span></h1>
+    <div id="ui-layer">
+        <div>PRECEDENT: <span id="precedent-val">100</span></div>
+        <div>LIVES: <span id="lives-val">3</span></div>
+        <div>STATUS: <span id="status-val">DISTRICT COURT</span></div>
+        <div>YEAR: <span id="year-val">1984</span></div>
+    </div>
+    <div id="tower-select">
+        <button class="tower-btn selected" data-tower="1" title="Coder (Logic) – Boolean Bits, slows Auditors">1 Coder (50)</button>
+        <button class="tower-btn" data-tower="2" title="Attorney (Litigation) – Precedents, heavy damage">2 Attorney (75)</button>
+        <button class="tower-btn" data-tower="3" title="Activist (Community) – Heals Burden on nearby files">3 Activist (60)</button>
+        <button class="tower-btn" data-tower="4" title="Encryption Expert – Firewall, protects towers from Subpoenas">4 Encryption (80)</button>
+    </div>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div class="crt-overlay"></div>
+    </div>
+    <p id="tower-hint">Coder (Logic) (50) • Boolean Bits • Slows</p>
+    <script src="audio.js"></script>
+    <script src="game.js"></script>
+    <script>
+        (function initTowerSelect() {
+            document.querySelectorAll('.tower-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tower-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    const id = parseInt(btn.dataset.tower);
+                    const types = { 1: 'CODER', 2: 'ATTORNEY', 3: 'ACTIVIST', 4: 'ENCRYPTION' };
+                    if (typeof selectedTowerType !== 'undefined' && typeof TOWER_TYPES !== 'undefined') {
+                        selectedTowerType = TOWER_TYPES[types[id]];
+                        document.getElementById('tower-hint').innerText = selectedTowerType.name + ' (' + selectedTowerType.cost + ') • ' + selectedTowerType.hint;
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
