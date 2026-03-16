@@ -56,7 +56,7 @@ See [HISTORY.md](./HISTORY.md) for a fuller account.
 - **Cleared files:** Rainbow burst on success
 
 ### 4.3 Display
-- **Resolution:** 800×480 (CRT-inspired)
+- **Resolution:** 800×400 (CRT-inspired)
 - **Overlay:** Subtle scanlines, chromatic aberration
 - **Shift:** 9th Circuit stage dims to monochrome
 
@@ -98,11 +98,7 @@ Placed on the board by clicking. Each has a cost and role:
 - **Precedent:** Earned by clearing files (+20) and killing Auditors (+15). Spent on towers.
 - **Lives:** Start at 3. Lose 1 when a file is DENIED (Burden = 100). **Lives carry over** for the whole run (no reset per stage).
 
-### 5.6 Design Decisions (Locked In)
-- **Placement:** Click anywhere, no overlap with other towers (no grid or fixed spots).
-- **Attorney visuals:** Same 32×32 block as Coder, different color (e.g. gold/amber).
-- **Activist:** Medium range, medium Burden heal.
-- **Art:** Placeholders until custom art; **Audio:** original or CC0/CC-BY only.
+Design decisions (placement, lives, art, audio, high score) are in [docs/ROADMAP.md](ROADMAP.md).
 
 ---
 
@@ -112,16 +108,16 @@ Placed on the board by clicking. Each has a cost and role:
 - **Level 1 (District Court):** Bright colors, Suspect Class buff (2× damage), cheaper towers
 - **Level 2 (9th Circuit):** Monochrome shift, Rational Basis ruling, higher costs, 1.5× enemy speed
 
-### 6.2 Arcade Stages (Planned)
+### 6.2 Arcade Stages
 
 | Stage | Year | Event | Difficulty |
 |-------|------|-------|------------|
-| 01 | 1984 | The Investigation Begins | Easy – tutorial |
-| 02 | 1987 | District Court Victory | Bonus – high rainbow energy |
-| 03 | 1990 | 9th Circuit Reversal | Hard – monochrome shift |
-| 04 | 1995 | The Executive Order | Survival – hold 60 seconds to win |
+| 01 | 1984 | The Investigation Begins | Easy |
+| 02 | 1987 | District Court Victory | Bonus |
+| 03 | 1990 | 9th Circuit Reversal | Hard – monochrome |
+| 04 | 1995 | The Executive Order | Survival 60s to win |
 
-**Current implementation:** Four stages (1984→1987→1990→1995), 60s each; win = survive 60s in 1995.
+Four stages, 60s each; win = survive 60s in 1995.
 
 ---
 
@@ -144,33 +140,14 @@ Placed on the board by clicking. Each has a cost and role:
 
 ## 8. Implementation Status
 
-See **[docs/ROADMAP.md](ROADMAP.md)** for current status, sprint breakdown, and open questions.
+See **[docs/ROADMAP.md](ROADMAP.md)** for current status and next steps.
 
-| Feature | Status |
-|---------|--------|
-| Case Files + movement | ✅ |
-| Auditors + spawning | ✅ |
-| Burden collision | ✅ |
-| Lives system (carry over) | ✅ |
-| Logic Tower (Coder) + slow | ✅ |
-| Attorney Tower | ✅ |
-| Activist Tower | ✅ |
-| Encryption Expert Tower | ✅ |
-| Tower placement + select (1–4) | ✅ |
-| Boolean Bits, Precedents | ✅ |
-| Suspect Class buff | ✅ |
-| Stage progression (1984→1995) | ✅ |
-| Win condition (60s in 1995) | ✅ |
-| Subpoenas (9th Circuit + 1995) | ✅ |
-| Win/lose screens + Retry | ✅ |
-| Audio (procedural SFX) | ✅ |
-| 32×32 pixel art assets | ❌ (placeholders) |
+All core features are implemented (loop, towers, stages, Subpoenas, SFX, mute, BGM hook, high score, win/lose). The only missing piece is **32×32 pixel art** (placeholders used until you add sprites).
 
 ---
 
 ## 9. Future Considerations
 
-- **Subpoenas:** Enemy ability to disable towers (countered by Encryption Expert)
-- **Slowing:** Logic Tower slow effect on hit
-- **Save/load:** LocalStorage for high scores
 - **Mobile:** Touch controls for tower placement
+- **Sprite integration:** Per-entity PNGs → drawImage (see DEVELOPMENT.md Art Pipeline)
+- **BGM track:** Drop a file and call `window.bgm.setTrack('assets/bgm.ogg')` then `bgm.play()` after first user gesture

@@ -621,6 +621,9 @@ function resetGame() {
     projectiles = [];
     lastCaseSpawn = 0;
     lastAuditorSpawn = 0;
+    stageBannerText = '';
+    stageBannerUntil = 0;
+    highScoreUpdated = false;
     document.getElementById('precedent-val').innerText = precedent;
     document.getElementById('lives-val').innerText = lives;
     updateUI();

@@ -20,9 +20,11 @@ Technical documentation for contributors and maintainers of Class RAM-ifications
 Class-RAM-ifications/
 ├── index.html          # Entry point, CRT overlay, UI
 ├── game.js             # Game loop, classes, logic
-├── audio.js            # Procedural SFX (Web Audio API)
+├── audio.js            # Procedural SFX + BGM hook
 ├── README.md           # User-facing overview
+├── assets/             # Optional: BGM (bgm.ogg), sprites (see assets/README.md)
 ├── docs/
+│   ├── ROADMAP.md      # Status and next steps
 │   ├── GDD.md          # Game Design Document
 │   ├── HISTORY.md      # Historical case background
 │   └── DEVELOPMENT.md  # This file
@@ -51,9 +53,10 @@ Class-RAM-ifications/
 | `BooleanBit`, `Precedent` | game.js | Projectiles |
 
 ### Global State
-- `precedent`, `lives`, `gameActive`, `currentYear`, `isMonochrome`
+- `precedent`, `lives`, `gameActive`, `gameWon`, `selectedTowerType`, `currentStageIndex`, `stageStartTime`, `stageBannerText`, `stageBannerUntil`, `bestYear`, `bestStages`, `highScoreUpdated`
 - Arrays: `caseFiles`, `auditors`, `towers`, `projectiles`
 - `lanes` – Y-positions of the 4 motherboard lanes
+- `isMonochrome()` – function (from current stage)
 
 ### Collision
 - `rectsOverlap(a, b)` – AABB overlap for hitboxes
@@ -61,6 +64,18 @@ Class-RAM-ifications/
 
 ### Audio
 - `audio.js` – Procedural SFX via Web Audio API (no asset files). `window.sfx.init()` on first user gesture; then `sfx('placeTower')`, `sfx('fileCleared')`, etc. from game.js. Supports `window.sfx.toggleMute()` and optional BGM via `window.bgm.setTrack(url)`, `window.bgm.play()`, `window.bgm.stop()`.
+
+#### How to add BGM
+1. Add a track (e.g. `assets/bgm.ogg`) – use an original or CC0/CC-BY file.
+2. Start BGM on first user gesture so autoplay policies allow it. In `game.js`, in the same place you call `window.sfx.init()` (e.g. the canvas click or keydown handler), add:
+   ```javascript
+   if (window.bgm && !window._bgmStarted) {
+       window._bgmStarted = true;
+       window.bgm.setTrack('assets/bgm.ogg');
+       window.bgm.play();
+   }
+   ```
+3. Mute (M key) pauses both SFX and BGM.
 
 ---
 

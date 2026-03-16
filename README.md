@@ -26,19 +26,19 @@ npx serve .   # then open http://localhost:3000
 
 | Document | Description |
 |----------|-------------|
-| [docs/ROADMAP.md](docs/ROADMAP.md) | **Status, sprints, and decisions** – start here |
-| [docs/QUESTIONS-FOR-PRODUCT.md](docs/QUESTIONS-FOR-PRODUCT.md) | Product questions in groups (4–5 per group) with options and recommendations |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Current status and next steps |
 | [docs/GDD.md](docs/GDD.md) | Game Design Document – mechanics, visuals |
-| [docs/HISTORY.md](docs/HISTORY.md) | Historical case background (HTG v. DISCO) |
-| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Technical guide for contributors |
+| [docs/HISTORY.md](docs/HISTORY.md) | Historical case (HTG v. DISCO) |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Technical guide – run, deploy, constants, art, BGM |
 
 ## Deploy to Cloudflare Pages
 
-1. Create a [Cloudflare Pages](https://dash.cloudflare.com/) project
-2. Add secrets to your GitHub repo:
-   - `CLOUDFLARE_API_TOKEN` – from [API Tokens](https://dash.cloudflare.com/profile/api-tokens)
-   - `CLOUDFLARE_ACCOUNT_ID` – from your Cloudflare dashboard URL
-3. Push to `main` – the workflow deploys automatically
+1. Create a [Cloudflare Pages](https://dash.cloudflare.com/) project (e.g. `class-ram-ifications`).
+2. In GitHub: **Settings → Secrets and variables → Actions**; add:
+   - `CLOUDFLARE_API_TOKEN` – from [API Tokens](https://dash.cloudflare.com/profile/api-tokens) (Cloudflare Pages edit permission).
+   - `CLOUDFLARE_ACCOUNT_ID` – from your Cloudflare dashboard URL.
+3. Push to `main` (or run the **Deploy to Cloudflare Pages** workflow from the Actions tab).
+4. **Verify:** Open the live URL; confirm play, stage advances, tower placement, win/lose, Retry (R), mute (M), and high score on game over.
 
 ## Tech
 
