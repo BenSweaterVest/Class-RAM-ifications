@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Digester — Template</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #1a1a2e; --surface: #16213e; --surface-2: #1c2a4a;
+            --border: #2a3a5c; --border-light: #3a4a6c;
+            --text: #e0e0e0; --text-dim: #8892a4; --text-bright: #ffffff;
+            --accent: #0f9b8e; --accent-glow: #0f9b8e44; --accent-2: #e8a838;
+            --success: #2ecc71; --success-bg: #2ecc7118;
+            --danger: #e74c3c; --danger-bg: #e74c3c18;
+            --code-bg: #0d1117;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'DM Sans', system-ui, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--sans); line-height: 1.6; max-width: 1200px; margin: 0 auto; padding: 40px 24px; background: var(--bg); color: var(--text); }
+
+        /* ── Header ── */
+        .header { text-align: center; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+        .header h1 { font-family: var(--mono); font-size: 1.8em; font-weight: 700; color: var(--text-bright); letter-spacing: -0.02em; }
+        .header h1 span { color: var(--accent); }
+        .header p { color: var(--text-dim); font-size: 0.9em; margin-top: 6px; }
+
+        /* ── Collapsible Panels ── */
+        .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
+        .panel-toggle { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; cursor: pointer; user-select: none; transition: background 0.2s; }
+        .panel-toggle:hover, .panel-toggle:focus-visible { background: var(--surface-2); outline: none; }
+        .panel-toggle h3 { font-family: var(--mono); font-size: 0.85em; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; }
+        .panel-toggle .arrow { color: var(--text-dim); font-size: 0.8em; transition: transform 0.2s; }
+        .panel-toggle.open .arrow { transform: rotate(180deg); }
+        .panel-body { display: none; padding: 0 24px 24px; border-top: 1px solid var(--border); }
+        .panel-body.open { display: block; padding-top: 20px; }
+
+        /* ── Settings Grid ── */
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .setting-group { position: relative; }
+        .setting-group > label { display: block; font-family: var(--mono); font-size: 0.72em; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+        .setting-group select, .setting-group input[type="range"] { width: 100%; padding: 8px 12px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.85em; }
+        .setting-group select { cursor: pointer; }
+        .setting-group select option { background: var(--code-bg); }
+        .color-input-row { display: flex; align-items: center; gap: 10px; }
+        .color-input-row input[type="color"] { width: 40px; height: 36px; border: 1px solid var(--border); border-radius: 6px; background: none; cursor: pointer; padding: 2px; }
+        .color-input-row input[type="text"] { flex: 1; padding: 8px 12px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.85em; }
+        .range-row { display: flex; align-items: center; gap: 12px; }
+        .range-row input[type="range"] { flex: 1; }
+        .range-row .range-val { font-family: var(--mono); font-size: 0.8em; color: var(--accent); min-width: 40px; text-align: right; }
+        .toggle-row { display: flex; align-items: center; gap: 10px; }
+        .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; inset: 0; background: var(--border); border-radius: 12px; cursor: pointer; transition: background 0.2s; }
+        .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: var(--text-dim); border-radius: 50%; transition: all 0.2s; }
+        .toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); background: var(--text-bright); }
+        .toggle-label { font-size: 0.85em; color: var(--text); }
+
+        /* ── Tooltips ── */
+        .hint { display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; font-size: 0.65em; font-weight: 700; color: var(--text-dim); background: var(--border); border-radius: 50%; cursor: help; margin-left: 6px; vertical-align: middle; position: relative; }
+        .hint .hint-text { display: none; position: absolute; bottom: calc(100% + 8px); right: 0; width: 280px; padding: 10px 14px; background: var(--code-bg); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text); font-family: var(--sans); font-size: 12px; font-weight: 400; text-transform: none; letter-spacing: 0; line-height: 1.5; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.4); white-space: normal; text-align: left; }
+        .hint .hint-text::after { content: ''; position: absolute; top: 100%; right: 16px; border: 6px solid transparent; border-top-color: var(--border-light); }
+        .hint:hover .hint-text, .hint:focus .hint-text { display: block; }
+
+        /* ── Action Buttons ── */
+        .actions-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .btn { font-family: var(--mono); font-size: 0.78em; font-weight: 700; padding: 10px 18px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.06em; background: transparent; color: var(--text-dim); }
+        .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--text-bright); }
+        .btn-primary:hover { background: #0db9a8; }
+        .btn-outline:hover { border-color: var(--text-dim); color: var(--text); }
+        .btn-danger { color: var(--danger); border-color: var(--danger-bg); }
+        .btn-danger:hover { background: var(--danger-bg); border-color: var(--danger); }
+
+        /* ── Progress Bar ── */
+        .progress-bar { background: var(--surface); border: 1px solid var(--border); padding: 16px 24px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
+        .progress-text { font-family: var(--mono); font-weight: 700; font-size: 0.85em; color: var(--accent); white-space: nowrap; min-width: 110px; }
+        .progress-track { flex-grow: 1; height: 8px; background: var(--code-bg); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); border-radius: 4px; transition: width 0.4s ease; width: 0%; }
+
+        /* ── Category / Section ── */
+        .category { background: var(--surface); border: 1px solid var(--border); padding: 28px; border-radius: 12px; margin-bottom: 28px; }
+        .category h2 { font-family: var(--mono); font-size: 0.9em; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; padding-bottom: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+
+        /* ── Asset Item — configurable layout ── */
+        .asset-item { display: grid; gap: 16px; align-items: start; margin-bottom: 24px; padding: 16px; border-bottom: 1px solid var(--border); cursor: default; transition: background 0.15s; border-radius: 8px; margin-left: -16px; margin-right: -16px; }
+        .asset-item:last-child { border-bottom: none; margin-bottom: 0; }
+        .asset-item.row-drop-hover { background: var(--accent-glow); }
+
+        /* Layout variants */
+        .asset-item.layout-right  { grid-template-columns: 50px 1fr 200px; }
+        .asset-item.layout-left   { grid-template-columns: 200px 50px 1fr; }
+        .asset-item.layout-top    { grid-template-columns: 50px 1fr; grid-template-rows: auto auto; }
+        .asset-item.layout-bottom { grid-template-columns: 50px 1fr; grid-template-rows: auto auto; }
+        .asset-item.layout-top .drop-zone    { grid-column: 1 / -1; grid-row: 1; }
+        .asset-item.layout-top .checkbox      { grid-row: 2; }
+        .asset-item.layout-top .content       { grid-row: 2; }
+        .asset-item.layout-bottom .drop-zone  { grid-column: 1 / -1; grid-row: 2; }
+        .asset-item.layout-left .drop-zone    { grid-column: 1; grid-row: 1; }
+        .asset-item.layout-left .checkbox      { grid-column: 2; grid-row: 1; }
+        .asset-item.layout-left .content       { grid-column: 3; grid-row: 1; }
+
+        .checkbox { width: 24px; height: 24px; cursor: pointer; margin-top: 4px; accent-color: var(--accent); }
+        .asset-label { font-weight: 700; font-size: 1.1em; color: var(--text-bright); display: block; margin-bottom: 6px; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-family: var(--mono); font-size: 0.65em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-left: 8px; vertical-align: middle; }
+
+        /* ── Code Blocks (asset rows only) ── */
+        .asset-item code, .category code { display: block; background: var(--code-bg); color: var(--text-dim); padding: 10px 14px; border-radius: 6px; margin: 6px 0; white-space: pre-wrap; font-family: var(--mono); font-size: 0.8em; border: 1px solid var(--border); position: relative; cursor: pointer; transition: all 0.2s; }
+        .asset-item code:hover, .category code:hover { background: var(--surface-2); border-color: var(--border-light); }
+        .asset-item code::after, .category code::after { content: "COPY"; position: absolute; top: 6px; right: 10px; font-size: 0.7em; font-weight: 700; background: var(--accent-glow); color: var(--accent); padding: 2px 8px; border-radius: 3px; opacity: 0; transition: opacity 0.2s; }
+        .asset-item code:hover::after, .category code:hover::after { opacity: 1; }
+        .asset-item code.copied { border-color: var(--accent) !important; }
+        .filename-code { color: var(--accent-2); border-color: #e8a83833; }
+        .prompt-code { border-color: var(--accent-glow); }
+
+        /* ── Drop Zone ── */
+        .drop-zone { border: 2px dashed var(--border-light); border-radius: 10px; min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--code-bg); transition: all 0.3s; text-align: center; padding: 10px; position: relative; overflow: hidden; }
+        .drop-zone.dragover { background: var(--accent-glow); border-color: var(--accent); transform: scale(1.02); }
+        .drop-zone.done { border: 2px solid var(--success); background: var(--success-bg); }
+        .drop-zone.done .redrop-hint { display: none; font-size: 0.6em; color: var(--text-dim); margin-top: 2px; }
+        .drop-zone.done:hover .redrop-hint { display: block; }
+        .drop-zone p { font-family: var(--mono); font-size: 0.7em; font-weight: 700; color: var(--text-dim); margin: 3px 0; text-transform: uppercase; letter-spacing: 0.06em; }
+        .drop-zone .done-label { font-family: var(--mono); font-size: 0.65em; color: var(--success); font-weight: 700; margin-top: 4px; }
+        .drop-zone .preview-thumb { max-width: 110px; max-height: 110px; border-radius: 4px; image-rendering: pixelated; background: repeating-conic-gradient(var(--border) 0% 25%, var(--surface) 0% 50%) 50% / 10px 10px; }
+        .preview-canvas { display: none; }
+
+        /* ── Prompt Guide ── */
+        .guide-section { margin-bottom: 20px; }
+        .guide-section h4 { font-family: var(--mono); font-size: 0.78em; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+        .guide-section p, .guide-section li { font-size: 0.88em; color: var(--text-dim); line-height: 1.7; margin-bottom: 6px; }
+        .guide-section ul, .guide-section ol { padding-left: 20px; }
+        /* Inline code in guide — NOT copyable */
+        .guide-section code { display: inline; padding: 2px 6px; margin: 0; font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); color: var(--text-dim); border: none; border-radius: 3px; cursor: text; position: static; white-space: nowrap; }
+        .guide-section code::after { display: none; }
+        .guide-section code:hover { background: var(--code-bg); }
+        .prompt-example { padding: 12px 16px; border-radius: 8px; margin: 8px 0 16px; font-family: var(--mono); font-size: 0.78em; line-height: 1.6; white-space: pre-wrap; }
+        .prompt-bad { background: var(--danger-bg); border: 1px solid #e74c3c44; color: #f0a0a0; }
+        .prompt-good { background: var(--success-bg); border: 1px solid #2ecc7144; color: #a0f0b0; }
+        .prompt-tag { display: inline-block; font-size: 0.7em; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+        .prompt-tag.bad { background: var(--danger); color: white; }
+        .prompt-tag.good { background: var(--success); color: white; }
+
+        /* ── Importer ── */
+        .importer-area { width: 100%; min-height: 120px; padding: 14px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--mono); font-size: 0.8em; resize: vertical; margin-bottom: 12px; }
+        .importer-area::placeholder { color: var(--text-dim); }
+        .importer-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+        .importer-row select, .importer-row input { padding: 8px 12px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.82em; }
+        .importer-row input[type="number"] { width: 80px; }
+        .importer-row label { font-family: var(--mono); font-size: 0.72em; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+
+        /* ── Warning banner ── */
+        .warning-banner { background: #e8a83815; border: 1px solid #e8a83844; border-radius: 8px; padding: 10px 16px; margin-bottom: 16px; font-size: 0.82em; color: var(--accent-2); font-family: var(--mono); display: none; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><span>&#9670;</span> Asset Digester <span>&#9670;</span></h1>
+    <p>Drag &amp; drop image processing pipeline — watermark removal, chroma key, resize, rename</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  PROMPT CRAFTING GUIDE                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="panel">
+    <div class="panel-toggle" role="button" tabindex="0" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
+        <h3>&#9997; Prompt Crafting Guide</h3>
+        <span class="arrow">&#9660;</span>
+    </div>
+    <div class="panel-body">
+        <div class="guide-section">
+            <h4>The Problem</h4>
+            <p>AI image generators default to a "generic template" when prompts are vague. If you describe 12 characters using only personality traits ("honest expression," "intense gaze," "analytical look"), you'll get 12 near-identical faces. The AI interprets all of those as the same visual: a medium-build man with brown hair and a beard.</p>
+        </div>
+        <div class="guide-section">
+            <h4>The Fix — Concrete Visual Anchors</h4>
+            <p>Every prompt needs at least 5 of these physical differentiators:</p>
+            <ul>
+                <li><strong>Facing direction</strong> — "facing 3/4 left", "facing right", "straight ahead"</li>
+                <li><strong>Hair</strong> — color, length, style (bald, curly, straight, wild, tied back)</li>
+                <li><strong>Facial hair</strong> — none, stubble, goatee, full beard, specific color</li>
+                <li><strong>Skin tone</strong> — fair, olive, tan, dark brown, pale, weathered</li>
+                <li><strong>Body type</strong> — stocky, thin, broad-shouldered, small, tall</li>
+                <li><strong>Clothing color</strong> — a SPECIFIC color per character, not just "robes"</li>
+                <li><strong>Held item / prop</strong> — key, scroll, dagger, bread basket, staff</li>
+                <li><strong>Unique feature</strong> — scar, headband, crown, torn clothing, eye patch</li>
+                <li><strong>Age</strong> — teens, 20s, 50s, elderly</li>
+                <li><strong>Expression + pose cue</strong> — "one eyebrow raised", "chin raised defiantly"</li>
+            </ul>
+        </div>
+        <div class="guide-section">
+            <h4>Example — Bad vs Good Prompts (Characters)</h4>
+            <span class="prompt-tag bad">&#10007; Bad — Vague</span>
+            <div class="prompt-example prompt-bad">Generate a 2D pixel art portrait of "Bartholomew the Apostle". He should have an honest expression with sharp, discerning eyes. Style: 16-bit retro character art. Background: solid flat magenta (#FF00FF).</div>
+            <span class="prompt-tag good">&#10003; Good — Visually Specific</span>
+            <div class="prompt-example prompt-good">Generate a 2D stylized RPG pixel art bust portrait of "Bartholomew the Apostle" facing straight ahead. He has long straight black hair parted in the middle, is clean-shaven with an angular jawline. Dark olive skin. He wears an orange-amber robe with his arms crossed over his chest. Expression: Honest and forthright, sharp discerning eyes. Style: 16-bit retro character art. Background: solid flat magenta (#FF00FF).</div>
+            <p>The bad prompt produces the AI's default "brown-haired bearded man." The good prompt specifies hair (long, straight, black, parted), facial hair (none), skin (dark olive), clothing (orange-amber), pose (arms crossed), and facing (straight ahead) — each anchor pushes the output away from the generic default.</p>
+        </div>
+        <div class="guide-section">
+            <h4>Example — Bad vs Good Prompts (Creatures / Sprites)</h4>
+            <span class="prompt-tag bad">&#10007; Bad — Generic</span>
+            <div class="prompt-example prompt-bad">Generate a 2D pixel art sprite of a "Red Herring". It is a small fish colored in red. It should look deceptive. Background: solid flat magenta (#FF00FF).</div>
+            <span class="prompt-tag good">&#10003; Good — Species-Accurate + Gimmick</span>
+            <div class="prompt-example prompt-good">Generate a 2D 16-bit retro RPG pixel art sprite of a "Red Herring" facing left with its body angled slightly as if sneaking away. It is an Atlantic Herring — a small, sleek, streamlined fish with a forked tail, a single dorsal fin, and large silvery scales. Colors: deep suspicious crimson-red body with dark charcoal-grey shading along its back. Its eye is narrow, shifty, and side-glancing. A faint dark smoky shadow trails behind it. A tiny question mark hovers above its head. Background: solid flat magenta (#FF00FF).</div>
+            <p>The bad prompt gives you "a red fish." The good prompt specifies species anatomy (herring body, forked tail, dorsal fin), color distribution (crimson body, charcoal back), facing direction (left, sneaking), expression detail (narrow, shifty eye), and a unique visual gimmick (smoke trail, question mark).</p>
+        </div>
+        <div class="guide-section">
+            <h4>Key Rules</h4>
+            <ul>
+                <li><strong>No two assets should share</strong> the same hair color + clothing color + facing direction.</li>
+                <li><strong>Every character gets a unique held item</strong> — this alone differentiates silhouettes at thumbnail size.</li>
+                <li><strong>Specify the background color</strong> in every prompt if using chroma key (e.g., "solid flat magenta #FF00FF").</li>
+                <li><strong>Avoid colors that match your chroma key</strong> in the subject (e.g., don't say "magenta fins" with a magenta background).</li>
+                <li><strong>For creatures:</strong> name the real-world species and its defining anatomy. "Mackerel with wavy vertical stripes" beats "a fish."</li>
+                <li><strong>For groups:</strong> specify formation, individual heights/builds, and who stands where. AI struggles with "four men" but handles "diamond formation: front man short and crouching, left man tall with red headwrap."</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SETTINGS PANEL                                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="panel">
+    <div class="panel-toggle" role="button" tabindex="0" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
+        <h3>&#9881; Processing Settings</h3>
+        <span class="arrow">&#9660;</span>
+    </div>
+    <div class="panel-body" id="settingsBody">
+        <div id="settingsWarning" class="warning-banner">⚠ Corner Patch mode requires Chroma Key to be enabled — the patch is painted in the chroma color and cleaned up by the background removal pass. Enable Chroma Key or switch to Edge Crop mode.</div>
+        <div class="settings-grid">
+            <div class="setting-group">
+                <label>Watermark Removal <span class="hint" tabindex="0">?<span class="hint-text"><strong>Corner Patch</strong> paints your chroma key color over the bottom-right corner at the source image's native resolution, then the background removal pass cleans it up. Best for small corner logos (e.g. Gemini sparkle). <em>Requires Chroma Key to be enabled.</em><br><br><strong>Edge Crop</strong> trims pixels from the bottom and right edges before resizing. Better for watermarks that span a full edge. Works with or without Chroma Key.<br><br><strong>None</strong> skips watermark removal entirely.<br><br><strong>Default: Corner Patch</strong></span></span></label>
+                <select id="watermarkMode" onchange="onSettingsChange(); checkSettingsConflicts();">
+                    <option value="none">None</option>
+                    <option value="corner" selected>Corner Patch (bottom-right)</option>
+                    <option value="edges">Edge Crop (bottom + right)</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>Watermark Size <span class="hint" tabindex="0">?<span class="hint-text">Percentage of the source image to cover (corner) or crop (edges). Applied at source resolution before resizing, so it stays proportionally small.<br><br><strong>Higher</strong> = removes more. Safer but may clip content.<br><strong>Lower</strong> = removes less. Preserves content but may leave residue.<br><br><strong>Default: 14%</strong> — covers the Gemini sparkle with margin.</span></span></label>
+                <div class="range-row">
+                    <input type="range" id="watermarkSize" min="0" max="25" value="14" step="1" oninput="updateRangeDisplay(this, '%'); onSettingsChange();">
+                    <span class="range-val" id="watermarkSizeVal">14%</span>
+                </div>
+            </div>
+            <div class="setting-group">
+                <label>Chroma Key <span class="hint" tabindex="0">?<span class="hint-text">Replaces a specific background color with transparency. Enable if your AI images use a solid colored background that should become transparent.<br><br>Disable if images already have transparent backgrounds.<br><br><strong>Default: On</strong></span></span></label>
+                <div class="toggle-row">
+                    <label class="toggle-switch"><input type="checkbox" id="chromaEnabled" checked onchange="onSettingsChange(); checkSettingsConflicts();"><span class="toggle-slider"></span></label>
+                    <span class="toggle-label">Enable background removal</span>
+                </div>
+            </div>
+            <div class="setting-group">
+                <label>Chroma Key Color <span class="hint" tabindex="0">?<span class="hint-text">The background color to make transparent. Must match what you specify in your prompts.<br><br><strong>Magenta (#FF00FF)</strong> is standard — it almost never appears in natural subjects.<br><br>For green screen, use #00FF00.<br><br><strong>Default: #FF00FF</strong></span></span></label>
+                <div class="color-input-row">
+                    <input type="color" id="chromaColor" value="#FF00FF" onchange="syncColorHex(this); onSettingsChange();">
+                    <input type="text" id="chromaHex" value="#FF00FF" oninput="syncColorPicker(this); onSettingsChange();" maxlength="7">
+                </div>
+            </div>
+            <div class="setting-group">
+                <label>Chroma Tolerance <span class="hint" tabindex="0">?<span class="hint-text">How different a pixel can be from the key color and still be removed. RGB Euclidean distance (0–441).<br><br><strong>Higher</strong> = more aggressive. Good for AI backgrounds with slight color variation. Risk: eats sprite edges.<br><strong>Lower</strong> = more precise. Risk: leaves colored fringe.<br><br><strong>Default: 100</strong> — balanced for AI magenta backgrounds.</span></span></label>
+                <div class="range-row">
+                    <input type="range" id="chromaTolerance" min="10" max="200" value="100" step="5" oninput="updateRangeDisplay(this, ''); onSettingsChange();">
+                    <span class="range-val" id="chromaToleranceVal">100</span>
+                </div>
+            </div>
+            <div class="setting-group">
+                <label>Export Format <span class="hint" tabindex="0">?<span class="hint-text"><strong>PNG</strong> — lossless, transparency, pixel-perfect. Best for game sprites.<br><br><strong>WebP</strong> — smaller files, transparency support. Some older tools don't support it.<br><br><strong>Default: PNG</strong></span></span></label>
+                <select id="exportFormat" onchange="onSettingsChange()">
+                    <option value="image/png" selected>PNG (lossless, transparency)</option>
+                    <option value="image/webp">WebP (smaller file size)</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>Auto-Download <span class="hint" tabindex="0">?<span class="hint-text">When on, processed images download immediately on drop. When off, you get a preview with a manual download button.<br><br><strong>Default: On</strong> — fastest for batch processing.</span></span></label>
+                <div class="toggle-row">
+                    <label class="toggle-switch"><input type="checkbox" id="autoDownload" checked onchange="onSettingsChange()"><span class="toggle-slider"></span></label>
+                    <span class="toggle-label">Download on drop</span>
+                </div>
+            </div>
+            <div class="setting-group">
+                <label>Drop Zone Position <span class="hint" tabindex="0">?<span class="hint-text">Where the drop zone appears relative to prompts. Move it if Chrome's download bar overlaps the default right-side position.<br><br>The entire row also accepts drops regardless of this setting.<br><br><strong>Default: Right</strong></span></span></label>
+                <select id="dropPosition" onchange="applyLayout(); onSettingsChange();">
+                    <option value="right" selected>Right side</option>
+                    <option value="left">Left side</option>
+                    <option value="top">Top</option>
+                    <option value="bottom">Bottom</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  ASSET IMPORTER                                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="panel">
+    <div class="panel-toggle" role="button" tabindex="0" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
+        <h3>&#10514; Import Asset List</h3>
+        <span class="arrow">&#9660;</span>
+    </div>
+    <div class="panel-body">
+        <div class="guide-section">
+            <p>Paste a list of assets to auto-generate rows. One asset per line:</p>
+            <div class="prompt-example prompt-good" style="margin-top:8px;">filename.png | Label Text | tag_name | Your prompt text here</div>
+            <p>Separate fields with <code>|</code> (pipe). Only filename is required — tag and prompt are optional. If label is omitted, it's generated from the filename.</p>
+        </div>
+        <div class="importer-row">
+            <label>Section Name:</label>
+            <input type="text" id="importSectionName" value="Imported Assets" style="flex:1;">
+            <label>Size:</label>
+            <input type="number" id="importSize" value="256" min="16" max="2048" step="16">
+            <label>Tag Color:</label>
+            <input type="color" id="importTagColor" value="#0f9b8e">
+        </div>
+        <textarea class="importer-area" id="importArea" placeholder="peter.png | Peter the Rock | earth | Generate a 2D pixel art portrait of Peter...&#10;andrew.png | Andrew the Introducer | water | Generate a 2D pixel art portrait of Andrew...&#10;holy_mackerel.png | Holy Mackerel | holy"></textarea>
+        <div style="display:flex;gap:12px;align-items:center;">
+            <button class="btn btn-primary" onclick="importAssets()">Generate Rows</button>
+            <button class="btn btn-outline" onclick="document.getElementById('importArea').value='';">Clear</button>
+            <span id="importFeedback" style="font-family:var(--mono);font-size:0.78em;color:var(--success);display:none;"></span>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  ACTION BAR + PROGRESS                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="actions-bar">
+    <button class="btn btn-primary" onclick="reprocessAll()">&#8635; Re-process All</button>
+    <button class="btn btn-danger" onclick="resetProgress()">Reset Progress</button>
+</div>
+
+<div class="progress-bar">
+    <span class="progress-text" id="progressText">0 / 0</span>
+    <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+</div>
+
+<canvas id="processingCanvas" class="preview-canvas"></canvas>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  ASSET CONTAINER                                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="assetContainer">
+    <div class="category">
+        <h2>Example Category (delete me)</h2>
+        <div class="asset-item layout-right" ondrop="rowDrop(event)" ondragover="rowDragOver(event)" ondragleave="rowDragLeave(event)">
+            <input type="checkbox" class="checkbox">
+            <div class="content">
+                <span class="asset-label">Example Asset <span class="tag" style="background:#0f9b8e22;color:#0f9b8e;border:1px solid #0f9b8e;">Type</span></span>
+                <code class="filename-code" onclick="copyText(this)">example_asset.png</code>
+                <code class="prompt-code" onclick="copyText(this)">Your AI image generation prompt goes here. Be specific: direction, hair, colors, held items, unique features. Background: solid flat magenta (#FF00FF).</code>
+            </div>
+            <div class="drop-zone" ondrop="handleDrop(event, 'example_asset.png', 256)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                <p>Drop image here</p>
+                <p style="font-size:0.6em;opacity:0.6;">(256 × 256)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ═══════════════════════════════════════════════════════════
+    //  SETTINGS
+    // ═══════════════════════════════════════════════════════════
+    const SETTINGS_KEY = 'digester_settings';
+    const COMPLETED_KEY = 'digester_completed';
+    const IMPORT_KEY = 'digester_imports';
+
+    function getSettings() {
+        return {
+            watermarkMode: document.getElementById('watermarkMode').value,
+            watermarkSize: parseInt(document.getElementById('watermarkSize').value),
+            chromaEnabled: document.getElementById('chromaEnabled').checked,
+            chromaColor: document.getElementById('chromaHex').value,
+            chromaTolerance: parseInt(document.getElementById('chromaTolerance').value),
+            exportFormat: document.getElementById('exportFormat').value,
+            autoDownload: document.getElementById('autoDownload').checked,
+            dropPosition: document.getElementById('dropPosition').value,
+        };
+    }
+
+    function onSettingsChange() {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(getSettings()));
+    }
+
+    function checkSettingsConflicts() {
+        const warn = document.getElementById('settingsWarning');
+        const mode = document.getElementById('watermarkMode').value;
+        const chroma = document.getElementById('chromaEnabled').checked;
+        warn.style.display = (mode === 'corner' && !chroma) ? 'block' : 'none';
+    }
+
+    function restoreSettings() {
+        try {
+            const s = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+            if (!s) return;
+            if (s.watermarkMode) document.getElementById('watermarkMode').value = s.watermarkMode;
+            if (s.watermarkSize != null) document.getElementById('watermarkSize').value = s.watermarkSize;
+            document.getElementById('chromaEnabled').checked = s.chromaEnabled !== false;
+            if (s.chromaColor) { document.getElementById('chromaColor').value = s.chromaColor; document.getElementById('chromaHex').value = s.chromaColor; }
+            if (s.chromaTolerance != null) document.getElementById('chromaTolerance').value = s.chromaTolerance;
+            if (s.exportFormat) document.getElementById('exportFormat').value = s.exportFormat;
+            document.getElementById('autoDownload').checked = s.autoDownload !== false;
+            if (s.dropPosition) document.getElementById('dropPosition').value = s.dropPosition;
+            document.getElementById('watermarkSizeVal').textContent = (s.watermarkSize ?? 14) + '%';
+            document.getElementById('chromaToleranceVal').textContent = s.chromaTolerance ?? 100;
+        } catch {}
+    }
+
+    function togglePanel(el) { el.classList.toggle('open'); el.nextElementSibling.classList.toggle('open'); }
+    function updateRangeDisplay(input, suffix) { const d = document.getElementById(input.id + 'Val'); if (d) d.textContent = input.value + suffix; }
+    function syncColorHex(p) { document.getElementById('chromaHex').value = p.value.toUpperCase(); }
+    function syncColorPicker(t) { if (/^#[0-9A-Fa-f]{6}$/.test(t.value)) document.getElementById('chromaColor').value = t.value; }
+
+    // ═══════════════════════════════════════════════════════════
+    //  LAYOUT
+    // ═══════════════════════════════════════════════════════════
+    function applyLayout() {
+        const pos = document.getElementById('dropPosition').value;
+        document.querySelectorAll('.asset-item').forEach(item => {
+            item.classList.remove('layout-right', 'layout-left', 'layout-top', 'layout-bottom');
+            item.classList.add('layout-' + pos);
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  FULL-ROW DROP TARGET
+    // ═══════════════════════════════════════════════════════════
+    function rowDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add('row-drop-hover');
+        const dz = e.currentTarget.querySelector('.drop-zone');
+        if (dz) dz.classList.add('dragover');
+    }
+
+    function rowDragLeave(e) {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            e.currentTarget.classList.remove('row-drop-hover');
+            const dz = e.currentTarget.querySelector('.drop-zone');
+            if (dz) dz.classList.remove('dragover');
+        }
+    }
+
+    function rowDrop(e) {
+        e.preventDefault(); // Always prevent default to avoid opening image in browser
+        const item = e.currentTarget;
+        item.classList.remove('row-drop-hover');
+        const dz = item.querySelector('.drop-zone');
+        if (!dz) return;
+        dz.classList.remove('dragover');
+
+        const ondrop = dz.getAttribute('ondrop');
+        const fnMatch = ondrop && ondrop.match(/handleDrop\(event,\s*'([^']+)'/);
+        const sizeMatch = ondrop && ondrop.match(/,\s*(\d+)\s*\)/);
+        if (!fnMatch || !sizeMatch) return;
+
+        const filename = fnMatch[1];
+        const size = parseInt(sizeMatch[1]);
+        const file = e.dataTransfer.files[0];
+
+        if (!file && e.dataTransfer.items) {
+            const url = e.dataTransfer.getData('text/uri-list');
+            if (url) processImageFromUrl(url, filename, size, dz);
+            return;
+        }
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (ev) => processImage(ev.target.result, filename, size, dz);
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  ASSET IMPORTER
+    // ═══════════════════════════════════════════════════════════
+    function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    function escAttr(str) { return str.replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function buildAssetRowsHtml(text, sectionName, size, tagColor, layout) {
+        const lines = text.split('\n').filter(l => l.trim());
+        let html = `<div class="category"><h2>${escHtml(sectionName)} (${size}×${size})</h2>`;
+
+        lines.forEach(line => {
+            const parts = line.split('|').map(s => s.trim());
+            const filename = parts[0] || 'untitled.png';
+            const label = parts[1] || filename.replace(/\.\w+$/, '').replace(/[_-]/g, ' ');
+            const tag = parts[2] || '';
+            const prompt = parts.length > 3 ? parts.slice(3).join('|').trim() : '';
+            const tagHtml = tag ? `<span class="tag" style="background:${tagColor}22;color:${tagColor};border:1px solid ${tagColor};">${escHtml(tag)}</span>` : '';
+
+            html += `
+        <div class="asset-item layout-${layout}" ondrop="rowDrop(event)" ondragover="rowDragOver(event)" ondragleave="rowDragLeave(event)">
+            <input type="checkbox" class="checkbox">
+            <div class="content">
+                <span class="asset-label">${escHtml(label)} ${tagHtml}</span>
+                <code class="filename-code" onclick="copyText(this)">${escHtml(filename)}</code>
+                ${prompt ? `<code class="prompt-code" onclick="copyText(this)">${escHtml(prompt)}</code>` : ''}
+            </div>
+            <div class="drop-zone" ondrop="handleDrop(event, '${escAttr(filename)}', ${size})" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                <p>Drop image here</p>
+                <p style="font-size:0.6em;opacity:0.6;">(${size} × ${size})</p>
+            </div>
+        </div>`;
+        });
+
+        html += '</div>';
+        return { html, count: lines.length };
+    }
+
+    function importAssets() {
+        const text = document.getElementById('importArea').value.trim();
+        if (!text) return alert('Paste your asset list first.');
+
+        const sectionName = document.getElementById('importSectionName').value || 'Imported Assets';
+        const size = parseInt(document.getElementById('importSize').value) || 256;
+        const rawColor = document.getElementById('importTagColor').value;
+        const tagColor = /^#[0-9A-Fa-f]{6}$/.test(rawColor) ? rawColor : '#0f9b8e';
+        const layout = document.getElementById('dropPosition').value;
+
+        const { html, count } = buildAssetRowsHtml(text, sectionName, size, tagColor, layout);
+        document.getElementById('assetContainer').insertAdjacentHTML('beforeend', html);
+
+        // Save import data so rows survive refresh
+        const imports = JSON.parse(localStorage.getItem(IMPORT_KEY) || '[]');
+        imports.push({ text, sectionName, size, tagColor, layout });
+        localStorage.setItem(IMPORT_KEY, JSON.stringify(imports));
+
+        // Clear textarea to prevent accidental double-import
+        document.getElementById('importArea').value = '';
+
+        // Feedback
+        const fb = document.getElementById('importFeedback');
+        fb.textContent = `✓ Added ${count} asset${count !== 1 ? 's' : ''}`;
+        fb.style.display = 'inline';
+        setTimeout(() => { fb.style.display = 'none'; }, 3000);
+
+        // Scroll to new section
+        const cats = document.querySelectorAll('.category');
+        if (cats.length) cats[cats.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        updateProgress();
+        restoreState();
+    }
+
+    function restoreImports() {
+        try {
+            const imports = JSON.parse(localStorage.getItem(IMPORT_KEY) || '[]');
+            imports.forEach(imp => {
+                const safeColor = /^#[0-9A-Fa-f]{6}$/.test(imp.tagColor) ? imp.tagColor : '#0f9b8e';
+                const { html } = buildAssetRowsHtml(imp.text, imp.sectionName, imp.size, safeColor, imp.layout || 'right');
+                document.getElementById('assetContainer').insertAdjacentHTML('beforeend', html);
+            });
+        } catch {}
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  PROGRESS / STATE
+    // ═══════════════════════════════════════════════════════════
+    function getCompleted() { try { return JSON.parse(localStorage.getItem(COMPLETED_KEY)) || {}; } catch { return {}; } }
+    function saveCompleted(fn) { const c = getCompleted(); c[fn] = true; localStorage.setItem(COMPLETED_KEY, JSON.stringify(c)); }
+    const rawImages = {};
+
+    function updateProgress() {
+        const total = document.querySelectorAll('.asset-item').length;
+        const done = document.querySelectorAll('.checkbox:checked').length;
+        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        document.getElementById('progressText').textContent = `${done} / ${total}`;
+        document.getElementById('progressFill').style.width = `${pct}%`;
+    }
+
+    function resetProgress() {
+        if (!confirm('Reset all progress and imported sections?\n(Already downloaded files are safe.)')) return;
+        localStorage.removeItem(COMPLETED_KEY);
+        localStorage.removeItem(IMPORT_KEY);
+        location.reload();
+    }
+
+    function restoreState() {
+        const completed = getCompleted();
+        document.querySelectorAll('.drop-zone').forEach(dz => {
+            const ondrop = dz.getAttribute('ondrop');
+            const fnMatch = ondrop && ondrop.match(/'([^']+\.\w+)'/);
+            if (fnMatch && completed[fnMatch[1]]) {
+                const fn = fnMatch[1];
+                dz.classList.add('done');
+                dz.innerHTML = `<span class="done-label" style="font-size:1.4em;">✓</span><span class="done-label">${escHtml(fn)}</span><span class="redrop-hint">Drop new image to replace</span>`;
+                const ai = dz.closest('.asset-item');
+                if (ai) { const cb = ai.querySelector('.checkbox'); if (cb) cb.checked = true; }
+            }
+        });
+        updateProgress();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  RE-PROCESS ALL
+    // ═══════════════════════════════════════════════════════════
+    function reprocessAll() {
+        const keys = Object.keys(rawImages);
+        if (!keys.length) return alert('No images to re-process. Drop some images first.');
+        if (!confirm(`Re-process ${keys.length} image(s) with current settings?`)) return;
+        keys.forEach(fn => { const e = rawImages[fn]; if (e) processImage(e.dataUrl, fn, e.targetSize, e.dropZone); });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  CLIPBOARD
+    // ═══════════════════════════════════════════════════════════
+    function copyText(el) {
+        const text = el.innerText;
+        const showFeedback = () => {
+            const orig = text;
+            el.innerText = "COPIED!";
+            el.classList.add('copied');
+            setTimeout(() => { el.innerText = orig; el.classList.remove('copied'); }, 800);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(showFeedback).catch(() => {
+                fallbackCopy(text);
+                showFeedback();
+            });
+        } else {
+            fallbackCopy(text);
+            showFeedback();
+        }
+    }
+
+    function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0;';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  DRAG & DROP
+    // ═══════════════════════════════════════════════════════════
+    function handleDragOver(e) { e.preventDefault(); e.stopPropagation(); e.currentTarget.classList.add('dragover'); }
+    function handleDragLeave(e) { e.stopPropagation(); e.currentTarget.classList.remove('dragover'); }
+
+    async function handleDrop(e, filename, size) {
+        e.preventDefault();
+        e.stopPropagation();
+        const dropZone = e.currentTarget;
+        dropZone.classList.remove('dragover');
+        const row = dropZone.closest('.asset-item');
+        if (row) row.classList.remove('row-drop-hover');
+
+        const file = e.dataTransfer.files[0];
+        if (!file && e.dataTransfer.items) {
+            const url = e.dataTransfer.getData('text/uri-list');
+            if (url) processImageFromUrl(url, filename, size, dropZone);
+            return;
+        }
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (ev) => processImage(ev.target.result, filename, size, dropZone);
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function processImageFromUrl(url, filename, size, dropZone) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+            c.getContext('2d').drawImage(img, 0, 0);
+            processImage(c.toDataURL('image/png'), filename, size, dropZone);
+        };
+        img.onerror = () => {
+            dropZone.innerHTML = `<p style="color:var(--danger);font-size:0.75em;">⚠ CORS blocked.</p><p style="color:var(--text-dim);font-size:0.65em;">Save the image first, then drag the file here.</p>`;
+            const ondrop = dropZone.getAttribute('ondrop');
+            const m = ondrop && ondrop.match(/,\s*(\d+)\s*\)/);
+            const sz = m ? m[1] : '256';
+            setTimeout(() => { dropZone.innerHTML = `<p>Drop image here</p><p style="font-size:0.6em;opacity:0.6;">(${sz} × ${sz})</p>`; }, 3000);
+        };
+        img.src = url;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  CORE PROCESSING PIPELINE
+    // ═══════════════════════════════════════════════════════════
+    function processImage(dataUrl, filename, targetSize, dropZone) {
+        const s = getSettings();
+        rawImages[filename] = { dataUrl, targetSize, dropZone };
+
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.getElementById('processingCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = targetSize;
+            canvas.height = targetSize;
+
+            // Step 1: Watermark removal at source resolution
+            const pct = s.watermarkSize / 100;
+            const shouldPatch = s.watermarkMode === 'corner' && s.chromaEnabled && pct > 0;
+            const shouldCrop = s.watermarkMode === 'edges' && pct > 0;
+
+            if (shouldPatch || shouldCrop) {
+                const temp = document.createElement('canvas');
+                temp.width = img.width; temp.height = img.height;
+                const tctx = temp.getContext('2d');
+                tctx.drawImage(img, 0, 0);
+
+                if (shouldPatch) {
+                    const pw = Math.floor(img.width * pct), ph = Math.floor(img.height * pct);
+                    tctx.fillStyle = s.chromaColor;
+                    tctx.fillRect(img.width - pw, img.height - ph, pw, ph);
+                    ctx.drawImage(temp, 0, 0, targetSize, targetSize);
+                } else {
+                    const cr = Math.floor(img.width * pct), cb = Math.floor(img.height * pct);
+                    ctx.drawImage(temp, 0, 0, img.width - cr, img.height - cb, 0, 0, targetSize, targetSize);
+                }
+            } else {
+                ctx.drawImage(img, 0, 0, targetSize, targetSize);
+            }
+
+            // Step 2: Chroma key
+            if (s.chromaEnabled) {
+                const hex = s.chromaColor;
+                const kR = parseInt(hex.slice(1,3),16), kG = parseInt(hex.slice(3,5),16), kB = parseInt(hex.slice(5,7),16);
+                const tol = s.chromaTolerance;
+                const id = ctx.getImageData(0, 0, targetSize, targetSize);
+                const d = id.data;
+                for (let i = 0; i < d.length; i += 4) {
+                    const diff = Math.sqrt((d[i]-kR)**2 + (d[i+1]-kG)**2 + (d[i+2]-kB)**2);
+                    if (diff < tol) d[i+3] = 0;
+                }
+                ctx.putImageData(id, 0, 0);
+            }
+
+            const result = canvas.toDataURL(s.exportFormat);
+            const ext = s.exportFormat === 'image/webp' ? '.webp' : '.png';
+            const dlName = filename.replace(/\.\w+$/, ext);
+
+            // Step 3: Download
+            if (s.autoDownload) {
+                const a = document.createElement('a');
+                a.download = dlName; a.href = result; a.click();
+            }
+
+            // Step 4: UI
+            dropZone.classList.add('done');
+            dropZone.innerHTML = `<img class="preview-thumb" src="${result}" alt="${escHtml(filename)}"><span class="done-label">✓ ${escHtml(filename)}</span><span class="redrop-hint">Drop new image to replace</span>`;
+
+            if (!s.autoDownload) {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-outline';
+                btn.style.cssText = 'margin-top:6px;font-size:0.65em;padding:4px 10px;';
+                btn.textContent = '↓ Download';
+                btn.onclick = () => { const a = document.createElement('a'); a.download = dlName; a.href = result; a.click(); };
+                dropZone.appendChild(btn);
+            }
+
+            const ai = dropZone.closest('.asset-item');
+            if (ai) { const cb = ai.querySelector('.checkbox'); if (cb) cb.checked = true; }
+            saveCompleted(filename);
+            updateProgress();
+        };
+        img.src = dataUrl;
+    }
+
+    // ── Checkbox sync ──
+    document.addEventListener('change', (e) => { if (e.target.classList.contains('checkbox')) updateProgress(); });
+
+    // ── Init ──
+    restoreSettings();
+    restoreImports();
+    applyLayout();
+    restoreState();
+    checkSettingsConflicts();
+</script>
+
+</body>
+</html>
