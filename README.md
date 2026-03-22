@@ -1,48 +1,72 @@
 # Class RAM-ifications
 
-A 2D arcade tower defense game inspired by *High Tech Gays v. Defense Industrial Security Clearance Office* (1984–1995). **Federal-Core** (monochrome/IBM green) vs. **Neon-Tech** (rainbow/synthwave). Protect the Clearance Pipeline from DISCO Auditors so case files reach "Cleared" status before the 1995 Executive Order.
+An in-progress historical arcade project inspired by High Tech Gays v. Defense Industrial Security Clearance Office (1984-1995).
+
+## What Is This?
+
+A runner game about building collective strength under escalating institutional pressure. You collect HTG members, survive hazards, clear barriers with Solidarity, and advance through five historical narrative checkpoints.
 
 ## Play
 
-Open `index.html` in a browser, or deploy to [Cloudflare Pages](https://pages.cloudflare.com/).
+- Runner mode (default): index.html
+- Legacy mode: index.html?mode=legacy
+
+Run locally:
 
 ```bash
-npx serve .   # then open http://localhost:3000
+npx serve .
 ```
+
+## Current Runner Targets
+
+- Run length: 180 seconds
+- Barrier clears required for victory: 4
+- Phase chain thresholds: 3 -> 5 -> 7 -> 9
+- Narrative checkpoints: 5 (intro, phase 1 clear, phase 2 clear, phase 3 clear, final EO 12968 card)
 
 ## Controls
 
-- **1–4** or click tower buttons to select: Coder (50), Attorney (75), Activist (60), Encryption (80)
-- **Click** on the canvas to place the selected tower
-- **R** to Retry after game over
-- **M** to toggle SFX mute
-- Case Files move left→right; Auditors move right→left
-- If an Auditor touches a Case File, its Burden bar fills with Red Tape
-- Burden = 100 → file DENIED, lose 1 Life
-- File reaches the right edge → Cleared, gain 20 Precedent
-- Survive 60 seconds in each stage (1984→1987→1990→1995) to win
+- Up/Down: lane change
+- Left/A: move left
+- Right/D: move right
+- Space: Solidarity
+- R: restart
+- M: mute
 
-## Documentation
+Touch controls are supported and toggleable.
 
-| Document | Description |
-|----------|-------------|
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Current status and next steps |
-| [docs/GDD.md](docs/GDD.md) | Game Design Document – mechanics, visuals |
-| [docs/HISTORY.md](docs/HISTORY.md) | Historical case (HTG v. DISCO) |
-| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Technical guide – run, deploy, constants, art, BGM |
+## Gameplay Summary
 
-## Deploy to Cloudflare Pages
+- Collect HTG members to increase chain.
+- Avoid suits, cabinets, and bots.
+- Use Solidarity only when barrier is near and current phase threshold is met.
+- Each successful barrier clear advances narrative and phase state.
+- Final clear unlocks Executive Order 12968 victory card.
 
-1. Create a [Cloudflare Pages](https://dash.cloudflare.com/) project (e.g. `class-ram-ifications`).
-2. In GitHub: **Settings → Secrets and variables → Actions**; add:
-   - `CLOUDFLARE_API_TOKEN` – from [API Tokens](https://dash.cloudflare.com/profile/api-tokens) (Cloudflare Pages edit permission).
-   - `CLOUDFLARE_ACCOUNT_ID` – from your Cloudflare dashboard URL.
-3. Push to `main` (or run the **Deploy to Cloudflare Pages** workflow from the Actions tab).
-4. **Verify:** Open the live URL; confirm play, stage advances, tower placement, win/lose, Retry (R), mute (M), and high score on game over.
+## Verification
 
-## Tech
+Run full checks:
 
-- Vanilla JavaScript + Canvas
-- Procedural SFX via Web Audio API (no asset files)
-- No build step – static HTML/JS
-- CRT-inspired aesthetic with scanline overlay
+```bash
+node scripts/run_all_checks.js
+```
+
+Focused runner smoke (with local server):
+
+```bash
+npx http-server . -p 4173 -c-1
+node scripts/smoke_runner_focus.js
+```
+
+## Key Docs
+
+- docs/GDD.md
+- docs/DEVELOPMENT.md
+- docs/MECHANICS_GUIDE.md
+- docs/TODOS.md
+- docs/ROADMAP.md
+- docs/PROGRAM_STATUS.md
+
+## Historical Note
+
+The game reflects the arc from discriminatory clearance treatment to policy correction in 1995 through Executive Order 12968.

@@ -1,0 +1,180 @@
+{
+  "game": "class_ram_ifications",
+  "default_chroma": "magenta",
+  "assets": [
+    {
+      "id": "TOWER_01",
+      "category": "Coder Tower",
+      "expected_size": "128x128",
+      "prompt": "A compact blocky tower module resembling a 1980s IBM mainframe terminal unit, facing front, viewed from a slight low angle. Dark charcoal-black rectangular chassis body, a small square CRT screen on the front face displaying a scrolling green binary '01010' pattern, rows of toggle switches along both side panels, blinking cyan LED indicator lights along the top row, and a thick coaxial cable plug at the base rear. Hard-edged bright cyan pixel blocks outline the CRT screen bezel with sharp pixel edges — no gradient blending, no translucent edges. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "TOWER_02",
+      "category": "Attorney Tower",
+      "expected_size": "128x128",
+      "prompt": "A compact blocky tower module styled as a miniature law library podium, facing front, viewed from a slight low angle. Dark polished mahogany-brown wooden frame, a small golden scales-of-justice emblem mounted on the front face center, a row of three leather-bound gold-spined law books lined along the top edge, and a small brass nameplate at the base reading 'ATY' in block letters. Hard-edged bright amber-gold pixel blocks radiate outward from the scales emblem in a starburst pattern with sharp pixel edges — no gradient blending, no translucent edges. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "TOWER_03",
+      "category": "Activist Tower",
+      "expected_size": "128x128",
+      "prompt": "A compact blocky tower module styled as a community broadcast megaphone station, facing front, viewed from a slight low angle. Bright hot-pink painted metal chassis body, a large outward-facing megaphone bell mounted on top center aimed forward, a rectangular speaker grille on the front face with a hot-pink wire mesh, two diagonal antenna masts with small flag pennants on each top corner, and a horizontal rainbow stripe sticker decal along the lower side panel. Overall hand-painted activist aesthetic with slightly dented painted metal texture in varying shades of hot pink and deep rose. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat green (#00FF00). Do not use green, lime, or yellow-green tones in the design. IMPORTANT: This subject is intentionally bright pink/magenta.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "TOWER_04",
+      "category": "Encryption Tower",
+      "expected_size": "128x128",
+      "prompt": "A compact blocky tower module styled as a cybersecurity firewall node, facing front, viewed from a slight low angle. Deep violet-purple rectangular metal chassis body, a large hexagonal shield emblem embossed on the front face center, rows of dark indigo circuit trace lines etched along both side panels, a narrow horizontal slit viewport on the front face with hard-edged medium-violet pixel blocks glowing inside with sharp pixel edges, three short stubby antenna nubs along the top edge, and a thick wide base suggesting a heavy secure anchor point. No gradient blending, no translucent edges on the glow. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat green (#00FF00). Do not use green, lime, or yellow-green tones in the design. IMPORTANT: This subject is intentionally purple/violet.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "ENEMY_01",
+      "category": "DISCO Auditor",
+      "expected_size": "128x128",
+      "prompt": "A stocky, wide-shouldered bureaucrat figure facing left in a brisk aggressive walking pose. He wears a slightly ill-fitting charcoal grey three-piece suit with a white dress shirt and a narrow dark tie. He has a square jaw, thick black-framed square glasses, slicked-back dark hair parted severely on one side, and thin pursed lips set in a permanent scowl. He holds a grey metal clipboard in his forward hand with a red paper form and curling red tape strips hanging off its edge. A laminated rectangular ID badge on a dark lanyard rests at chest height with the letters 'DISCO' visible in block type. Age: mid-40s, bureaucratic build. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing."
+    },
+    {
+      "id": "FILE_01",
+      "category": "Case File",
+      "expected_size": "128x128",
+      "prompt": "A manila security case folder with a thick stack of papers inside, laying flat at a slight forward-facing tilt. Golden-amber manila cardstock cover with a slightly worn and dog-eared top-right corner, a bold red rubber-stamp 'CLASSIFIED' mark in block letters across the center face, a small typed black case number label in the lower left corner, two brass brad fasteners visible along the top edge, and a neat stack of white printed pages peeking out from the bottom. A thin red string tie closure hangs loose off the right side. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design."
+    },
+    {
+      "id": "PROJ_01",
+      "category": "Boolean Bit Projectile",
+      "expected_size": "64x64",
+      "prompt": "A single 2D pixel art icon of a glowing cyan digital data packet — a small cube-shaped token with a flat bright cyan front face, dark navy side and bottom faces, and electric blue circuit trace lines etched diagonally along its side panels. A single-pixel white highlight dot sits at the top-left corner of the cube. Hard-edged bright cyan pixel blocks radiate outward from the cube in a four-pointed cross starburst pattern with sharp pixel edges. No gradient blending, no translucent edges. Style: 16-bit retro RPG item icon. Generate a single icon only, no duplicates. Use dark grey and navy for body shading. No drop shadow. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "PROJ_02",
+      "category": "Precedent Projectile",
+      "expected_size": "64x64",
+      "prompt": "A single 2D pixel art icon of a glowing golden legal document fragment — a small angular shard of golden-amber parchment paper broken at a sharp diagonal edge, with typed black text lines printed across its surface, a dark brown aged vellum underside, bright gold pixel highlights along the torn edges, and a small red wax seal dot in the lower corner. Hard-edged bright amber-gold pixel blocks radiate outward from the fragment in a starburst pattern with sharp pixel edges. No gradient blending, no translucent edges. Style: 16-bit retro RPG item icon. Generate a single icon only, no duplicates. Use dark grey and dark brown for body shading. No drop shadow. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "PLAYER_01",
+      "category": "Timothy Dooling Player Character",
+      "expected_size": "128x128",
+      "prompt": "A slim, athletic man in his late 20s facing right in a dynamic running stride, right arm pumping forward and left leg extended back mid-step. He has short light brown hair slightly ruffled from speed, a clean-shaven face with warm olive-tan skin, and a focused determined expression. He wears a pale blue Oxford button-up shirt with the sleeves rolled to mid-forearm, dark khaki slacks with a narrow black belt at the waist, and white low-top sneakers with blue trim. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing."
+    },
+    {
+      "id": "FOLLOWER_01",
+      "category": "HTG Follower Type 01",
+      "expected_size": "128x128",
+      "prompt": "A tall, lanky man in his early 30s facing right in a running stride, left arm extended forward and legs mid-step. He has straight dark brown hair parted on the left, a clean-shaven narrow jaw, light-medium skin tone, and small wire-rimmed rectangular glasses with thin metal frames. He wears a solid navy blue crew-neck sweater layered over a white button-down collar visible at the neckline, dark blue straight-leg jeans, and brown leather loafers. A manila folder is tucked firmly under his right arm. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing."
+    },
+    {
+      "id": "FOLLOWER_02",
+      "category": "HTG Follower Type 02",
+      "expected_size": "128x128",
+      "prompt": "A medium-height, slightly stocky man in his mid-30s facing right in a running stride with his left fist raised in a defiant gesture. He has curly short auburn hair with prominent sideburns, a fair complexion with visible light freckles across the nose and cheeks, and a stout neck. He wears an open-collar green plaid flannel shirt with the top buttons undone over a plain white undershirt visible at the chest, black corduroy trousers, and scuffed brown work boots. His expression is defiant and animated. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing."
+    },
+    {
+      "id": "FOLLOWER_03",
+      "category": "HTG Follower Type 03",
+      "expected_size": "128x128",
+      "prompt": "A short, wiry man in his late 20s facing right in a focused sprinting stride, both arms bent at the elbows and legs in mid-sprint. He has close-cropped straight black hair, dark olive skin, a neat thick black mustache, and a sharp jawline with a concentrated expression. He wears a heather grey V-neck T-shirt with no additional layer, dark navy work pants with visible belt loop hardware at the waist, and black high-top canvas athletic sneakers with white rubber soles. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing."
+    },
+    {
+      "id": "FOLLOWER_04",
+      "category": "HTG Follower Type 04",
+      "expected_size": "128x128",
+      "prompt": "A tall, broad-shouldered man in his early 30s facing right in a confident running stride, his right arm raised forward carrying a tightly rolled legal document. He has a full textured natural afro hairstyle, medium-warm brown skin, and a broad open face with round gold-rimmed circular glasses. He wears a caramel-brown corduroy vest with two front flap pockets over a white ribbed turtleneck sweater, dark brown straight-leg slacks, and tan leather oxford dress shoes. His expression is confident and resolute. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing."
+    },
+    {
+      "id": "FOLLOWER_05",
+      "category": "HTG Follower Type 05",
+      "expected_size": "128x128",
+      "prompt": "A slim, medium-height person in their late 20s facing right in a determined running stride, arms bent at the elbows and legs extended mid-step. They have short pixie-cut dark hair with a slight wave at the temple, a smooth light-medium olive complexion, and a sharp focused expression with a slightly set jaw. They wear a bright scarlet red blazer with small shoulder pads over a black turtleneck sweater, tailored black straight-leg slacks, and black leather flat shoes. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing."
+    },
+    {
+      "id": "ENEMY_02",
+      "category": "Corporate Suit",
+      "expected_size": "128x128",
+      "prompt": "A clean-cut, medium-build man in his early 40s facing left in a brisk purposeful walking stride, right arm swinging forward. He has neat short dark hair combed and side-parted with a slight pomade sheen, a clean-shaven jaw, light-medium skin, and a slightly smug closed-lip expression. He wears a navy blue pinstripe three-piece suit with matching vest and trousers, a crisp white dress shirt, a wide bright red power tie with a tight Windsor knot, gold oval cufflinks at the wrists, and polished black oxford shoes. He carries a glossy black leather briefcase in his forward hand. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing."
+    },
+    {
+      "id": "ENEMY_03",
+      "category": "Filing Cabinet",
+      "expected_size": "128x128",
+      "prompt": "A tall beige-painted two-drawer metal filing cabinet viewed at a slight 3/4 angle, tilted very slightly forward to suggest aggressive rolling momentum on four small black caster wheels. The top drawer is open approximately halfway with a cascade of crinkled white papers and coiled crimson red tape strips spilling out over the front edge. A bold red rubber-stamp impression reading 'DENIED' in blocky capitals covers the upper front drawer face. A rectangular 'RESTRICTED — DO NOT COPY' sticker label is affixed to the right side panel. The bottom drawer is sealed shut with a bent grey metal security bar latch across its front. Both drawers have recessed flat metal handle pulls with small dark knobs. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design."
+    },
+    {
+      "id": "ENEMY_04",
+      "category": "Polygraph Bot",
+      "expected_size": "128x128",
+      "prompt": "A boxy industrial robot machine on four thick rubber caster wheels, facing left in an aggressive forward-rolling stance viewed at a slight 3/4 angle. The gunmetal grey rectangular chassis has a large circular analog dial face centered on the upper front panel with a red needle pointer angled accusatorially to the far right. Two jointed accordion-tube arms extend forward, each ending in a round flat suction-cup electrode disc. A vertical slot on the left side panel feeds out a narrow white paper strip printed with jagged red accusation lines. A blinking amber dome warning light sits atop the chassis. The upper front face has two rectangular eye-slot panels with narrow hard-edged amber-yellow horizontal slit openings rendered as flat pixel blocks with sharp edges. No gradient blending, no translucent edges. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "BARRIER_01",
+      "category": "Gay Investigation Unit Wall",
+      "expected_size": "256x256",
+      "prompt": "A massive imposing institutional barrier wall spanning the full width of the frame, styled as a 1980s U.S. government security agency checkpoint blockade. The wall body is reinforced concrete grey with horizontal cast-form seam lines. A thick horizontal steel safety bar is bolted across the center at hip height with heavy steel bracket mounts on either side. A large official dark navy government placard is mounted at the top center, reading 'DISCO — DEFENSE INVESTIGATIVE SERVICE' in heavy stenciled white block letters with a thin white border frame. Two institutional fluorescent tube light fixtures are mounted on angled wall brackets at the upper corners; hard-edged bright amber-yellow pixel blocks radiate downward and inward in a flat V-pattern with sharp pixel edges — no gradient blending, no translucent edges. Diagonal black and yellow hazard striping bands run along the base of the wall across the full width. Two heavy black bollard posts stand at either bottom corner. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only — the full wall as one image, not multiple views or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "COLLECTIBLE_01",
+      "category": "HTG Member Collectible",
+      "expected_size": "128x128",
+      "prompt": "A medium-height, lean individual in their late 20s facing right in an open-armed welcoming pose, as if reaching forward to join a moving group. They have shoulder-length wavy light brown hair framing a round friendly face, warm light-medium skin, and a broad open smile with an optimistic expression. They wear a bright yellow button-up shirt with the top two buttons casually undone, faded blue straight-leg jeans with a visible leather belt, and white low-top canvas sneakers. Both arms are raised slightly to either side in an eager welcoming gesture. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing."
+    },
+    {
+      "id": "FX_01",
+      "category": "Solidarity Heart",
+      "expected_size": "64x64",
+      "prompt": "A single bold pixel art heart icon in deep crimson red with dark carmine-red shading along the lower curves of each lobe. The classic symmetrical heart shape has clean straight pixel edges with no anti-aliasing. A single bright white highlight pixel dot sits at the upper-left corner of the left lobe. Hard-edged bright warm-white and pale yellow pixel blocks radiate outward from the center of the heart in a four-pointed plus starburst pattern with sharp pixel edges. No gradient blending, no translucent edges. Style: 16-bit retro RPG item icon. Generate a single icon only, no duplicates. Use dark carmine and charcoal for body shading. No drop shadow. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "FX_02",
+      "category": "Precedent Shield",
+      "expected_size": "128x128",
+      "prompt": "A heraldic shield shape in pixel art designed as a glowing legal precedent barrier effect. The shield body is solid golden amber with dark old-gold shading along the lower edge and right side. A bold dark charcoal scales-of-justice emblem is centered on the shield face. The shield border is a thick band of polished brass-gold with riveted square detail at each corner. Hard-edged bright golden-yellow and pale cream pixel blocks radiate outward from the shield border in an eight-spoke wheel starburst pattern with sharp pixel edges. No gradient blending, no translucent edges. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "FX_03",
+      "category": "Red Tape Pit",
+      "expected_size": "128x128",
+      "prompt": "A square tile-format hazard zone indicator sprite. The center shows a chaotic pile of coiled and tangled crimson red bureaucratic tape ribbons heaped on a dark charcoal grey floor surface. Loose ribbon ends trail outward toward the tile corners. The ribbon coil loops have visible flat inner surfaces shaded in dark carmine. A small dark navy rubber-stamp impression reading 'BLOCKED' in blocky capital letters is visible on the largest flat ribbon section in the center. The outer tile border features a diagonal black and red striped hazard warning band around all four sides. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design."
+    },
+    {
+      "id": "ENV_01",
+      "category": "Corporate Logic Grid Tile",
+      "expected_size": "64x64",
+      "prompt": "A single isometric floor tile viewed from a 45-degree isometric perspective as a regular rhombus shape. The tile surface is dark grey short-pile office carpet with a subtle lighter grey square grid-line pattern pressed into the carpet surface. Directional carpet pile texture is rendered as faint hard diagonal pixel lines across the surface. The rhombus shape has crisp straight pixel edges and a single-pixel dark charcoal border defining all four sides of the isometric diamond outline. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design."
+    },
+    {
+      "id": "ENV_02",
+      "category": "Runner Mode Background",
+      "expected_size": "original",
+      "prompt": "Generate a 2D pixel art runner game background scene of a 1980s Silicon Valley corporate office building interior hallway drawn for a five-lane horizontal runner layout. The viewpoint is a slight overhead isometric-feel perspective. Five parallel horizontal lane zones stretch the full width of the scene. The floor is dark grey low-pile office carpet with lighter grey square tile seam lines forming a regular grid. The far back wall is institutional beige with a grey horizontal wainscot panel at mid-height. Evenly spaced doorways with frosted glass panel inserts line the back wall, each with a dark wood door frame. Overhead recessed fluorescent tube light panels in a white acoustic tile drop ceiling cast flat even light. A red rectangular 'RESTRICTED ACCESS ZONE' sign is mounted on the back wall between two doorways. A small cork bulletin board with scattered tacked papers is visible near one edge. Style: 16-bit retro RPG background scene, flat colors, sharp pixel grid. This is a full background scene — fill the entire canvas with no empty space. Do not include any characters, creatures, or enemies."
+    },
+    {
+      "id": "UI_01",
+      "category": "Solidarity Button Inactive",
+      "expected_size": "128x128",
+      "prompt": "A rounded rectangular UI button with slightly beveled edges in a flat inactive powered-down state. The button body is dark slate-grey with a muted warm-grey inner face. A centered raised-fist silhouette emblem in dark charcoal grey sits in the upper-center area of the button face. Below the emblem, a small all-caps label reading 'SOLIDARITY' in mid-grey blocky pixel lettering is centered on the lower button face. The button border is a thin single-pixel dark charcoal outline. No glow, no radiating effects — the button reads as dimmed and awaiting activation. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design."
+    },
+    {
+      "id": "UI_02",
+      "category": "Solidarity Button Active",
+      "expected_size": "128x128",
+      "prompt": "A rounded rectangular UI button with slightly beveled edges in a fully active lit state. The button body is vivid bright red with a warm-red inner face bevel highlight. A centered raised-fist silhouette emblem in bright white sits prominently in the upper-center area of the button face. Below the emblem, a small all-caps label reading 'SOLIDARITY' in bright white blocky pixel lettering is centered on the lower button face. Hard-edged bright red and warm white pixel blocks radiate outward from the button border in a repeating starburst pattern with sharp pixel edges. No gradient blending, no translucent edges. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark carmine and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    },
+    {
+      "id": "UI_03",
+      "category": "Solidarity Button Urgent",
+      "expected_size": "128x128",
+      "prompt": "A rounded rectangular UI button with slightly beveled edges in a flashing urgent alert state. The button body is vivid bright amber-yellow with alternating darker amber and bright yellow hard-edged pixel band highlights across the inner face. A centered raised-fist silhouette emblem in bold bright yellow sits in the upper-center area of the button face. Below the emblem, a bold all-caps label reading 'NOW!' in bright white blocky pixel lettering is centered on the lower button face. Hard-edged bright amber-yellow and white pixel blocks radiate outward from the button border in a dense burst starburst pattern with sharp pixel edges. No gradient blending, no translucent edges. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark amber-brown and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
+      "fringe_tolerance_override": 90
+    }
+  ]
+}

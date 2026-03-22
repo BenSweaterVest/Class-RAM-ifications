@@ -1,12 +1,13 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
 
 // Tower types
 const TOWER_TYPES = {
-    CODER: { id: 1, cost: 50, key: '1', name: 'Coder (Logic)', hint: 'Boolean Bits • Slows' },
-    ATTORNEY: { id: 2, cost: 75, key: '2', name: 'Attorney (Litigation)', hint: 'Precedents • Heavy damage' },
+    CODER: { id: 1, cost: 50, key: '1', name: 'Coder (Logic)', hint: 'Boolean Bits | Slows' },
+    ATTORNEY: { id: 2, cost: 75, key: '2', name: 'Attorney (Litigation)', hint: 'Precedents | Heavy damage' },
     ACTIVIST: { id: 3, cost: 60, key: '3', name: 'Activist (Community)', hint: 'Heals Burden' },
-    ENCRYPTION: { id: 4, cost: 80, key: '4', name: 'Encryption Expert', hint: 'Firewall • Protects towers' }
+    ENCRYPTION: { id: 4, cost: 80, key: '4', name: 'Encryption Expert', hint: 'Firewall | Protects towers' }
 };
 
 // Stage config: { year, title, duration, monochrome, spawnMultiplier, auditorSpeedMultiplier, canSubpoena }
@@ -38,6 +39,30 @@ let caseFiles = [];
 let auditors = [];
 let towers = [];
 let projectiles = [];
+
+const spriteAssets = {};
+const spriteLoadState = {};
+const warnedMissingSprites = new Set();
+const SPRITE_PATHS = {
+    coderTower: 'assets/processed/TOWER_01_CoderTower_00001_.png',
+    attorneyTower: 'assets/processed/TOWER_02_AttorneyTower_00001_.png',
+    activistTower: 'assets/processed/TOWER_03_ActivistTower_00001_.png',
+    encryptionTower: 'assets/processed/TOWER_04_EncryptionTower_00001_.png',
+    auditor: 'assets/processed/ENEMY_01_DISCOAuditor_00001_.png',
+    caseFile: 'assets/processed/FILE_01_CaseFile_00001_.png',
+    booleanBit: 'assets/processed/PROJ_01_BooleanBitProjectile_00001_.png',
+    precedent: 'assets/processed/PROJ_02_PrecedentProjectile_00001_.png'
+};
+const SPRITE_SPECS = {
+    coderTower: { dx: -16, dy: -16, w: 32, h: 32 },
+    attorneyTower: { dx: -16, dy: -16, w: 32, h: 32 },
+    activistTower: { dx: -16, dy: -16, w: 32, h: 32 },
+    encryptionTower: { dx: -16, dy: -16, w: 32, h: 32 },
+    auditor: { dx: -4, dy: -18, w: 32, h: 32 },
+    caseFile: { dx: -1, dy: -21, w: 32, h: 32 },
+    booleanBit: { dx: -6, dy: -6, w: 12, h: 12 },
+    precedent: { dx: -7, dy: -7, w: 14, h: 14 }
+};
 
 function getCurrentStage() { return STAGES[currentStageIndex]; }
 function isMonochrome() { return getCurrentStage().monochrome; }
@@ -91,6 +116,116 @@ function dist(a, b) {
     return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
+function loadSprite(key, src) {
+    const img = new Image();
+    spriteLoadState[key] = 'loading';
+    img.addEventListener('load', () => {
+        const processed = applyRuntimeChromaKey(img);
+        spriteAssets[key] = processed;
+        spriteLoadState[key] = 'loaded';
+    });
+    img.addEventListener('error', () => {
+        spriteLoadState[key] = 'error';
+        console.warn(`Sprite failed to load: ${key} (${src})`);
+    });
+    img.src = src;
+    return img;
+}
+
+function getSprite(key) {
+    const asset = spriteAssets[key];
+    if (!asset) return null;
+
+    if (asset instanceof HTMLCanvasElement) {
+        return spriteLoadState[key] === 'loaded' ? asset : null;
+    }
+
+    return asset.complete && asset.naturalWidth > 0 ? asset : null;
+}
+
+function applyRuntimeChromaKey(source) {
+    try {
+        const off = document.createElement('canvas');
+        off.width = source.naturalWidth || source.width;
+        off.height = source.naturalHeight || source.height;
+        const offCtx = off.getContext('2d', { willReadFrequently: true });
+        offCtx.drawImage(source, 0, 0);
+
+        const imageData = offCtx.getImageData(0, 0, off.width, off.height);
+        const data = imageData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+
+            // Chroma key both magenta and green backgrounds used by the asset pipeline.
+            const magenta = r >= 245 && g <= 20 && b >= 245;
+            const green = g >= 245 && r <= 20 && b <= 20;
+            if (magenta || green) {
+                data[i + 3] = 0;
+            }
+        }
+
+        offCtx.putImageData(imageData, 0, 0);
+        return off;
+    } catch (err) {
+        console.warn('Chroma key processing failed; using raw sprite image fallback.', err);
+        return source;
+    }
+}
+
+function drawSprite(key, x, y, w, h) {
+    const img = getSprite(key);
+    if (!img) {
+        if (key && spriteLoadState[key] === 'error' && !warnedMissingSprites.has(key)) {
+            warnedMissingSprites.add(key);
+            console.warn(`Using fallback rendering for sprite: ${key}`);
+        }
+        return false;
+    }
+    ctx.drawImage(img, x, y, w, h);
+    return true;
+}
+
+function drawConfiguredSprite(key, anchorX, anchorY) {
+    const spec = SPRITE_SPECS[key];
+    if (!spec) return false;
+    return drawSprite(key, anchorX + spec.dx, anchorY + spec.dy, spec.w, spec.h);
+}
+
+function getSpriteLoadSummary() {
+    const summary = { loaded: 0, loading: 0, error: 0 };
+    Object.values(spriteLoadState).forEach(state => {
+        if (summary[state] != null) summary[state]++;
+    });
+    return summary;
+}
+
+window.classRamificationsDebug = {
+    getSpriteLoadSummary,
+    getSpriteLoadState: () => ({ ...spriteLoadState })
+};
+
+function setSelectedTower(type) {
+    selectedTowerType = type;
+    document.querySelectorAll('.tower-btn').forEach(btn => {
+        btn.classList.toggle('selected', Number(btn.dataset.tower) === type.id);
+    });
+    updateUI();
+}
+
+function initTowerSelectUI() {
+    document.querySelectorAll('.tower-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (window.sfx) window.sfx.init();
+            const towerId = Number(btn.dataset.tower);
+            const towerType = Object.values(TOWER_TYPES).find(type => type.id === towerId);
+            if (towerType) setSelectedTower(towerType);
+        });
+    });
+}
+
 function isTowerProtected(tower) {
     return towers.some(enc => enc instanceof EncryptionTower && enc !== tower && dist(enc, tower) <= enc.range);
 }
@@ -116,8 +251,10 @@ class CaseFile {
     }
 
     draw() {
-        ctx.fillStyle = this.cleared ? '#ff00ff' : '#d4af37';
-        ctx.fillRect(this.x, this.y - 15, this.w, this.h);
+        if (!drawConfiguredSprite('caseFile', this.x, this.y)) {
+            ctx.fillStyle = this.cleared ? '#ff00ff' : '#d4af37';
+            ctx.fillRect(this.x, this.y - 15, this.w, this.h);
+        }
         ctx.fillStyle = 'red';
         ctx.fillRect(this.x, this.y - 25, (this.burden / 100) * this.w, 5);
     }
@@ -162,10 +299,12 @@ class Auditor {
     }
 
     draw() {
-        ctx.fillStyle = isMonochrome() ? '#555' : '#333';
-        ctx.fillRect(this.x, this.y - 10, this.w, this.h);
-        ctx.strokeStyle = '#00ff00';
-        ctx.strokeRect(this.x, this.y - 10, this.w, this.h);
+        if (!drawConfiguredSprite(isMonochrome() ? null : 'auditor', this.x, this.y)) {
+            ctx.fillStyle = isMonochrome() ? '#555' : '#333';
+            ctx.fillRect(this.x, this.y - 10, this.w, this.h);
+            ctx.strokeStyle = '#00ff00';
+            ctx.strokeRect(this.x, this.y - 10, this.w, this.h);
+        }
     }
 }
 
@@ -202,11 +341,13 @@ class LogicTower {
     }
 
     draw() {
-        const disabled = Date.now() < this.disabledUntil;
-        ctx.fillStyle = disabled ? '#333' : '#00aaff';
-        ctx.fillRect(this.x - 16, this.y - 16, this.w, this.h);
-        ctx.strokeStyle = disabled ? '#555' : '#00ffff';
-        ctx.strokeRect(this.x - 16, this.y - 16, this.w, this.h);
+        const disabled = performance.now() < this.disabledUntil;
+        if (!drawConfiguredSprite(disabled ? null : 'coderTower', this.x, this.y)) {
+            ctx.fillStyle = disabled ? '#333' : '#00aaff';
+            ctx.fillRect(this.x - 16, this.y - 16, this.w, this.h);
+            ctx.strokeStyle = disabled ? '#555' : '#00ffff';
+            ctx.strokeRect(this.x - 16, this.y - 16, this.w, this.h);
+        }
         if (!disabled) {
             ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
             ctx.beginPath();
@@ -249,11 +390,13 @@ class AttorneyTower {
     }
 
     draw() {
-        const disabled = Date.now() < this.disabledUntil;
-        ctx.fillStyle = disabled ? '#333' : '#d4af37';
-        ctx.fillRect(this.x - 16, this.y - 16, this.w, this.h);
-        ctx.strokeStyle = disabled ? '#555' : '#ffaa00';
-        ctx.strokeRect(this.x - 16, this.y - 16, this.w, this.h);
+        const disabled = performance.now() < this.disabledUntil;
+        if (!drawConfiguredSprite(disabled ? null : 'attorneyTower', this.x, this.y)) {
+            ctx.fillStyle = disabled ? '#333' : '#d4af37';
+            ctx.fillRect(this.x - 16, this.y - 16, this.w, this.h);
+            ctx.strokeStyle = disabled ? '#555' : '#ffaa00';
+            ctx.strokeRect(this.x - 16, this.y - 16, this.w, this.h);
+        }
         if (!disabled) {
             ctx.strokeStyle = 'rgba(255, 170, 0, 0.2)';
             ctx.beginPath();
@@ -289,11 +432,13 @@ class ActivistTower {
     }
 
     draw() {
-        const disabled = Date.now() < this.disabledUntil;
-        ctx.fillStyle = disabled ? '#333' : '#ff69b4';
-        ctx.fillRect(this.x - 16, this.y - 16, this.w, this.h);
-        ctx.strokeStyle = disabled ? '#555' : '#ff1493';
-        ctx.strokeRect(this.x - 16, this.y - 16, this.w, this.h);
+        const disabled = performance.now() < this.disabledUntil;
+        if (!drawConfiguredSprite(disabled ? null : 'activistTower', this.x, this.y)) {
+            ctx.fillStyle = disabled ? '#333' : '#ff69b4';
+            ctx.fillRect(this.x - 16, this.y - 16, this.w, this.h);
+            ctx.strokeStyle = disabled ? '#555' : '#ff1493';
+            ctx.strokeRect(this.x - 16, this.y - 16, this.w, this.h);
+        }
         if (!disabled) {
             ctx.strokeStyle = 'rgba(255, 105, 180, 0.2)';
             ctx.beginPath();
@@ -317,11 +462,13 @@ class EncryptionTower {
     update() {}
 
     draw() {
-        const disabled = Date.now() < this.disabledUntil;
-        ctx.fillStyle = disabled ? '#333' : '#9370db';
-        ctx.fillRect(this.x - 16, this.y - 16, this.w, this.h);
-        ctx.strokeStyle = disabled ? '#555' : '#8a2be2';
-        ctx.strokeRect(this.x - 16, this.y - 16, this.w, this.h);
+        const disabled = performance.now() < this.disabledUntil;
+        if (!drawConfiguredSprite(disabled ? null : 'encryptionTower', this.x, this.y)) {
+            ctx.fillStyle = disabled ? '#333' : '#9370db';
+            ctx.fillRect(this.x - 16, this.y - 16, this.w, this.h);
+            ctx.strokeStyle = disabled ? '#555' : '#8a2be2';
+            ctx.strokeRect(this.x - 16, this.y - 16, this.w, this.h);
+        }
         ctx.strokeStyle = 'rgba(138, 43, 226, 0.2)';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
@@ -347,12 +494,14 @@ class BooleanBit {
     }
 
     onHit() {
-        this.target.slowUntil = Date.now() + 2000;
+        this.target.slowUntil = performance.now() + 2000;
     }
 
     draw() {
-        ctx.fillStyle = '#00ffff';
-        ctx.fillRect(this.x - 3, this.y - 3, this.w, this.h);
+        if (!drawConfiguredSprite('booleanBit', this.x, this.y)) {
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(this.x - 3, this.y - 3, this.w, this.h);
+        }
     }
 }
 
@@ -376,8 +525,10 @@ class Precedent {
     onHit() {}
 
     draw() {
-        ctx.fillStyle = '#ffaa00';
-        ctx.fillRect(this.x - 4, this.y - 4, this.w, this.h);
+        if (!drawConfiguredSprite('precedent', this.x, this.y)) {
+            ctx.fillStyle = '#ffaa00';
+            ctx.fillRect(this.x - 4, this.y - 4, this.w, this.h);
+        }
     }
 }
 
@@ -442,7 +593,7 @@ function updateStage(now) {
         document.getElementById('status-val').innerText = next.title.toUpperCase();
         document.getElementById('year-val').innerText = next.year;
         document.getElementById('status-val').style.color = next.monochrome ? 'red' : '#00ff00';
-        stageBannerText = `${next.year} – ${next.title}`;
+        stageBannerText = `${next.year} - ${next.title}`;
         stageBannerUntil = now + 2000;
         sfx('stageAdvance');
     }
@@ -453,7 +604,7 @@ function updateUI() {
     document.getElementById('status-val').innerText = stage.title.toUpperCase();
     document.getElementById('year-val').innerText = stage.year;
     document.getElementById('status-val').style.color = stage.monochrome ? 'red' : '#00ff00';
-    document.getElementById('tower-hint').innerText = `${selectedTowerType.name} (${selectedTowerType.cost}) • ${selectedTowerType.hint}`;
+    document.getElementById('tower-hint').innerText = `${selectedTowerType.name} (${selectedTowerType.cost}) | ${selectedTowerType.hint}`;
 }
 
 // --- Main Game Loop ---
@@ -592,10 +743,10 @@ canvas.addEventListener('click', (e) => {
 // --- Tower Select (keys 1-4) ---
 document.addEventListener('keydown', (e) => {
     if (window.sfx) window.sfx.init();
-    if (e.key === '1') selectedTowerType = TOWER_TYPES.CODER;
-    else if (e.key === '2') selectedTowerType = TOWER_TYPES.ATTORNEY;
-    else if (e.key === '3') selectedTowerType = TOWER_TYPES.ACTIVIST;
-    else if (e.key === '4') selectedTowerType = TOWER_TYPES.ENCRYPTION;
+    if (e.key === '1') setSelectedTower(TOWER_TYPES.CODER);
+    else if (e.key === '2') setSelectedTower(TOWER_TYPES.ATTORNEY);
+    else if (e.key === '3') setSelectedTower(TOWER_TYPES.ACTIVIST);
+    else if (e.key === '4') setSelectedTower(TOWER_TYPES.ENCRYPTION);
     else if (e.key === 'm' || e.key === 'M') {
         if (window.sfx && typeof window.sfx.toggleMute === 'function') {
             window.sfx.toggleMute();
@@ -604,7 +755,6 @@ document.addEventListener('keydown', (e) => {
     else if (e.key === 'r' || e.key === 'R') {
         if (!gameActive) resetGame();
     }
-    updateUI();
 });
 
 // --- Reset ---
@@ -631,7 +781,11 @@ function resetGame() {
 }
 
 // Start
+Object.entries(SPRITE_PATHS).forEach(([key, src]) => {
+    spriteAssets[key] = loadSprite(key, src);
+});
+initTowerSelectUI();
 loadHighScore();
-updateUI();
+setSelectedTower(TOWER_TYPES.CODER);
 stageStartTime = performance.now();
 gameLoop(stageStartTime);

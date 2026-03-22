@@ -15,13 +15,53 @@
             margin: 0;
             overflow: hidden;
         }
+        body.compact-ui h1 {
+            margin: 8px 0 2px;
+            font-size: 20px;
+        }
+        body.compact-ui #mode-banner {
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        body.compact-ui #ui-layer {
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+        body.compact-ui #runner-help,
+        body.compact-ui #tower-hint {
+            display: none !important;
+        }
+        body.compact-ui #runner-controls {
+            margin-top: 4px !important;
+        }
+        body.compact-ui #runner-touch {
+            margin-top: 4px;
+            gap: 6px;
+        }
+        body.compact-ui .tower-btn {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+        body.compact-ui #game-container {
+            margin-top: 6px;
+        }
+        :root {
+            --game-width: min(95vw, 1200px);
+        }
         #game-container {
             position: relative;
             border: 4px solid #333;
-            margin-top: 20px;
+            margin-top: 12px;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
         }
-        canvas { background: #000; cursor: crosshair; }
+        canvas {
+            background: #000;
+            cursor: crosshair;
+            width: var(--game-width);
+            height: auto;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
@@ -30,7 +70,7 @@
             pointer-events: none;
         }
         #ui-layer {
-            width: 800px; padding: 10px; display: flex; justify-content: space-between; flex-wrap: wrap;
+            width: var(--game-width); padding: 10px; display: flex; justify-content: space-between; flex-wrap: wrap;
         }
         .rainbow-text {
             background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
@@ -48,10 +88,104 @@
         }
         .tower-btn:hover { border-color: #00ff00; }
         .tower-btn.selected { border-color: #00ffff; background: #002200; }
+        #runner-touch {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        #runner-controls-toggle {
+            margin-left: 8px;
+        }
+        #compact-ui-toggle {
+            margin-left: 8px;
+            display: none;
+        }
+        #runner-help {
+            display: none;
+            width: var(--game-width);
+            margin-top: 10px;
+            border: 2px solid #1f3a1f;
+            background: rgba(0, 20, 0, 0.7);
+            padding: 10px 12px;
+            box-sizing: border-box;
+            font-size: 13px;
+            line-height: 1.35;
+        }
+        #runner-help h3 {
+            margin: 0 0 6px 0;
+            color: #9dff9d;
+            font-size: 14px;
+        }
+        #runner-help .tower-btn {
+            margin-top: 8px;
+        }
+        #runner-narrative {
+            display: none;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(680px, 90vw);
+            border: 2px solid #2a5a2a;
+            background: rgba(3, 18, 3, 0.95);
+            box-shadow: 0 0 24px rgba(0, 255, 0, 0.2);
+            padding: 14px;
+            z-index: 20;
+            color: #c8ffc8;
+            line-height: 1.45;
+        }
+        #runner-narrative h3 {
+            margin: 0 0 8px 0;
+            color: #9dff9d;
+            font-size: 16px;
+        }
+        #runner-narrative-body {
+            white-space: pre-line;
+            font-size: 14px;
+        }
+        #runner-narrative .tower-btn {
+            margin-top: 12px;
+        }
+        #runner-narrative.runner-narrative-theme-neutral {
+            border-color: #2a5a2a;
+            box-shadow: 0 0 24px rgba(0, 255, 0, 0.2);
+        }
+        #runner-narrative.runner-narrative-theme-hopeful {
+            border-color: #c6a343;
+            box-shadow: 0 0 24px rgba(255, 205, 90, 0.35);
+            color: #fff2c6;
+        }
+        #runner-narrative.runner-narrative-theme-happy {
+            border-color: #31a85e;
+            box-shadow: 0 0 24px rgba(79, 255, 151, 0.35);
+            color: #d6ffe5;
+        }
+        #runner-narrative.runner-narrative-theme-somber {
+            border-color: #8b4242;
+            box-shadow: 0 0 24px rgba(186, 80, 80, 0.3);
+            color: #ffd8d8;
+        }
+        #runner-narrative.runner-narrative-theme-victory {
+            border-color: #f8d14a;
+            box-shadow: 0 0 26px rgba(255, 210, 70, 0.4);
+            background:
+                linear-gradient(135deg, rgba(255, 0, 0, 0.12), rgba(255, 127, 0, 0.12), rgba(255, 255, 0, 0.12), rgba(0, 255, 0, 0.12), rgba(0, 0, 255, 0.12), rgba(139, 0, 255, 0.12)),
+                rgba(3, 18, 3, 0.95);
+            color: #fff7d2;
+        }
+        @media (max-width: 900px) {
+            #ui-layer { width: 96vw; }
+            #game-container { margin-top: 12px; }
+            #runner-touch .tower-btn { min-width: 76px; }
+            canvas { max-width: 96vw; height: auto; }
+            #runner-help { width: 96vw; }
+        }
     </style>
 </head>
 <body>
     <h1>CLASS <span class="rainbow-text">RAM-IFICATIONS</span></h1>
+    <div id="mode-banner"><span id="mode-label">MODE: legacy</span> <button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
     <div id="ui-layer">
         <div>PRECEDENT: <span id="precedent-val">100</span></div>
         <div>LIVES: <span id="lives-val">3</span></div>
@@ -59,33 +193,53 @@
         <div>YEAR: <span id="year-val">1984</span></div>
     </div>
     <div id="tower-select">
-        <button class="tower-btn selected" data-tower="1" title="Coder (Logic) – Boolean Bits, slows Auditors">1 Coder (50)</button>
-        <button class="tower-btn" data-tower="2" title="Attorney (Litigation) – Precedents, heavy damage">2 Attorney (75)</button>
-        <button class="tower-btn" data-tower="3" title="Activist (Community) – Heals Burden on nearby files">3 Activist (60)</button>
-        <button class="tower-btn" data-tower="4" title="Encryption Expert – Firewall, protects towers from Subpoenas">4 Encryption (80)</button>
+        <button class="tower-btn selected" data-tower="1" title="Coder (Logic) - Boolean Bits, slows Auditors">1 Coder (50)</button>
+        <button class="tower-btn" data-tower="2" title="Attorney (Litigation) - Precedents, heavy damage">2 Attorney (75)</button>
+        <button class="tower-btn" data-tower="3" title="Activist (Community) - Heals Burden on nearby files">3 Activist (60)</button>
+        <button class="tower-btn" data-tower="4" title="Encryption Expert - Firewall, protects towers from Subpoenas">4 Encryption (80)</button>
+    </div>
+    <div id="runner-controls" style="display:none; margin-top: 8px;">
+        <button id="solidarity-btn" class="tower-btn" disabled onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.solidarity){window.runnerControls.solidarity();}">SOLIDARITY</button>
+        <button id="runner-controls-toggle" class="tower-btn" style="display:none;" type="button">SHOW TOUCH CONTROLS</button>
+        <div id="runner-touch">
+            <button id="runner-left-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.slow){window.runnerControls.slow();}">LEFT</button>
+            <button id="runner-right-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.dash){window.runnerControls.dash();}">RIGHT</button>
+            <button id="runner-dash-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.laneUp){window.runnerControls.laneUp();}">LANE UP</button>
+            <button id="runner-lane-down-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.laneDown){window.runnerControls.laneDown();}">LANE DOWN</button>
+            <button id="runner-restart-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.restart){window.runnerControls.restart();}">RESTART</button>
+        </div>
+    </div>
+    <div id="runner-help" aria-live="polite">
+        <h3>How Runner Mode Works</h3>
+        <div>
+            Goal: clear 4 barriers and establish 4 precedents by activating Solidarity at each phase gate.
+        </div>
+        <div>
+            Build chain: collect HTG members (small yellow/pink allies). Do not collide with suits, cabinets, or bots.
+        </div>
+        <div>
+            Barrier loop: Solidarity only works when a barrier is close and chain meets the phase threshold (3, then 5, then 7, then 9).
+        </div>
+        <div>
+            Controls: Up/Down lanes, Left/A move left, Right or D move right, Space Solidarity, R restart.
+        </div>
+        <div>
+            Obstacle effects: Suits strip extra chain, Cabinets slow movement, Bots lock lane switches.
+        </div>
+        <button id="runner-help-close" class="tower-btn">GOT IT</button>
     </div>
     <div id="game-container">
         <canvas id="gameCanvas" width="800" height="400"></canvas>
         <div class="crt-overlay"></div>
+        <div id="runner-narrative" aria-live="polite" aria-modal="true" role="dialog">
+            <h3 id="runner-narrative-title">Checkpoint</h3>
+            <div id="runner-narrative-body"></div>
+            <button id="runner-narrative-next" class="tower-btn">CONTINUE</button>
+        </div>
     </div>
-    <p id="tower-hint">Coder (Logic) (50) • Boolean Bits • Slows</p>
+    <div id="runner-legend" style="display:none; width: var(--game-width); margin-top: 8px; font-size: 12px; line-height: 1.35; color:#b7ffb7;"></div>
+    <p id="tower-hint">Coder (Logic) (50) | Boolean Bits | Slows</p>
     <script src="audio.js"></script>
-    <script src="game.js"></script>
-    <script>
-        (function initTowerSelect() {
-            document.querySelectorAll('.tower-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.tower-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    const id = parseInt(btn.dataset.tower);
-                    const types = { 1: 'CODER', 2: 'ATTORNEY', 3: 'ACTIVIST', 4: 'ENCRYPTION' };
-                    if (typeof selectedTowerType !== 'undefined' && typeof TOWER_TYPES !== 'undefined') {
-                        selectedTowerType = TOWER_TYPES[types[id]];
-                        document.getElementById('tower-hint').innerText = selectedTowerType.name + ' (' + selectedTowerType.cost + ') • ' + selectedTowerType.hint;
-                    }
-                });
-            });
-        })();
-    </script>
+    <script src="mode-loader.js"></script>
 </body>
 </html>

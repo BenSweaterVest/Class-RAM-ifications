@@ -1,0 +1,27 @@
+{
+  "name": "class-ram-ifications",
+  "version": "1.0.0",
+  "description": "An in-progress historical arcade project inspired by *High Tech Gays v. Defense Industrial Security Clearance Office* (1984-1995).",
+  "main": "audio.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BenSweaterVest/Class-RAM-ifications.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BenSweaterVest/Class-RAM-ifications/issues"
+  },
+  "homepage": "https://github.com/BenSweaterVest/Class-RAM-ifications#readme",
+  "devDependencies": {
+    "playwright": "^1.58.2"
+  }
+}
