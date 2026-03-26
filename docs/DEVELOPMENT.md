@@ -1,6 +1,6 @@
 # Development Guide
 
-Last updated: March 25, 2026
+Last updated: March 26, 2026
 
 ## Runtime Ownership
 
@@ -19,11 +19,23 @@ Last updated: March 25, 2026
 - Touch gesture handling (swipe/tap) is implemented in `runner_mode.js` (`handleTouchGestureStart/Move/End/Cancel`). `docs/MOBILE_GESTURE_PLAN.md` is the historical spec for reference; real-device tuning remains open.
 - Project-level sequencing for the next few sprints lives in `docs/NEXT_SPRINTS_PLAN.md`.
 
+## Difficulty System
+
+Three named modes selectable from the top bar dropdown (takes effect on next restart):
+
+- `story` — longer wall intervals (×1.30), threshold −1, slower obstacles (×0.85), fewer spawns (×0.75)
+- `organize` — default; all scalars at 1.0
+- `resist` — tighter wall intervals (×0.85), threshold +1, faster obstacles (×1.15), denser spawns (×1.25)
+
+Base per-round profiles live in `ROUND_PROFILES` (runner_mode.js). `DIFFICULTY_MODES` holds the scalars. `getRoundProfile()` merges them and is the single source of truth for all difficulty-sensitive values: `wallIntervalMs`, `chainThreshold`, `memberSpawnMs`, `obstacleBase`, `solidarityRangePx`, `shieldDurationMs`, `speedMult`.
+
+Obstacle pressure ramps 40% within each round (`WITHIN_ROUND_RAMP = 0.4`) then resets on barrier clear. Difficulty is captured from the dropdown at `resetGame()` and locked for the run.
+
 ## Implemented Runner Contracts
 
 - 5 narrative keys in NARRATIVE_COPY
 - 5-step sequence in NARRATIVE_SEQUENCE
-- Phase thresholds in PHASE_CHAIN_THRESHOLDS = [3, 5, 7, 9]
+- Per-round chain thresholds: [3, 4, 5, 6] (normal) via ROUND_PROFILES — scaled by difficulty mode
 - Precedent target PRECEDENT_TARGET = 4
 - Phase-based year mapping and background key mapping
 

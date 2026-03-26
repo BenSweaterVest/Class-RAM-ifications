@@ -181,7 +181,7 @@ const RUNNER_SPRITE_PATHS = {
     suit: 'assets/processed/ENEMY_02_CorporateSuit_00001_.png',
     cabinet: 'assets/processed/ENEMY_03_FilingCabinet_00001_.png',
     bot: 'assets/processed/ENEMY_04_PolygraphBot_00001_.png',
-    wall: 'assets/processed/BARRIER_01_GayInvestigationUnitWall_00001_.png',
+    wall: 'assets/processed/BARRIER_v5_BarrierWall-SecurityDoor_00001_.png',
     heartFx: 'assets/processed/FX_01_SolidarityHeart_00001_.png',
     shieldFx: 'assets/processed/FX_02_PrecedentShield_00001_.png',
     tapeFx: 'assets/processed/FX_03_RedTapePit_00001_.png',
@@ -214,7 +214,7 @@ const RUNNER_SPRITE_SPECS = {
     suit: { w: 32, h: 30 },
     cabinet: { w: 28, h: 26 },
     bot: { w: 24, h: 24 },
-    wall: { w: 80, h: 80 },
+    wall: { w: 80, h: 320 },
     heartFx: { w: 10, h: 10 },
     shieldFx: { w: 74, h: 74 },
     tapeFx: { w: 18, h: 18 },
@@ -668,7 +668,7 @@ function handleNarrativeContinue(e) {
 }
 
 function updateUI() {
-    if (uiPrecedent) uiPrecedent.textContent = `${chainCount} chain | ${precedentEstablished} cleared`;
+    if (uiPrecedent) uiPrecedent.textContent = `${chainCount}/${getCurrentThreshold()} chain | ${precedentEstablished} cleared`;
     if (uiLives) uiLives.textContent = String(lives);
     if (uiStatus) {
         if (gameWon) uiStatus.textContent = 'EXECUTIVE ORDER 12968';
@@ -1425,21 +1425,23 @@ function draw() {
 function drawDebugOverlay() {
     const now = performance.now();
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-    ctx.fillRect(canvas.width - 250, 6, 244, 122);
+    ctx.fillRect(canvas.width - 250, 6, 244, 150);
     ctx.strokeStyle = '#55ff55';
-    ctx.strokeRect(canvas.width - 250, 6, 244, 122);
+    ctx.strokeRect(canvas.width - 250, 6, 244, 150);
 
     ctx.fillStyle = '#a7ffa7';
     ctx.font = '11px Courier New';
     ctx.fillText('DEBUG (F2)', canvas.width - 236, 22);
-    ctx.fillText(`active: ${gameActive}`, canvas.width - 236, 38);
-    ctx.fillText(`paused: ${narrativePaused}`, canvas.width - 236, 52);
+    ctx.fillText(`difficulty: ${activeDifficulty}`, canvas.width - 236, 38);
+    ctx.fillText(`active: ${gameActive}  paused: ${narrativePaused}`, canvas.width - 236, 52);
     ctx.fillText(`lane: ${player.lane}/${player.targetLane}`, canvas.width - 236, 66);
-    ctx.fillText(`chain: ${chainCount}`, canvas.width - 236, 80);
+    ctx.fillText(`chain: ${chainCount}/${getCurrentThreshold()}`, canvas.width - 236, 80);
     ctx.fillText(`obstacles: ${obstacles.length}`, canvas.width - 236, 94);
     ctx.fillText(`members: ${members.length}`, canvas.width - 236, 108);
     const wallDx = wall ? Math.round(wall.x - player.x) : -1;
-    ctx.fillText(`wall dx: ${wallDx}`, canvas.width - 120, 108);
+    ctx.fillText(`wall dx: ${wallDx}`, canvas.width - 236, 122);
+    const profile = getRoundProfile();
+    ctx.fillText(`wallMs: ${profile.wallIntervalMs}  spawnBase: ${profile.obstacleBase.toFixed(2)}`, canvas.width - 236, 136);
 }
 
 function loop(now) {

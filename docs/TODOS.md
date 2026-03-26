@@ -21,6 +21,7 @@ Last updated: March 26, 2026
 - [x] Replace the current narrow-screen legend rail with the decided mobile bottom-sheet pattern opened from the existing card row.
 - [x] Make the mobile bottom sheet pause gameplay cleanly and resume cleanly on close.
 - [x] Tune rounds 3 and 4 slightly easier while preserving the current feel of rounds 1 and 2.
+- [x] Redesign difficulty system: unified ROUND_PROFILES table + DIFFICULTY_MODES scalars replacing the old independent time-ramp and ease profile; per-round ramp that resets on barrier clear; Story/Organize/Resist dropdown in top bar.
 - [x] Update focused smoke and docs after the mobile bottom-sheet implementation lands.
 - [x] Expand Playwright smoke: gameplay liveness check added (control API + canvas frame-change assertion).
 - [x] Consolidate duplicated release/readiness notes: BACKLOG_TRIAGE.md removed, PIVOT_DECISIONS_SUMMARY.md updated, MOBILE_GESTURE_PLAN.md and DEVELOPMENT.md refreshed.
