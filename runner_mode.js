@@ -21,11 +21,27 @@ const runnerLegendSheetClose = document.getElementById('runner-legend-sheet-clos
 
 const LANES = [70, 130, 190, 250, 310];
 const RUN_DURATION_MS = 180000;
-const WALL_INTERVAL_MS = 25000;
 const WALL_WARNING_MS = 1800;
-const PHASE_CHAIN_THRESHOLDS = [3, 5, 7, 9];
 const SOLIDARITY_RANGE_PX = 140;
 const PRECEDENT_TARGET = 4;
+const WITHIN_ROUND_RAMP = 0.4;
+
+// Per-round profiles (normal difficulty). Index = precedentEstablished (barriers cleared so far).
+// barrier demand = chainThreshold * memberSpawnMs / wallIntervalMs
+// R0: 22%  R1: 30%  R2: 38%  R3: 47%  — gradual, coherent escalation each round.
+const ROUND_PROFILES = [
+    { wallIntervalMs: 26000, chainThreshold: 3, memberSpawnMs: 1800, obstacleBase: 1.00, solidarityRangePx: SOLIDARITY_RANGE_PX,      tooLateBufferPx: -30, shieldDurationMs: 1800 },
+    { wallIntervalMs: 23000, chainThreshold: 4, memberSpawnMs: 1700, obstacleBase: 1.15, solidarityRangePx: SOLIDARITY_RANGE_PX + 10,  tooLateBufferPx: -34, shieldDurationMs: 1900 },
+    { wallIntervalMs: 21000, chainThreshold: 5, memberSpawnMs: 1600, obstacleBase: 1.30, solidarityRangePx: SOLIDARITY_RANGE_PX + 20,  tooLateBufferPx: -38, shieldDurationMs: 2050 },
+    { wallIntervalMs: 19000, chainThreshold: 6, memberSpawnMs: 1500, obstacleBase: 1.50, solidarityRangePx: SOLIDARITY_RANGE_PX + 28,  tooLateBufferPx: -44, shieldDurationMs: 2200 },
+];
+
+// Difficulty mode scalars applied on top of the round profile.
+const DIFFICULTY_MODES = {
+    story:    { wallMult: 1.30, thresholdOffset: -1, memberMult: 0.85, obstacleMult: 0.75, speedMult: 0.85 },
+    organize: { wallMult: 1.00, thresholdOffset:  0, memberMult: 1.00, obstacleMult: 1.00, speedMult: 1.00 },
+    resist:   { wallMult: 0.85, thresholdOffset:  1, memberMult: 1.15, obstacleMult: 1.25, speedMult: 1.15 },
+};
 
 const PHASE_YEAR_BY_PRECEDENT = [1984, 1987, 1990, 1995, 1995];
 const PHASE_BACKGROUND_KEY_BY_PRECEDENT = [
@@ -48,6 +64,8 @@ let courtroomFinaleActive = false;
 let pendingVictoryAfterNarrative = false;
 
 let runStart = 0;
+let roundStart = 0;
+let activeDifficulty = 'organize';
 let lastSpawn = 0;
 let lastMemberSpawn = 0;
 let lastWall = 0;
@@ -322,7 +340,11 @@ function resetGame() {
     courtroomFinaleActive = false;
     pendingVictoryAfterNarrative = false;
 
+    const diffSelect = document.getElementById('difficulty-select');
+    activeDifficulty = (diffSelect && diffSelect.value) || 'normal';
+
     runStart = performance.now();
+    roundStart = runStart;
     lastSpawn = runStart;
     lastMemberSpawn = runStart - 1400;
     lastWall = runStart;
@@ -556,8 +578,7 @@ function toggleLegendCard(cardId) {
 }
 
 function getCurrentThreshold() {
-    const idx = Math.min(precedentEstablished, PHASE_CHAIN_THRESHOLDS.length - 1);
-    return PHASE_CHAIN_THRESHOLDS[idx];
+    return getRoundProfile().chainThreshold;
 }
 
 function getCurrentPhaseYear() {
@@ -570,35 +591,24 @@ function getCurrentBackgroundKey() {
     return PHASE_BACKGROUND_KEY_BY_PRECEDENT[idx];
 }
 
-function getLatePhaseEaseProfile() {
-    if (precedentEstablished >= 3) {
-        return {
-            obstacleDensity: 0.75,
-            wallIntervalMs: 19500,
-            solidarityRangePx: SOLIDARITY_RANGE_PX + 34,
-            tooLateBufferPx: -50,
-            shieldDurationMs: 2300
-        };
-    }
-    if (precedentEstablished >= 2) {
-        return {
-            obstacleDensity: 0.80,
-            wallIntervalMs: 18000,
-            solidarityRangePx: SOLIDARITY_RANGE_PX + 22,
-            tooLateBufferPx: -42,
-            shieldDurationMs: 2100
-        };
-    }
+function getRoundProfile() {
+    const idx = Math.min(precedentEstablished, ROUND_PROFILES.length - 1);
+    const base = ROUND_PROFILES[idx];
+    const diff = DIFFICULTY_MODES[activeDifficulty] || DIFFICULTY_MODES.organize;
     return {
-        obstacleDensity: 1,
-        wallIntervalMs: WALL_INTERVAL_MS,
-        solidarityRangePx: SOLIDARITY_RANGE_PX,
-        tooLateBufferPx: -30,
-        shieldDurationMs: 1800
+        wallIntervalMs:    Math.round(base.wallIntervalMs * diff.wallMult),
+        chainThreshold:    Math.max(1, base.chainThreshold + diff.thresholdOffset),
+        memberSpawnMs:     Math.round(base.memberSpawnMs * diff.memberMult),
+        obstacleBase:      base.obstacleBase * diff.obstacleMult,
+        solidarityRangePx: base.solidarityRangePx,
+        tooLateBufferPx:   base.tooLateBufferPx,
+        shieldDurationMs:  base.shieldDurationMs,
+        speedMult:         diff.speedMult,
     };
 }
 
 function handleBarrierClear() {
+    roundStart = performance.now();
     precedentEstablished += 1;
     score += 100;
     courtroomFinaleActive = precedentEstablished >= 3;
@@ -623,6 +633,7 @@ function applyPauseCompensation(deltaMs) {
     if (!deltaMs) return;
 
     runStart += deltaMs;
+    roundStart += deltaMs;
     lastSpawn += deltaMs;
     lastMemberSpawn += deltaMs;
     lastWall += deltaMs;
@@ -860,20 +871,21 @@ function enqueueSpawn(now, delayMs, kind, lane) {
 }
 
 function createObstacle(now, type, lane) {
-    let speed = 2.1 + Math.random() * 1.2;
+    const sm = getRoundProfile().speedMult;
+    let speed = (2.1 + Math.random() * 1.2) * sm;
     let w = 24;
     let h = 18;
     let renderW = 24;
     let renderH = 18;
     if (type === 'cabinet') {
-        speed = 2.5;
+        speed = 2.5 * sm;
         w = 26;
         h = 20;
         renderW = 28;
         renderH = 26;
     }
     if (type === 'bot') {
-        speed = 1.8;
+        speed = 1.8 * sm;
         w = 34;
         h = 22;
         renderW = 24;
@@ -903,11 +915,10 @@ function createObstacle(now, type, lane) {
 }
 
 function schedulePatterns(now) {
-    const elapsed = now - runStart;
-    const densityScale = 1 + Math.min(1.4, elapsed / RUN_DURATION_MS);
-    const easeProfile = getLatePhaseEaseProfile();
-    const finaleScale = courtroomFinaleActive ? 1.35 : 1;
-    const spawnEvery = 1400 / (densityScale * finaleScale * easeProfile.obstacleDensity);
+    const profile = getRoundProfile();
+    const roundElapsed = now - roundStart;
+    const withinRoundScale = 1 + WITHIN_ROUND_RAMP * Math.min(1, roundElapsed / profile.wallIntervalMs);
+    const spawnEvery = 1400 / (withinRoundScale * profile.obstacleBase);
     if (now < nextPatternAt) return;
     nextPatternAt = now + spawnEvery;
 
@@ -958,7 +969,7 @@ function processPendingSpawns(now) {
 }
 
 function spawnMember(now) {
-    if (now - lastMemberSpawn < 1800) return;
+    if (now - lastMemberSpawn < getRoundProfile().memberSpawnMs) return;
     lastMemberSpawn = now;
     const lane = Math.floor(Math.random() * LANES.length);
     const scale = 0.84 + Math.random() * 0.32;
@@ -985,11 +996,8 @@ function spawnMember(now) {
 }
 
 function maybeSpawnWall(now) {
-    const easeProfile = getLatePhaseEaseProfile();
-    const interval = courtroomFinaleActive
-        ? Math.max(15500, easeProfile.wallIntervalMs - 1000)
-        : easeProfile.wallIntervalMs;
-    if (wall || now - lastWall < interval) return;
+    const profile = getRoundProfile();
+    if (wall || now - lastWall < profile.wallIntervalMs) return;
     lastWall = now;
     wall = {
         x: canvas.width + 90,
@@ -1010,20 +1018,19 @@ function getSolidarityState(now) {
     if (!wall) {
         return { ready: false, reason: 'No barrier to activate against' };
     }
-    const easeProfile = getLatePhaseEaseProfile();
-    const threshold = getCurrentThreshold();
-    if (chainCount < threshold) {
+    const profile = getRoundProfile();
+    if (chainCount < profile.chainThreshold) {
         return {
             ready: false,
-            reason: `Need ${threshold - chainCount} more chain`
+            reason: `Need ${profile.chainThreshold - chainCount} more chain`
         };
     }
 
     const distanceToWall = wall.x - player.x;
-    if (distanceToWall > easeProfile.solidarityRangePx) {
+    if (distanceToWall > profile.solidarityRangePx) {
         return { ready: false, reason: 'Too early, wait for barrier' };
     }
-    if (distanceToWall < easeProfile.tooLateBufferPx) {
+    if (distanceToWall < profile.tooLateBufferPx) {
         return { ready: false, reason: 'Too late, barrier passed' };
     }
 
@@ -1035,8 +1042,7 @@ function canActivateSolidarity(now) {
 }
 
 function activateSolidarity(now) {
-    const easeProfile = getLatePhaseEaseProfile();
-    wall.activeUntil = now + easeProfile.shieldDurationMs;
+    wall.activeUntil = now + getRoundProfile().shieldDurationMs;
     clearCollectedMembers();
     chainCount = 0;
     playSfx('stageAdvance');

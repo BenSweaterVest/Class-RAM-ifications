@@ -139,6 +139,17 @@
         }
         .tower-btn:hover { border-color: #00ff00; }
         .tower-btn.selected { border-color: #00ffff; background: #002200; }
+        #difficulty-select {
+            background: #111; color: #00ff00; border: 2px solid #333;
+            padding: 6px 10px; cursor: pointer; font-family: inherit; font-size: 12px;
+            appearance: none; -webkit-appearance: none;
+        }
+        #difficulty-select:hover { border-color: #00ff00; }
+        #difficulty-select:focus { outline: none; border-color: #00ff00; }
+        body.light-mode #difficulty-select {
+            background: #fffdf7; color: #153015; border-color: #9fb09f;
+        }
+        body.light-mode #difficulty-select:hover { border-color: #2d6b2d; }
         body.light-mode .tower-btn {
             background: #fffdf7;
             color: #153015;
@@ -595,7 +606,7 @@
 </head>
 <body>
     <h1>CLASS <span class="rainbow-text">RAM-IFICATIONS</span></h1>
-    <div id="mode-banner"><span id="mode-label" style="display:none;"></span><button id="audio-mute-toggle" class="tower-btn" type="button">MUTE: OFF</button><button id="theme-toggle" class="tower-btn" type="button">BRIGHT MODE</button><button id="restart-toggle" class="tower-btn" type="button">RESTART</button><button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
+    <div id="mode-banner"><span id="mode-label" style="display:none;"></span><button id="audio-mute-toggle" class="tower-btn" type="button">MUTE: OFF</button><button id="theme-toggle" class="tower-btn" type="button">BRIGHT MODE</button><select id="difficulty-select" title="Difficulty (takes effect on next restart)"><option value="story">STORY</option><option value="organize" selected>ORGANIZE</option><option value="resist">RESIST</option></select><button id="restart-toggle" class="tower-btn" type="button">RESTART</button><button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
     <div id="ui-layer">
         <div><span id="precedent-label">PRECEDENT:</span> <span id="precedent-val">100</span></div>
         <div>LIVES: <span id="lives-val">3</span></div>
