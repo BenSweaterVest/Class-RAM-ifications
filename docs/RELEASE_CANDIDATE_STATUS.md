@@ -1,6 +1,6 @@
 # Release Candidate Status Snapshot
 
-Date: March 22, 2026
+Date: March 25, 2026
 Mode focus: Runner default (`index.html`), legacy reference (`index.html?mode=legacy`)
 
 ## Build And Script Validation
@@ -32,7 +32,7 @@ Executed:
 
 Result:
 
-- PASS: source/runtime PNG parity (27/27)
+- PASS: source/runtime PNG parity (44/44)
 - PASS: runner contract checks
 - PASS: smoke contract checks
 - PASS: full verification bundle (`run_all_checks`)
@@ -48,7 +48,8 @@ Result:
 - PASS: narrative continue reliability (click + Enter fallback)
 - PASS: intro historical framing starts with court-case context
 - PASS: control semantics + obstacle-effect legend/hint/help wiring
-- PASS: pride-color visual variation signal (7 active color buckets)
+- PASS: pride-color visual variation signal (6 active color buckets)
+- PASS: promoted narrative cards and HTG roster did not break focused browser smoke
 
 ## Checklist Status (Current)
 
@@ -75,7 +76,7 @@ Reference: `docs/DEPLOY_CHECKLIST.md`
 Reference: `docs/RELEASE_CHECKLIST.md`
 
 - Runner readiness: implementation largely in place, manual validation pending
-- Repo/asset decisions: partially open
+- Repo/asset decisions: partially open (retired generic follower art cleanup still optional)
 - Audio policy decision: open
 
 ## Deferred / Open Decision Gates
@@ -84,7 +85,7 @@ Reference: `docs/RELEASE_CHECKLIST.md`
 - Difficulty tuning profile and solidarity threshold confirmation
 - Narrative tone and reading-length approval
 - Audio policy for first release (SFX-only or include BGM)
-- Long-term handling of `class_ram_ifications assets/`
+- Long-term handling of retired generic follower/collectible PNGs
 
 ## Suggested Immediate Next Actions
 

@@ -1,6 +1,6 @@
 # Program Status
 
-Last updated: March 22, 2026
+Last updated: March 25, 2026
 
 ## Current State
 
@@ -10,20 +10,22 @@ Last updated: March 22, 2026
 - Dynamic phase thresholds implemented: 3/5/7/9.
 - Victory now resolves through final EO 12968 narrative card.
 - Popup tone styling and tone-specific SFX implemented.
-- Phase background selection with fallback implemented.
+- Phase background selection now uses promoted location-specific art.
+- Narrative popup cards are installed and rendered behind the historical text.
+- Runner collectible/follower art now uses the eight named HTG pride-roster members.
 
 ## Verification State
 
 - run_all_checks: PASS
-- smoke_runner_focus: PASS (after intro-text assertion update)
+- smoke_runner_focus: PASS (March 25 post-art integration rerun)
 
 ## Open Non-Code Dependency
 
-Phase background art files are still optional/missing; fallback rendering is active until those files are added.
+No external art dependency is blocking runner mode. The new background, card, and HTG member PNGs are now committed in both mirrored asset folders.
 
 ## Release Readiness Snapshot
 
 Engineering: strong
-Documentation: synchronized in core guides
+Documentation: synchronized in core guides and asset metadata
 Live deploy evidence: still pending
 Device-matrix signoff: still pending owner validation

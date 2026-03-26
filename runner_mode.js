@@ -65,10 +65,16 @@ let solidarityFeedbackUntil = 0;
 let laneLockFeedbackText = '';
 let laneLockFeedbackUntil = 0;
 let narrativePaused = false;
+let legendPaused = false;
 let narrativeQueue = [];
 let narrativePauseStartedAt = 0;
+let legendPauseStartedAt = 0;
 const shownNarrativeKeys = new Set();
 let debugOverlayEnabled = false;
+let collectedMembers = [];
+let legendExpandedCardId = '';
+let legendRosterRotationIndex = 0;
+let legendRosterRotationInterval = 0;
 
 const player = {
     x: 180,
@@ -114,26 +120,23 @@ const NARRATIVE_COPY = {
 
 const NARRATIVE_SEQUENCE = ['intro', 'phase1Clear', 'phase2Clear', 'phase3Clear', 'phase4Victory'];
 
-const PRIDE_MEMBER_VARIANTS = [
-    { color: '#ff1493', name: 'Hot Pink', meaning: 'Sexuality' },
-    { color: '#e53935', name: 'Red', meaning: 'Life' },
-    { color: '#fb8c00', name: 'Orange', meaning: 'Healing' },
-    { color: '#fdd835', name: 'Yellow', meaning: 'Sunlight' },
-    { color: '#43a047', name: 'Green', meaning: 'Nature' },
-    { color: '#00acc1', name: 'Turquoise', meaning: 'Art/Magic' },
-    { color: '#3949ab', name: 'Indigo', meaning: 'Serenity/Harmony' },
-    { color: '#7e57c2', name: 'Violet', meaning: 'Spirit' }
-];
+const NARRATIVE_CARD_BY_KEY = {
+    intro: 'card01',
+    phase1Clear: 'card02',
+    phase2Clear: 'card03',
+    phase3Clear: 'card04',
+    phase4Victory: 'card05'
+};
 
-const PRIDE_FLAG_COLORS = [
-    '#ff1493',
-    '#e53935',
-    '#fb8c00',
-    '#fdd835',
-    '#43a047',
-    '#00acc1',
-    '#3949ab',
-    '#7e57c2'
+const PRIDE_MEMBER_VARIANTS = [
+    { key: 'htgAlex', color: '#ff1493', colorName: 'Hot Pink', meaning: 'Sexuality', characterName: 'Alex' },
+    { key: 'htgCarmen', color: '#e53935', colorName: 'Red', meaning: 'Life', characterName: 'Carmen' },
+    { key: 'htgMarcus', color: '#fb8c00', colorName: 'Orange', meaning: 'Healing', characterName: 'Marcus' },
+    { key: 'htgSam', color: '#fdd835', colorName: 'Yellow', meaning: 'Sunlight', characterName: 'Sam' },
+    { key: 'htgJordan', color: '#43a047', colorName: 'Green', meaning: 'Nature', characterName: 'Jordan' },
+    { key: 'htgDani', color: '#00acc1', colorName: 'Turquoise', meaning: 'Art/Magic', characterName: 'Dani' },
+    { key: 'htgRobin', color: '#3949ab', colorName: 'Indigo', meaning: 'Serenity', characterName: 'Robin' },
+    { key: 'htgEvelyn', color: '#7e57c2', colorName: 'Violet', meaning: 'Spirit', characterName: 'Evelyn' }
 ];
 
 const PLAYER_MIN_X = 88;
@@ -141,19 +144,20 @@ const PLAYER_MAX_X = canvas.width - 120;
 
 const runnerSpriteAssets = {};
 const runnerSpriteState = {};
-const tintedSpriteCache = new Map();
 
 const RUNNER_SPRITE_PATHS = {
     player: 'assets/processed/PLAYER_01_TimothyDoolingPlayerCharacter_00001_.png',
-    follower01: 'assets/processed/FOLLOWER_01_HTGFollowerType01_00001_.png',
-    follower02: 'assets/processed/FOLLOWER_02_HTGFollowerType02_00001_.png',
-    follower03: 'assets/processed/FOLLOWER_03_HTGFollowerType03_00001_.png',
-    follower04: 'assets/processed/FOLLOWER_04_HTGFollowerType04_00001_.png',
-    follower05: 'assets/processed/FOLLOWER_05_HTGFollowerType05_00001_.png',
+    htgAlex: 'assets/processed/HTG_01_HTGMemberAlex_00001_.png',
+    htgCarmen: 'assets/processed/HTG_02_HTGMemberCarmen_00001_.png',
+    htgMarcus: 'assets/processed/HTG_03_HTGMemberMarcus_00001_.png',
+    htgSam: 'assets/processed/HTG_04_HTGMemberSam_00001_.png',
+    htgJordan: 'assets/processed/HTG_05_HTGMemberJordan_00001_.png',
+    htgDani: 'assets/processed/HTG_06_HTGMemberDani_00001_.png',
+    htgRobin: 'assets/processed/HTG_07_HTGMemberRobin_00001_.png',
+    htgEvelyn: 'assets/processed/HTG_08_HTGMemberEvelyn_00001_.png',
     suit: 'assets/processed/ENEMY_02_CorporateSuit_00001_.png',
     cabinet: 'assets/processed/ENEMY_03_FilingCabinet_00001_.png',
     bot: 'assets/processed/ENEMY_04_PolygraphBot_00001_.png',
-    member: 'assets/processed/COLLECTIBLE_01_HTGMemberCollectible_00001_.png',
     wall: 'assets/processed/BARRIER_01_GayInvestigationUnitWall_00001_.png',
     heartFx: 'assets/processed/FX_01_SolidarityHeart_00001_.png',
     shieldFx: 'assets/processed/FX_02_PrecedentShield_00001_.png',
@@ -163,23 +167,30 @@ const RUNNER_SPRITE_PATHS = {
     uiSolidarityUrgent: 'assets/processed/UI_03_SolidarityButtonUrgent_00001_.png',
     gridTile: 'assets/processed/ENV_01_CorporateLogicGridTile_00001_.png',
     background: 'assets/processed/ENV_02_RunnerModeBackground_00001_.png',
-    backgroundPhase1: 'assets/processed/ENV_03_SiliconValleyOffice_00001_.png',
-    backgroundPhase2: 'assets/processed/ENV_04_DistrictCourtroom_00001_.png',
-    backgroundPhase3: 'assets/processed/ENV_05_AppealsCourtroom_00001_.png',
-    backgroundPhase4: 'assets/processed/ENV_06_WashingtonDCCorridor_00001_.png'
+    backgroundPhase1: 'assets/processed/BG_01_v3_BackgroundSiliconValley_00001_.png',
+    backgroundPhase2: 'assets/processed/BG_02_v1_BackgroundDistrictCourt_00001_.png',
+    backgroundPhase3: 'assets/processed/BG_03_BackgroundAppealsCourt_00001_.png',
+    backgroundPhase4: 'assets/processed/BG_04_v3_BackgroundWashingtonDC_00001_.png',
+    card01: 'assets/processed/CARD_01_CardIntro1984_00001_.png',
+    card02: 'assets/processed/CARD_02_CardSuitFiled1984_00001_.png',
+    card03: 'assets/processed/CARD_03_CardHendersonRules1987_00001_.png',
+    card04: 'assets/processed/CARD_04_CardReversal1990_00001_.png',
+    card05: 'assets/processed/CARD_05_CardExecutiveOrder1995_00001_.png'
 };
 
 const RUNNER_SPRITE_SPECS = {
     player: { w: 26, h: 26 },
-    follower01: { w: 14, h: 14 },
-    follower02: { w: 14, h: 14 },
-    follower03: { w: 14, h: 14 },
-    follower04: { w: 14, h: 14 },
-    follower05: { w: 14, h: 14 },
+    htgAlex: { w: 16, h: 22 },
+    htgCarmen: { w: 15, h: 22 },
+    htgMarcus: { w: 15, h: 22 },
+    htgSam: { w: 16, h: 22 },
+    htgJordan: { w: 15, h: 23 },
+    htgDani: { w: 15, h: 23 },
+    htgRobin: { w: 14, h: 22 },
+    htgEvelyn: { w: 14, h: 22 },
     suit: { w: 32, h: 30 },
     cabinet: { w: 28, h: 26 },
     bot: { w: 24, h: 24 },
-    member: { w: 20, h: 20 },
     wall: { w: 80, h: 80 },
     heartFx: { w: 10, h: 10 },
     shieldFx: { w: 74, h: 74 },
@@ -192,10 +203,13 @@ const RUNNER_SPRITE_SPECS = {
     backgroundPhase1: { w: 360, h: 240 },
     backgroundPhase2: { w: 360, h: 240 },
     backgroundPhase3: { w: 360, h: 240 },
-    backgroundPhase4: { w: 360, h: 240 }
+    backgroundPhase4: { w: 360, h: 240 },
+    card01: { w: 680, h: 380 },
+    card02: { w: 680, h: 380 },
+    card03: { w: 680, h: 380 },
+    card04: { w: 680, h: 380 },
+    card05: { w: 680, h: 380 }
 };
-
-const FOLLOWER_VARIANT_KEYS = ['follower01', 'follower02', 'follower03', 'follower04', 'follower05'];
 
 function loadRunnerSprite(key, src) {
     const img = new Image();
@@ -267,40 +281,28 @@ function drawRunnerSprite(key, x, y, fallbackDraw, sizeOverride, drawOptions) {
     ctx.drawImage(img, x - spec.w / 2, y - spec.h / 2, spec.w, spec.h);
 }
 
-function drawTintedRunnerSprite(key, x, y, tintColor, sizeOverride, fallbackDraw) {
-    const img = getRunnerSprite(key);
-    if (!img) {
-        fallbackDraw();
-        return;
-    }
-
-    const spec = sizeOverride || RUNNER_SPRITE_SPECS[key] || { w: 24, h: 24 };
-    const cacheKey = `${key}:${tintColor}:${spec.w}x${spec.h}`;
-    let tinted = tintedSpriteCache.get(cacheKey);
-    if (!tinted) {
-        tinted = document.createElement('canvas');
-        tinted.width = spec.w;
-        tinted.height = spec.h;
-        const tctx = tinted.getContext('2d');
-        tctx.drawImage(img, 0, 0, spec.w, spec.h);
-        tctx.globalCompositeOperation = 'source-atop';
-        tctx.globalAlpha = 0.44;
-        tctx.fillStyle = tintColor;
-        tctx.fillRect(0, 0, spec.w, spec.h);
-        tctx.globalCompositeOperation = 'source-over';
-        tctx.globalAlpha = 1;
-        tintedSpriteCache.set(cacheKey, tinted);
-    }
-
-    ctx.drawImage(tinted, x - spec.w / 2, y - spec.h / 2, spec.w, spec.h);
-}
-
-function getFollowerVariantKey(index) {
-    return FOLLOWER_VARIANT_KEYS[index % FOLLOWER_VARIANT_KEYS.length];
-}
-
 function playSfx(name) {
     if (window.sfx && typeof window.sfx[name] === 'function') window.sfx[name]();
+}
+
+function clearCollectedMembers() {
+    collectedMembers = [];
+}
+
+function addCollectedMember(memberVariant) {
+    collectedMembers.unshift(memberVariant);
+    chainCount = collectedMembers.length;
+}
+
+function trimCollectedMembers(count = 1) {
+    if (count <= 0 || !collectedMembers.length) return false;
+    collectedMembers.splice(Math.max(0, collectedMembers.length - count), count);
+    chainCount = collectedMembers.length;
+    return true;
+}
+
+function getCollectedMemberForFollower(index) {
+    return collectedMembers[index] || PRIDE_MEMBER_VARIANTS[index % PRIDE_MEMBER_VARIANTS.length];
 }
 
 function resetGame() {
@@ -326,9 +328,13 @@ function resetGame() {
     wall = null;
     particles = [];
     pendingSpawns = [];
+    clearCollectedMembers();
     narrativePaused = false;
+    legendPaused = false;
     narrativeQueue = [];
     shownNarrativeKeys.clear();
+    legendExpandedCardId = '';
+    legendPauseStartedAt = 0;
 
     player.x = 180;
     player.targetX = 180;
@@ -387,9 +393,14 @@ function showNextNarrative() {
             'runner-narrative-theme-victory'
         );
         runnerNarrativePanel.classList.add(toneClass);
+        const narrativeCardKey = NARRATIVE_CARD_BY_KEY[nextKey];
+        const cardPath = narrativeCardKey ? RUNNER_SPRITE_PATHS[narrativeCardKey] : '';
+        runnerNarrativePanel.style.backgroundImage = cardPath
+            ? `linear-gradient(90deg, rgba(3, 18, 3, 0.22), rgba(3, 18, 3, 0.04)), url(${cardPath})`
+            : '';
     }
 
-    if (runnerNarrativeTitle) runnerNarrativeTitle.textContent = `Checkpoint ${progressLabel}: ${copy.title}`;
+    if (runnerNarrativeTitle) runnerNarrativeTitle.textContent = `History Checkpoint ${progressLabel}: ${copy.title}`;
     if (runnerNarrativeBody) runnerNarrativeBody.textContent = copy.body;
     runnerNarrativePanel.style.display = 'block';
     if (runnerNarrativeNextButton) runnerNarrativeNextButton.focus();
@@ -418,6 +429,57 @@ function advanceNarrative() {
     }
 
     updateUI();
+}
+
+function setLegendPaused(paused) {
+    if (legendPaused === paused) return;
+
+    const now = performance.now();
+    if (paused) {
+        legendPaused = true;
+        legendPauseStartedAt = now;
+        updateUI();
+        return;
+    }
+
+    if (legendPauseStartedAt > 0) {
+        applyPauseCompensation(Math.max(0, now - legendPauseStartedAt));
+        legendPauseStartedAt = 0;
+    }
+    legendPaused = false;
+    updateUI();
+}
+
+function collapseLegendCards() {
+    legendExpandedCardId = '';
+    if (runnerLegend) {
+        runnerLegend.querySelectorAll('.legend-card.is-expanded').forEach(card => {
+            card.classList.remove('is-expanded');
+            card.setAttribute('aria-expanded', 'false');
+        });
+    }
+    setLegendPaused(false);
+}
+
+function setLegendExpandedCard(cardId) {
+    if (!runnerLegend) return;
+    const cards = Array.from(runnerLegend.querySelectorAll('.legend-card'));
+    legendExpandedCardId = cardId;
+    cards.forEach(card => {
+        const expanded = card.dataset.cardId === cardId;
+        card.classList.toggle('is-expanded', expanded);
+        card.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    });
+    setLegendPaused(Boolean(cardId));
+}
+
+function toggleLegendCard(cardId) {
+    if (!cardId) return;
+    if (legendExpandedCardId === cardId) {
+        collapseLegendCards();
+        return;
+    }
+    setLegendExpandedCard(cardId);
 }
 
 function getCurrentThreshold() {
@@ -494,12 +556,13 @@ function handleNarrativeContinue(e) {
 }
 
 function updateUI() {
-    if (uiPrecedent) uiPrecedent.textContent = `${chainCount} | ${precedentEstablished}`;
+    if (uiPrecedent) uiPrecedent.textContent = `${chainCount} chain | ${precedentEstablished} cleared`;
     if (uiLives) uiLives.textContent = String(lives);
     if (uiStatus) {
         if (gameWon) uiStatus.textContent = 'EXECUTIVE ORDER 12968';
         else if (!gameActive) uiStatus.textContent = 'RUN FAILED';
         else if (narrativePaused) uiStatus.textContent = 'PAUSED: STORY CHECKPOINT';
+        else if (legendPaused) uiStatus.textContent = 'PAUSED: INFO CARD';
         else if (courtroomFinaleActive) uiStatus.textContent = 'COURTROOM GAUNTLET';
         else if (laneLockedUntil > performance.now()) uiStatus.textContent = 'LANE LOCKED';
         else if (wall) uiStatus.textContent = 'BARRIER ACTIVE';
@@ -534,28 +597,92 @@ function updateUI() {
 function renderRunnerLegend() {
     if (!runnerLegend) return;
 
-    const prideMeaning = PRIDE_MEMBER_VARIANTS.map(v => `${v.name}: ${v.meaning}`).join(' | ');
-    const thresholdLine = `Phase thresholds: ${PHASE_CHAIN_THRESHOLDS.join(' / ')}`;
+    const htgExpandedHtml =
+        '<div class="htg-card-explainer">Real people with real jobs at real defense contractors.\nHTG wasn\'t a protest group, it was a social organization that decided they needed to fight back.\nCollect them. Solidarity only works if you show up together.<br><br>Represented by eight members, each tied to a color from the original pride flag and its meaning.</div>' +
+        '<div class="htg-mini-grid">' +
+        PRIDE_MEMBER_VARIANTS.map(member => (
+            `<div class="htg-mini-card">` +
+            `<img src="${RUNNER_SPRITE_PATHS[member.key]}" alt="${member.characterName}">` +
+            `<div class="htg-mini-line">` +
+            `<strong>${member.characterName}</strong>` +
+            `<span class="htg-sep">|</span>` +
+            `<span>${member.colorName}</span>` +
+            `<span class="htg-sep">|</span>` +
+            `<span>${member.meaning}</span>` +
+            `</div>` +
+            `</div>`
+        )).join('') +
+        '</div>';
+
     const spriteCards = [
-        { path: RUNNER_SPRITE_PATHS.player, label: 'Player (Timothy Dooling)' },
-        { path: RUNNER_SPRITE_PATHS.member, label: 'HTG Member' },
-        { path: RUNNER_SPRITE_PATHS.suit, label: 'Suit' },
-        { path: RUNNER_SPRITE_PATHS.cabinet, label: 'Cabinet' },
-        { path: RUNNER_SPRITE_PATHS.bot, label: 'Bot' },
-        { path: RUNNER_SPRITE_PATHS.wall, label: 'Barrier Wall' }
+        {
+            id: 'contender',
+            path: RUNNER_SPRITE_PATHS.player,
+            label: 'Timothy Dooling (Contender)',
+            title: 'Contender',
+            description: 'You are Timothy Dooling, a former army officer and a nuclear fusion engineer at Lockheed Missiles and Space Co.\nYou applied for a Secret industrial clearance in 1983. Despite having held an Army clearance less than a year prior, you were denied for your "homosexual activity."\n\nNow you must Dodge hazards, build solidarity, and survive long enough to change the world.'
+        },
+        {
+            id: 'htg-members',
+            path: RUNNER_SPRITE_PATHS[PRIDE_MEMBER_VARIANTS[legendRosterRotationIndex].key],
+            label: 'HTG Members (Ally Chain)',
+            imageId: 'runner-legend-htg-preview',
+            title: 'HTG Members',
+            description: '',
+            expandedHtml: htgExpandedHtml
+        },
+        {
+            id: 'suit',
+            path: RUNNER_SPRITE_PATHS.suit,
+            label: 'Suit (Damage)',
+            title: 'DISCO Investigator (Suit)',
+            description: 'A Defense Industrial Security Clearance Office field agent.\nArmed with a manual that classifies homosexuality alongside alcoholism and psychosis.\nAuthorized to investigate "the nature and full extent of deviant acts."\nAvoid them or lose members of your chain, or if you are alone, your life.',
+            imageStyle: 'filter:grayscale(1) saturate(0.15) contrast(1.1);'
+        },
+        {
+            id: 'cabinet',
+            path: RUNNER_SPRITE_PATHS.cabinet,
+            label: 'Cabinet (Slow)',
+            title: 'Cabinet (SLOW)',
+            description: 'DISCO may grant clearances to gay applicants eventually.\nBut "eventually" meant months of intrusive questioning about sexual partners, meeting places, and "disclosed proclivities."\nA process designed to take six weeks that stretched years. The delay was more than a punishment, it was there to deter you. It slows you down.'
+        },
+        {
+            id: 'bot',
+            path: RUNNER_SPRITE_PATHS.bot,
+            label: 'Bot (LOCK)',
+            title: 'Bot (LOCK)',
+            description: 'The Defense Investigative Security Clearance Office didn\'t rely on agents alone.\nPolygraph machines. Surveillance equipment. Automated screening systems that flagged HTG membership before a human ever read your file. The apparatus locks your options before you even know it\'s there.'
+        },
+        {
+            id: 'wall',
+            path: RUNNER_SPRITE_PATHS.wall,
+            label: 'Policy (Barrier Wall)',
+            title: 'Policy (Barrier Wall)',
+            description: 'The Defense Industrial Security Clearance Office didn\'t need to fire you. It just needed to make clearance impossible.\nNo individual decision. No single agent. Just a policy that said gay applicants required expanded review, indefinitely. Only solidarity breaks through. Build your chain and push.'
+        }
     ].map(item => (
-        `<div style="display:flex;align-items:center;gap:6px;border:1px solid #2b4f2b;padding:4px 6px;background:#071107;">` +
-        `<img src="${item.path}" alt="${item.label}" style="width:22px;height:22px;image-rendering:pixelated;">` +
-        `<span>${item.label}</span>` +
-        `</div>`
+        `<button class="legend-card" type="button" tabindex="0" data-card-id="${item.id}" aria-expanded="false">` +
+        `<img ${item.imageId ? `id="${item.imageId}"` : ''} src="${item.path}" alt="${item.label}" ${item.imageStyle ? `style="${item.imageStyle}"` : ''}>` +
+        `<span class="legend-card-label">${item.label}</span>` +
+        `<div class="legend-tooltip"><strong>${item.title}</strong>${item.description ? item.description : ''}${item.expandedHtml || ''}</div>` +
+        `</button>`
     )).join('');
 
     runnerLegend.style.display = 'block';
     runnerLegend.innerHTML =
-        '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;">' + spriteCards + '</div>' +
-        '<strong>Obstacle Effects:</strong> Suit = heavier chain break, Cabinet = temporary movement slow, Bot = lane lock. ' +
-        '<strong>Pride Meanings:</strong> ' + prideMeaning + '<br>' +
-        '<strong>Solidarity:</strong> ' + thresholdLine;
+        '<div class="runner-legend-grid">' + spriteCards + '</div>';
+
+    if (legendRosterRotationInterval) {
+        clearInterval(legendRosterRotationInterval);
+    }
+    const rosterPreview = document.getElementById('runner-legend-htg-preview');
+    if (rosterPreview) {
+        legendRosterRotationInterval = window.setInterval(() => {
+            if (legendExpandedCardId === 'htg-members') return;
+            legendRosterRotationIndex = (legendRosterRotationIndex + 1) % PRIDE_MEMBER_VARIANTS.length;
+            rosterPreview.src = RUNNER_SPRITE_PATHS[PRIDE_MEMBER_VARIANTS[legendRosterRotationIndex].key];
+        }, 1100);
+    }
 }
 
 function setSolidarityFeedback(text, durationMs = 1200) {
@@ -679,8 +806,8 @@ function spawnMember(now) {
     lastMemberSpawn = now;
     const lane = Math.floor(Math.random() * LANES.length);
     const scale = 0.84 + Math.random() * 0.32;
-    const renderW = Math.round(30 * scale);
-    const renderH = Math.round(30 * scale);
+    const renderW = Math.round(18 * scale);
+    const renderH = Math.round(26 * scale);
     const w = Math.round(20 * scale);
     const h = Math.round(24 * scale);
     const prideVariant = PRIDE_MEMBER_VARIANTS[Math.floor(Math.random() * PRIDE_MEMBER_VARIANTS.length)];
@@ -692,9 +819,11 @@ function spawnMember(now) {
         h,
         renderW,
         renderH,
+        spriteKey: prideVariant.key,
         prideColor: prideVariant.color,
-        prideName: prideVariant.name,
+        prideName: prideVariant.colorName,
         prideMeaning: prideVariant.meaning,
+        characterName: prideVariant.characterName,
         speed: 2
     });
 }
@@ -747,6 +876,7 @@ function canActivateSolidarity(now) {
 
 function activateSolidarity(now) {
     wall.activeUntil = now + 1800;
+    clearCollectedMembers();
     chainCount = 0;
     playSfx('stageAdvance');
 
@@ -791,8 +921,7 @@ function getFollowerHitboxes() {
 }
 
 function applyTailLoss() {
-    if (chainCount > 0) {
-        chainCount = Math.max(0, chainCount - 1);
+    if (trimCollectedMembers(1)) {
         playSfx('auditorHit');
         updateUI();
         return true;
@@ -818,8 +947,7 @@ function applyObstacleEffect(obstacle, now) {
         return;
     }
     if (obstacle.type === 'suit') {
-        if (chainCount > 0) {
-            chainCount = Math.max(0, chainCount - 1);
+        if (trimCollectedMembers(1)) {
             setSolidarityFeedback('HIT: SUIT SHREDS EXTRA CHAIN');
         }
     }
@@ -828,6 +956,7 @@ function applyObstacleEffect(obstacle, now) {
 function update(now) {
     if (!gameActive) return;
     if (narrativePaused) return;
+    if (legendPaused) return;
 
     const elapsed = now - runStart;
     if (elapsed >= RUN_DURATION_MS && !gameWon) {
@@ -924,7 +1053,7 @@ function update(now) {
 
     for (const m of members) {
         if (collide(playerHitbox, m)) {
-            chainCount += 1;
+            addCollectedMember(PRIDE_MEMBER_VARIANTS.find(variant => variant.key === m.spriteKey) || PRIDE_MEMBER_VARIANTS[0]);
             score += 10;
             m.x = -999;
             playSfx('fileCleared');
@@ -993,12 +1122,12 @@ function draw() {
 
     members.forEach(m => {
         const centerX = m.x + m.w / 2;
-        drawTintedRunnerSprite('member', centerX, m.y, m.prideColor, { w: m.renderW, h: m.renderH }, () => {
+        drawRunnerSprite(m.spriteKey, centerX, m.y, () => {
             ctx.fillStyle = m.prideColor;
             ctx.beginPath();
             ctx.arc(centerX, m.y, Math.max(4, Math.floor(m.w * 0.45)), 0, Math.PI * 2);
             ctx.fill();
-        });
+        }, { w: m.renderW, h: m.renderH });
     });
 
     obstacles.forEach(o => {
@@ -1054,11 +1183,11 @@ function draw() {
     for (let i = 0; i < chainCount; i++) {
         const idx = Math.max(0, player.trail.length - 1 - i * 6);
         const t = player.trail[idx] || { x: player.x - i * 8, y: player.y };
-        const followerKey = getFollowerVariantKey(i);
-        drawRunnerSprite(followerKey, t.x, t.y, () => {
-            ctx.fillStyle = '#ff66aa';
+        const followerMember = getCollectedMemberForFollower(i);
+        drawRunnerSprite(followerMember.key, t.x, t.y, () => {
+            ctx.fillStyle = followerMember.color;
             ctx.fillRect(t.x, t.y - 6, 8, 12);
-        });
+        }, { w: 14, h: 20 });
     }
 
     drawRunnerSprite('player', player.x, player.y, () => {
@@ -1193,7 +1322,7 @@ function handleRunnerKeydown(e) {
     const code = e.code;
 
     if (narrativePaused) {
-        if (key === 'Enter' || key === ' ' || code === 'Space') {
+        if (key === 'Enter') {
             e.preventDefault();
             advanceNarrative();
         }
@@ -1334,6 +1463,24 @@ if (runnerNarrativePanel) {
         }
     });
 }
+
+if (runnerLegend) {
+    runnerLegend.addEventListener('click', e => {
+        const card = e.target.closest('.legend-card');
+        if (!card) {
+            collapseLegendCards();
+            return;
+        }
+        e.preventDefault();
+        toggleLegendCard(card.dataset.cardId || '');
+    });
+}
+
+document.addEventListener('pointerdown', e => {
+    if (!legendExpandedCardId || !runnerLegend) return;
+    if (runnerLegend.contains(e.target)) return;
+    collapseLegendCards();
+});
 
 window.runnerControls = {
     slow: () => {

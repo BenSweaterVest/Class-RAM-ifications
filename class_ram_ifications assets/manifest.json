@@ -1,106 +1,76 @@
 {
-    "TOWER_01_CoderTower": {
-        "id": "TOWER_01",
-        "prompt": "A compact blocky tower module resembling a 1980s IBM mainframe terminal unit, facing front, viewed from a slight low angle. Dark charcoal-black rectangular chassis body, a small square CRT screen on the front face displaying a scrolling green binary '01010' pattern, rows of toggle switches along both side panels, blinking cyan LED indicator lights along the top row, and a thick coaxial cable plug at the base rear. Hard-edged bright cyan pixel blocks outline the CRT screen bezel with sharp pixel edges \u00e2\u20ac\u201d no gradient blending, no translucent edges. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
-        "seed": 742671207,
-        "chroma_target_rgb": [
-            255,
-            0,
-            255
-        ],
-        "is_background": false,
-        "tolerance_override": 45,
-        "fringe_tolerance_override": 90
+  "project": "Class RAM-ifications",
+  "last_updated": "2026-03-25",
+  "runtime_png_count": 44,
+  "mirrored_png_folders": [
+    "assets/processed",
+    "class_ram_ifications assets"
+  ],
+  "collections": [
+    {
+      "id": "runner_active",
+      "label": "Runner mode active art",
+      "notes": "Currently wired into runner_mode.js for gameplay, phase backgrounds, and narrative popup cards.",
+      "files": [
+        "PLAYER_01_TimothyDoolingPlayerCharacter_00001_.png",
+        "HTG_01_HTGMemberAlex_00001_.png",
+        "HTG_02_HTGMemberCarmen_00001_.png",
+        "HTG_03_HTGMemberMarcus_00001_.png",
+        "HTG_04_HTGMemberSam_00001_.png",
+        "HTG_05_HTGMemberJordan_00001_.png",
+        "HTG_06_HTGMemberDani_00001_.png",
+        "HTG_07_HTGMemberRobin_00001_.png",
+        "HTG_08_HTGMemberEvelyn_00001_.png",
+        "ENEMY_02_CorporateSuit_00001_.png",
+        "ENEMY_03_FilingCabinet_00001_.png",
+        "ENEMY_04_PolygraphBot_00001_.png",
+        "BARRIER_01_GayInvestigationUnitWall_00001_.png",
+        "FX_01_SolidarityHeart_00001_.png",
+        "FX_02_PrecedentShield_00001_.png",
+        "FX_03_RedTapePit_00001_.png",
+        "UI_01_SolidarityButtonInactive_00001_.png",
+        "UI_02_SolidarityButtonActive_00001_.png",
+        "UI_03_SolidarityButtonUrgent_00001_.png",
+        "ENV_01_CorporateLogicGridTile_00001_.png",
+        "ENV_02_RunnerModeBackground_00001_.png",
+        "BG_01_v3_BackgroundSiliconValley_00001_.png",
+        "BG_02_v1_BackgroundDistrictCourt_00001_.png",
+        "BG_03_BackgroundAppealsCourt_00001_.png",
+        "BG_04_v3_BackgroundWashingtonDC_00001_.png",
+        "CARD_01_CardIntro1984_00001_.png",
+        "CARD_02_CardSuitFiled1984_00001_.png",
+        "CARD_03_CardHendersonRules1987_00001_.png",
+        "CARD_04_CardReversal1990_00001_.png",
+        "CARD_05_CardExecutiveOrder1995_00001_.png"
+      ]
     },
-    "TOWER_02_AttorneyTower": {
-        "id": "TOWER_02",
-        "prompt": "A compact blocky tower module styled as a miniature law library podium, facing front, viewed from a slight low angle. Dark polished mahogany-brown wooden frame, a small golden scales-of-justice emblem mounted on the front face center, a row of three leather-bound gold-spined law books lined along the top edge, and a small brass nameplate at the base reading 'ATY' in block letters. Hard-edged bright amber-gold pixel blocks radiate outward from the scales emblem in a starburst pattern with sharp pixel edges \u00e2\u20ac\u201d no gradient blending, no translucent edges. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
-        "seed": 543169341,
-        "chroma_target_rgb": [
-            255,
-            0,
-            255
-        ],
-        "is_background": false,
-        "tolerance_override": 45,
-        "fringe_tolerance_override": 90
+    {
+      "id": "legacy_reference",
+      "label": "Legacy mode and shared support art",
+      "notes": "Still retained for legacy mode or shared repository history.",
+      "files": [
+        "TOWER_01_CoderTower_00001_.png",
+        "TOWER_02_AttorneyTower_00001_.png",
+        "TOWER_03_ActivistTower_00001_.png",
+        "TOWER_04_EncryptionTower_00001_.png",
+        "ENEMY_01_DISCOAuditor_00001_.png",
+        "FILE_01_CaseFile_00001_.png",
+        "PROJ_01_BooleanBitProjectile_00001_.png",
+        "PROJ_02_PrecedentProjectile_00001_.png"
+      ]
     },
-    "TOWER_03_ActivistTower": {
-        "id": "TOWER_03",
-        "prompt": "A compact blocky tower module styled as a community broadcast megaphone station, facing front, viewed from a slight low angle. Bright hot-pink painted metal chassis body, a large outward-facing megaphone bell mounted on top center aimed forward, a rectangular speaker grille on the front face with a hot-pink wire mesh, two diagonal antenna masts with small flag pennants on each top corner, and a horizontal rainbow stripe sticker decal along the lower side panel. Overall hand-painted activist aesthetic with slightly dented painted metal texture in varying shades of hot pink and deep rose. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat green (#00FF00). Do not use green, lime, or yellow-green tones in the design. IMPORTANT: This subject is intentionally bright pink/magenta.",
-        "seed": 946151393,
-        "chroma_target_rgb": [
-            0,
-            255,
-            0
-        ],
-        "is_background": false,
-        "tolerance_override": 45,
-        "fringe_tolerance_override": 90
-    },
-    "TOWER_04_EncryptionTower": {
-        "id": "TOWER_04",
-        "prompt": "A compact blocky tower module styled as a cybersecurity firewall node, facing front, viewed from a slight low angle. Deep violet-purple rectangular metal chassis body, a large hexagonal shield emblem embossed on the front face center, rows of dark indigo circuit trace lines etched along both side panels, a narrow horizontal slit viewport on the front face with hard-edged medium-violet pixel blocks glowing inside with sharp pixel edges, three short stubby antenna nubs along the top edge, and a thick wide base suggesting a heavy secure anchor point. No gradient blending, no translucent edges on the glow. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat green (#00FF00). Do not use green, lime, or yellow-green tones in the design. IMPORTANT: This subject is intentionally purple/violet.",
-        "seed": 496363587,
-        "chroma_target_rgb": [
-            0,
-            255,
-            0
-        ],
-        "is_background": false,
-        "tolerance_override": 45,
-        "fringe_tolerance_override": 90
-    },
-    "ENEMY_01_DISCOAuditor": {
-        "id": "ENEMY_01",
-        "prompt": "A stocky, wide-shouldered bureaucrat figure facing left in a brisk aggressive walking pose. He wears a slightly ill-fitting charcoal grey three-piece suit with a white dress shirt and a narrow dark tie. He has a square jaw, thick black-framed square glasses, slicked-back dark hair parted severely on one side, and thin pursed lips set in a permanent scowl. He holds a grey metal clipboard in his forward hand with a red paper form and curling red tape strips hanging off its edge. A laminated rectangular ID badge on a dark lanyard rests at chest height with the letters 'DISCO' visible in block type. Age: mid-40s, bureaucratic build. Style: 16-bit retro character art with clean dark outlines. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey, navy, and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the character. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the character's skin or clothing.",
-        "seed": 928014994,
-        "chroma_target_rgb": [
-            255,
-            0,
-            255
-        ],
-        "is_background": false,
-        "tolerance_override": 45,
-        "fringe_tolerance_override": 80
-    },
-    "FILE_01_CaseFile": {
-        "id": "FILE_01",
-        "prompt": "A manila security case folder with a thick stack of papers inside, laying flat at a slight forward-facing tilt. Golden-amber manila cardstock cover with a slightly worn and dog-eared top-right corner, a bold red rubber-stamp 'CLASSIFIED' mark in block letters across the center face, a small typed black case number label in the lower left corner, two brass brad fasteners visible along the top edge, and a neat stack of white printed pages peeking out from the bottom. A thin red string tie closure hangs loose off the right side. Style: 16-bit retro RPG pixel art, flat colors, sharp pixel grid, strictly 2D sprite. Generate a single sprite only. Do not show multiple views, angles, or duplicates. Use dark grey and charcoal for body shading. No drop shadow, no ground shadow, no cast shadow beneath the sprite. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
-        "seed": 35008053,
-        "chroma_target_rgb": [
-            255,
-            0,
-            255
-        ],
-        "is_background": false,
-        "tolerance_override": 45,
-        "fringe_tolerance_override": 80
-    },
-    "PROJ_01_BooleanBitProjectile": {
-        "id": "PROJ_01",
-        "prompt": "A single 2D pixel art icon of a glowing cyan digital data packet \u00e2\u20ac\u201d a small cube-shaped token with a flat bright cyan front face, dark navy side and bottom faces, and electric blue circuit trace lines etched diagonally along its side panels. A single-pixel white highlight dot sits at the top-left corner of the cube. Hard-edged bright cyan pixel blocks radiate outward from the cube in a four-pointed cross starburst pattern with sharp pixel edges. No gradient blending, no translucent edges. Style: 16-bit retro RPG item icon. Generate a single icon only, no duplicates. Use dark grey and navy for body shading. No drop shadow. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
-        "seed": 699217324,
-        "chroma_target_rgb": [
-            255,
-            0,
-            255
-        ],
-        "is_background": false,
-        "tolerance_override": 45,
-        "fringe_tolerance_override": 90
-    },
-    "PROJ_02_PrecedentProjectile": {
-        "id": "PROJ_02",
-        "prompt": "A single 2D pixel art icon of a glowing golden legal document fragment \u00e2\u20ac\u201d a small angular shard of golden-amber parchment paper broken at a sharp diagonal edge, with typed black text lines printed across its surface, a dark brown aged vellum underside, bright gold pixel highlights along the torn edges, and a small red wax seal dot in the lower corner. Hard-edged bright amber-gold pixel blocks radiate outward from the fragment in a starburst pattern with sharp pixel edges. No gradient blending, no translucent edges. Style: 16-bit retro RPG item icon. Generate a single icon only, no duplicates. Use dark grey and dark brown for body shading. No drop shadow. Background: solid flat magenta (#FF00FF). Do not use pink, magenta, or purple tones in the design.",
-        "seed": 504042704,
-        "chroma_target_rgb": [
-            255,
-            0,
-            255
-        ],
-        "is_background": false,
-        "tolerance_override": 45,
-        "fringe_tolerance_override": 90
+    {
+      "id": "retired_runner_variants",
+      "label": "Retained but no longer wired in runner mode",
+      "notes": "Older generic follower/collectible art kept on disk but replaced by the eight named HTG members.",
+      "files": [
+        "FOLLOWER_01_HTGFollowerType01_00001_.png",
+        "FOLLOWER_02_HTGFollowerType02_00001_.png",
+        "FOLLOWER_03_HTGFollowerType03_00001_.png",
+        "FOLLOWER_04_HTGFollowerType04_00001_.png",
+        "FOLLOWER_05_HTGFollowerType05_00001_.png",
+        "COLLECTIBLE_01_HTGMemberCollectible_00001_.png"
+      ]
     }
+  ]
 }

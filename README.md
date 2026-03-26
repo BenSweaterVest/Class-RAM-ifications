@@ -23,6 +23,8 @@ npx serve .
 - Barrier clears required for victory: 4
 - Phase chain thresholds: 3 -> 5 -> 7 -> 9
 - Narrative checkpoints: 5 (intro, phase 1 clear, phase 2 clear, phase 3 clear, final EO 12968 card)
+- Narrative popup cards: illustrated card backplates with live text overlay
+- HTG roster: eight named pride-flag members reused for pickups and follower chain
 
 ## Controls
 

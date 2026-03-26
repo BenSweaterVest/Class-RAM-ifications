@@ -1,6 +1,6 @@
 # Development Guide
 
-Last updated: March 22, 2026
+Last updated: March 25, 2026
 
 ## Runtime Ownership
 
@@ -47,13 +47,30 @@ Audio cues:
 ## Backgrounds
 
 Runtime chooses phase background by precedent count.
-If phase asset is missing, fallback is ENV_02 default background.
+If a phase asset fails to load, fallback is ENV_02 default background.
 
-Expected optional assets:
-- ENV_03_SiliconValleyOffice_00001_.png
-- ENV_04_DistrictCourtroom_00001_.png
-- ENV_05_AppealsCourtroom_00001_.png
-- ENV_06_WashingtonDCCorridor_00001_.png
+Promoted phase backgrounds:
+- BG_01_v3_BackgroundSiliconValley_00001_.png
+- BG_02_v1_BackgroundDistrictCourt_00001_.png
+- BG_03_BackgroundAppealsCourt_00001_.png
+- BG_04_v3_BackgroundWashingtonDC_00001_.png
+
+Promoted narrative popup cards:
+- CARD_01_CardIntro1984_00001_.png
+- CARD_02_CardSuitFiled1984_00001_.png
+- CARD_03_CardHendersonRules1987_00001_.png
+- CARD_04_CardReversal1990_00001_.png
+- CARD_05_CardExecutiveOrder1995_00001_.png
+
+Runner HTG member roster:
+- HTG_01_HTGMemberAlex_00001_.png
+- HTG_02_HTGMemberCarmen_00001_.png
+- HTG_03_HTGMemberMarcus_00001_.png
+- HTG_04_HTGMemberSam_00001_.png
+- HTG_05_HTGMemberJordan_00001_.png
+- HTG_06_HTGMemberDani_00001_.png
+- HTG_07_HTGMemberRobin_00001_.png
+- HTG_08_HTGMemberEvelyn_00001_.png
 
 ## Validation Commands
 
@@ -64,4 +81,5 @@ Expected optional assets:
 
 - Keep docs and smoke assertions synchronized with narrative copy changes.
 - Prefer additive fallbacks over hard asset assumptions.
+- Keep `assets/processed/` and `class_ram_ifications assets/` PNGs mirrored so `check_asset_sync` stays green.
 - Keep legacy mode untouched unless requested.

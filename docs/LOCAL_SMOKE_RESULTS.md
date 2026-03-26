@@ -1,6 +1,6 @@
 # Local Smoke Results
 
-Date: March 22, 2026
+Date: March 25, 2026
 
 ## Scripted Verification
 
@@ -17,7 +17,12 @@ Date: March 22, 2026
 - Intro narrative copy assertion (Timothy Dooling lead): PASS
 - Control semantics wiring: PASS
 - Obstacle legend/help coherence: PASS
-- Pride-color visual variation sampling: PASS
+- Pride-color visual variation sampling: PASS (6 active color buckets after roster-art promotion)
+
+## Notes
+
+- Asset sync now validates 44 mirrored PNGs across `assets/processed/` and `class_ram_ifications assets/`.
+- Focused smoke was rerun after installing the March 25 background, card, and HTG member art.
 
 ## Manual Smoke
 

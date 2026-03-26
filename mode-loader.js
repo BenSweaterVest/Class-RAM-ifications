@@ -5,6 +5,9 @@
     const runnerControls = document.getElementById('runner-controls');
     const runnerControlsToggle = document.getElementById('runner-controls-toggle');
     const compactUiToggle = document.getElementById('compact-ui-toggle');
+    const audioMuteToggle = document.getElementById('audio-mute-toggle');
+    const themeToggle = document.getElementById('theme-toggle');
+    const precedentLabel = document.getElementById('precedent-label');
     const runnerHelp = document.getElementById('runner-help');
     const runnerNarrative = document.getElementById('runner-narrative');
     const hint = document.getElementById('tower-hint');
@@ -12,23 +15,19 @@
     const params = new URLSearchParams(window.location.search);
     const rawMode = params.get('mode');
     const mode = rawMode === 'legacy' ? 'legacy' : 'runner';
+    setupMuteToggle();
+    setupThemeToggle();
     setupCompactUiMode();
 
     document.body.dataset.mode = mode;
-    if (modeLabel) {
-        modeLabel.textContent = `MODE: ${mode}`;
-    } else if (modeBanner) {
-        modeBanner.textContent = `MODE: ${mode}`;
-    }
-
     if (mode === 'runner') {
         if (towerSelect) towerSelect.style.display = 'none';
-        if (runnerControls) runnerControls.style.display = 'block';
-        if (runnerHelp) runnerHelp.style.display = 'block';
+        if (runnerControls) runnerControls.style.display = 'none';
+        if (runnerHelp) runnerHelp.style.display = 'none';
         if (runnerNarrative) runnerNarrative.style.display = 'none';
-        setupRunnerTouchControls();
+        if (precedentLabel) precedentLabel.textContent = '';
         if (hint) {
-            hint.textContent = 'Runner controls: Up/Down lanes, Left/A move left, Right/D move right, Space Solidarity. Collect pride allies; avoid suits/cabinets/bots.';
+            hint.innerHTML = 'Runner controls: Up/Down lanes, Left/A move left, Right/D move right, Space Solidarity (burst through the barrier).<br>Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.';
         }
         if (window.bgm) {
             window.bgm.setTrack([
@@ -44,39 +43,8 @@
         if (runnerHelp) runnerHelp.style.display = 'none';
         if (runnerNarrative) runnerNarrative.style.display = 'none';
         if (runnerControls) runnerControls.style.display = 'none';
+        if (precedentLabel) precedentLabel.textContent = 'PRECEDENT:';
         loadScript('game.js');
-    }
-
-    function setupRunnerTouchControls() {
-        if (!runnerControls) return;
-
-        const runnerTouch = document.getElementById('runner-touch');
-        const touchCapable = isLikelyTouchDevice();
-        const stored = localStorage.getItem('runnerTouchControls');
-        let expanded = touchCapable;
-        if (stored === 'show') expanded = true;
-        if (stored === 'hide') expanded = false;
-
-        applyRunnerControlVisibility(expanded, touchCapable, runnerTouch);
-
-        if (!runnerControlsToggle) return;
-        runnerControlsToggle.style.display = 'inline-block';
-        runnerControlsToggle.onclick = () => {
-            expanded = !expanded;
-            localStorage.setItem('runnerTouchControls', expanded ? 'show' : 'hide');
-            applyRunnerControlVisibility(expanded, touchCapable, runnerTouch);
-        };
-    }
-
-    function applyRunnerControlVisibility(expanded, touchCapable, runnerTouch) {
-        if (runnerTouch) {
-            runnerTouch.style.display = expanded ? 'flex' : 'none';
-        }
-        if (runnerControlsToggle) {
-            const prefix = expanded ? 'HIDE' : 'SHOW';
-            const suffix = touchCapable ? 'TOUCH CONTROLS' : 'ON-SCREEN CONTROLS';
-            runnerControlsToggle.textContent = `${prefix} ${suffix}`;
-        }
     }
 
     function isLikelyTouchDevice() {
@@ -107,6 +75,46 @@
             localStorage.setItem('compactUiMode', compact ? 'on' : 'off');
             applyCompactState(compact);
         };
+    }
+
+    function setupMuteToggle() {
+        if (!audioMuteToggle) return;
+
+        const syncMuteLabel = () => {
+            const muted = window.sfx && typeof window.sfx.isMuted === 'function'
+                ? window.sfx.isMuted()
+                : false;
+            audioMuteToggle.textContent = `MUTE: ${muted ? 'ON' : 'OFF'}`;
+        };
+
+        audioMuteToggle.onclick = () => {
+            if (window.sfx && typeof window.sfx.toggleMute === 'function') {
+                window.sfx.toggleMute();
+            }
+            syncMuteLabel();
+        };
+
+        syncMuteLabel();
+    }
+
+    function setupThemeToggle() {
+        if (!themeToggle) return;
+
+        let lightMode = localStorage.getItem('siteTheme') === 'light';
+        applyTheme(lightMode);
+
+        themeToggle.onclick = () => {
+            lightMode = !lightMode;
+            localStorage.setItem('siteTheme', lightMode ? 'light' : 'dark');
+            applyTheme(lightMode);
+        };
+    }
+
+    function applyTheme(lightMode) {
+        document.body.classList.toggle('light-mode', lightMode);
+        if (themeToggle) {
+            themeToggle.textContent = lightMode ? 'DARK MODE' : 'BRIGHT MODE';
+        }
     }
 
     function applyCompactState(compact) {

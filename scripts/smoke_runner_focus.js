@@ -16,6 +16,16 @@ function fail(msg) {
 
     // 1) Continue control should dismiss intro checkpoint.
     await page.waitForSelector('#runner-narrative', { state: 'visible', timeout: 10000 });
+    const introButtonText = await page.$eval('#runner-narrative-next', el => el.textContent || '');
+    if (!introButtonText.includes('PRESS ENTER TO CONTINUE')) {
+      fail('Narrative continue button text was not updated to PRESS ENTER TO CONTINUE.');
+    }
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(250);
+    const narrativeDisplayAfterSpace = await page.$eval('#runner-narrative', el => getComputedStyle(el).display);
+    if (narrativeDisplayAfterSpace !== 'block') {
+      fail('Narrative modal should stay open when Space is pressed.');
+    }
     await page.click('#runner-narrative-next');
     await page.waitForTimeout(250);
     const narrativeDisplayAfterClick = await page.$eval('#runner-narrative', el => getComputedStyle(el).display);
@@ -36,6 +46,10 @@ function fail(msg) {
     // 2) Intro text should start with the Timothy Dooling context lead.
     await page.keyboard.press('KeyR');
     await page.waitForSelector('#runner-narrative', { state: 'visible', timeout: 10000 });
+    const introTitle = await page.$eval('#runner-narrative-title', el => el.textContent || '');
+    if (!introTitle.startsWith('History Checkpoint')) {
+      fail('Narrative title did not update to History Checkpoint.');
+    }
     const introText = await page.$eval('#runner-narrative-body', el => el.textContent || '');
     if (!introText.startsWith('You are Timothy Dooling - nuclear fusion engineer')) {
       fail('Intro narrative text does not start with the Timothy Dooling historical context paragraph.');
@@ -57,7 +71,6 @@ function fail(msg) {
         }
       }
 
-      const helpText = (document.getElementById('runner-help')?.textContent || '').replace(/\s+/g, ' ');
       const legendText = (document.getElementById('runner-legend')?.textContent || '').replace(/\s+/g, ' ');
       const hintText = (document.getElementById('tower-hint')?.textContent || '').replace(/\s+/g, ' ');
 
@@ -65,27 +78,65 @@ function fail(msg) {
         .every(id => !!document.getElementById(id));
 
       if (!hasTouchControls) return { ok: false, reason: 'expected runner touch control buttons missing' };
-      if (!helpText.includes('Left/A move left') || !helpText.includes('Right or D move right') || !helpText.includes('Up/Down lanes')) {
-        return { ok: false, reason: 'runner help control semantics text mismatch' };
-      }
-      if (!helpText.includes('Suits strip extra chain') || !helpText.includes('Cabinets slow movement') || !helpText.includes('Bots lock lane switches')) {
-        return { ok: false, reason: 'runner help obstacle effects text mismatch' };
-      }
-      if (!legendText.includes('Obstacle Effects:') || !legendText.includes('Suit =') || !legendText.includes('Cabinet =') || !legendText.includes('Bot =')) {
-        return { ok: false, reason: 'runner legend obstacle effects summary missing' };
-      }
-      if (!legendText.includes('Player (Timothy Dooling)') || !legendText.includes('HTG Member')) {
+      if (!legendText.includes('Timothy Dooling (Contender)') || !legendText.includes('HTG Members (Ally Chain)') || !legendText.includes('Suit (Damage)')) {
         return { ok: false, reason: 'runner legend sprite photo labels missing' };
       }
+      const tooltipTitles = Array.from(document.querySelectorAll('.legend-tooltip strong')).map(el => el.textContent || '');
+      const expectedTooltipTitles = [
+        'Contender',
+        'HTG Members',
+        'DISCO Investigator (Suit)',
+        'Cabinet (SLOW)',
+        'Bot (LOCK)',
+        'Policy (Barrier Wall)'
+      ];
+      for (const title of expectedTooltipTitles) {
+        if (!tooltipTitles.includes(title)) {
+          return { ok: false, reason: `legend hover card missing ${title}` };
+        }
+      }
+      const muteButtonText = (document.getElementById('audio-mute-toggle')?.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!muteButtonText.startsWith('MUTE:')) {
+        return { ok: false, reason: 'mute button missing or mislabeled' };
+      }
+      const themeButtonText = (document.getElementById('theme-toggle')?.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!themeButtonText.includes('MODE')) {
+        return { ok: false, reason: 'theme button missing or mislabeled' };
+      }
+      const htgCard = document.querySelector('[data-card-id="htg-members"]');
+      if (!htgCard) {
+        return { ok: false, reason: 'HTG members card missing' };
+      }
+      htgCard.click();
+      const expandedState = htgCard.getAttribute('aria-expanded');
+      const statusText = (document.getElementById('status-val')?.textContent || '').replace(/\s+/g, ' ').trim();
+      const htgTooltipText = (htgCard.querySelector('.legend-tooltip')?.textContent || '').replace(/\s+/g, ' ');
+      if (expandedState !== 'true') {
+        return { ok: false, reason: 'HTG members card did not expand on click' };
+      }
+      if (!statusText.includes('PAUSED: INFO CARD')) {
+        return { ok: false, reason: 'game did not pause when info card expanded' };
+      }
+      if (!htgTooltipText.includes('original pride flag') || !htgTooltipText.includes('Alex') || !htgTooltipText.includes('Evelyn')) {
+        return { ok: false, reason: 'HTG members expanded content missing pride-flag roster context' };
+      }
+      const htgMiniCards = htgCard.querySelectorAll('.htg-mini-card');
+      if (htgMiniCards.length !== 8) {
+        return { ok: false, reason: `expected 8 HTG mini cards, found ${htgMiniCards.length}` };
+      }
+      htgCard.click();
       if (!hintText.includes('Left/A move left') || !hintText.includes('Right/D move right') || !hintText.includes('Up/Down lanes')) {
         return { ok: false, reason: 'runner mode hint text mismatch' };
+      }
+      if (!hintText.includes('Space Solidarity (burst through the barrier)') || !hintText.includes('Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.')) {
+        return { ok: false, reason: 'runner mode hint action text mismatch' };
       }
 
       return {
         ok: true,
         hasTouchControls,
         hasControlSemantics: true,
-        hasObstacleLegend: true
+        hasHoverCards: true
       };
     });
 

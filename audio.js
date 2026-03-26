@@ -71,6 +71,16 @@
         bgmAudio.play().catch(() => {});
     }
 
+    function randomizeBgmStart(audio) {
+        if (!audio || audio.dataset.randomizedStart === 'true') return;
+        const duration = Number(audio.duration);
+        if (!Number.isFinite(duration) || duration <= 1) return;
+
+        const maxStart = Math.max(0, duration - 0.5);
+        audio.currentTime = Math.random() * maxStart;
+        audio.dataset.randomizedStart = 'true';
+    }
+
     function armBgmAutoplay() {
         if (bgmArmed) return;
         bgmArmed = true;
@@ -167,6 +177,7 @@
                 bgmAudio.loop = true;
                 bgmAudio.preload = 'auto';
                 bgmAudio.volume = 0.24;
+                bgmAudio.addEventListener('loadedmetadata', () => randomizeBgmStart(bgmAudio), { once: true });
             } catch (_) {
                 bgmAudio = null;
             }

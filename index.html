@@ -15,6 +15,10 @@
             margin: 0;
             overflow: hidden;
         }
+        body.light-mode {
+            background: #f2efe4;
+            color: #153015;
+        }
         body.compact-ui h1 {
             margin: 8px 0 2px;
             font-size: 20px;
@@ -30,6 +34,14 @@
         body.compact-ui #runner-help,
         body.compact-ui #tower-hint {
             display: none !important;
+        }
+        #mode-banner {
+            width: var(--game-width);
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
         }
         body.compact-ui #runner-controls {
             margin-top: 4px !important;
@@ -54,6 +66,10 @@
             margin-top: 12px;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
         }
+        body.light-mode #game-container {
+            border-color: #b7b09d;
+            box-shadow: 0 0 18px rgba(65, 98, 65, 0.16);
+        }
         canvas {
             background: #000;
             cursor: crosshair;
@@ -72,6 +88,16 @@
         #ui-layer {
             width: var(--game-width); padding: 10px; display: flex; justify-content: space-between; flex-wrap: wrap;
         }
+        body.light-mode #ui-layer,
+        body.light-mode #tower-hint {
+            color: #153015;
+        }
+        #tower-hint {
+            width: var(--game-width);
+            text-align: center;
+            margin: 10px 0 0 0;
+            line-height: 1.45;
+        }
         .rainbow-text {
             background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
             -webkit-background-clip: text;
@@ -88,6 +114,18 @@
         }
         .tower-btn:hover { border-color: #00ff00; }
         .tower-btn.selected { border-color: #00ffff; background: #002200; }
+        body.light-mode .tower-btn {
+            background: #fffdf7;
+            color: #153015;
+            border-color: #9fb09f;
+        }
+        body.light-mode .tower-btn:hover {
+            border-color: #2d6b2d;
+        }
+        body.light-mode .tower-btn.selected {
+            border-color: #2d6b2d;
+            background: #dfead9;
+        }
         #runner-touch {
             display: flex;
             gap: 8px;
@@ -100,6 +138,9 @@
         #compact-ui-toggle {
             margin-left: 8px;
             display: none;
+        }
+        #audio-mute-toggle {
+            margin-left: 8px;
         }
         #runner-help {
             display: none;
@@ -134,6 +175,18 @@
             z-index: 20;
             color: #c8ffc8;
             line-height: 1.45;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+        #runner-narrative-copy {
+            width: min(52%, 320px);
+            min-height: 320px;
+            padding: 10px 12px 12px 12px;
+            margin-left: auto;
+            background: linear-gradient(270deg, rgba(4, 14, 4, 0.92), rgba(4, 14, 4, 0.72) 72%, rgba(4, 14, 4, 0.18));
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
         }
         #runner-narrative h3 {
             margin: 0 0 8px 0;
@@ -174,20 +227,226 @@
                 rgba(3, 18, 3, 0.95);
             color: #fff7d2;
         }
+        body.light-mode #runner-narrative {
+            border-color: #7ca47c;
+            background: rgba(249, 246, 238, 0.96);
+            box-shadow: 0 0 24px rgba(70, 110, 70, 0.16);
+            color: #173317;
+        }
+        body.light-mode #runner-narrative-copy {
+            background: linear-gradient(270deg, rgba(255, 253, 247, 0.96), rgba(248, 244, 232, 0.88) 72%, rgba(248, 244, 232, 0.18));
+            border-left-color: rgba(25, 60, 25, 0.12);
+        }
+        body.light-mode #runner-narrative h3 {
+            color: #244824;
+        }
+        .legend-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #2b4f2b;
+            padding: 4px 6px;
+            background: #071107;
+            width: 100%;
+            min-width: 0;
+            cursor: pointer;
+            transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+        }
+        body.light-mode .legend-card {
+            border-color: #9fb09f;
+            background: #f9f6ee;
+        }
+        .legend-card img {
+            width: 22px;
+            height: 22px;
+            image-rendering: pixelated;
+        }
+        .legend-card-label {
+            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #143114;
+            border-radius: 3px;
+            line-height: 1.2;
+        }
+        body.light-mode .legend-card-label {
+            background: rgba(255, 255, 255, 0.95);
+            color: #183818;
+            border: 1px solid rgba(90, 120, 90, 0.18);
+        }
+        .legend-tooltip {
+            position: absolute;
+            left: -1px;
+            right: -1px;
+            bottom: calc(100% - 1px);
+            transform: translateY(12px);
+            min-height: 0;
+            max-height: 0;
+            padding: 10px 12px;
+            border: 1px solid #4f8f4f;
+            border-bottom: 0;
+            background: rgba(3, 18, 3, 0.97);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.18);
+            color: #d8ffd8;
+            opacity: 0;
+            pointer-events: none;
+            overflow-x: hidden;
+            overflow-y: auto;
+            transition: opacity 150ms ease, transform 150ms ease, max-height 180ms ease;
+            z-index: 30;
+            line-height: 1.35;
+            white-space: pre-line;
+        }
+        body.light-mode .legend-tooltip {
+            border-color: #8ca98c;
+            background: rgba(255, 253, 247, 0.98);
+            box-shadow: 0 0 18px rgba(70, 110, 70, 0.14);
+            color: #173317;
+        }
+        .legend-tooltip strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #9dff9d;
+        }
+        body.light-mode .legend-tooltip strong {
+            color: #244824;
+        }
+        .legend-tooltip ul {
+            margin: 6px 0 0 0;
+            padding-left: 16px;
+        }
+        .legend-tooltip li {
+            margin: 3px 0;
+        }
+        .htg-card-explainer {
+            margin-bottom: 10px;
+            padding: 8px 10px;
+            border: 1px solid rgba(110, 180, 110, 0.28);
+            background: rgba(10, 26, 10, 0.65);
+        }
+        body.light-mode .htg-card-explainer {
+            border-color: rgba(90, 120, 90, 0.22);
+            background: rgba(233, 240, 228, 0.92);
+        }
+        .htg-mini-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        .htg-mini-card {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 7px 8px;
+            border: 1px solid rgba(110, 180, 110, 0.28);
+            background: rgba(7, 17, 7, 0.88);
+        }
+        .htg-mini-card img {
+            width: 20px;
+            height: 28px;
+            flex: 0 0 auto;
+            image-rendering: pixelated;
+        }
+        .htg-mini-meta {
+            font-size: 11px;
+            color: #d8ffd8;
+        }
+        .htg-mini-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+            color: #f1fff1;
+            font-size: 11px;
+            line-height: 1.25;
+        }
+        .htg-mini-line strong {
+            color: #ffffff;
+        }
+        .htg-sep {
+            color: #8acb8a;
+        }
+        body.light-mode .htg-mini-card {
+            border-color: rgba(90, 120, 90, 0.22);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        body.light-mode .htg-mini-meta {
+            color: #284728;
+        }
+        body.light-mode .htg-mini-line {
+            color: #264426;
+        }
+        body.light-mode .htg-mini-line strong {
+            color: #173317;
+        }
+        body.light-mode .htg-sep {
+            color: #628862;
+        }
+        .legend-card[data-card-id="htg-members"].is-expanded .legend-tooltip {
+            left: -1px;
+            right: auto;
+            width: min(420px, 84vw);
+            max-height: 720px;
+        }
+        @media (max-width: 680px) {
+            .legend-card[data-card-id="htg-members"].is-expanded .legend-tooltip {
+                width: min(320px, 86vw);
+                max-height: 720px;
+            }
+        }
+        .legend-card.is-expanded .legend-tooltip {
+            opacity: 1;
+            transform: translateY(-8px);
+            max-height: 520px;
+        }
+        .legend-card.is-expanded {
+            transform: translateY(8px);
+            border-color: #5eb55e;
+            background: #0a1a0a;
+        }
+        body.light-mode .legend-card.is-expanded {
+            border-color: #628862;
+            background: #eef4e9;
+        }
+        .runner-legend-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 6px;
+            margin-bottom: 6px;
+        }
         @media (max-width: 900px) {
             #ui-layer { width: 96vw; }
             #game-container { margin-top: 12px; }
             #runner-touch .tower-btn { min-width: 76px; }
             canvas { max-width: 96vw; height: auto; }
             #runner-help { width: 96vw; }
+            #runner-narrative-copy { width: min(60%, 320px); }
+            .runner-legend-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 680px) {
+            .runner-legend-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            #runner-narrative {
+                width: min(96vw, 520px);
+                padding: 10px;
+            }
+            #runner-narrative-copy {
+                width: 100%;
+                min-height: 0;
+                background: linear-gradient(180deg, rgba(4, 14, 4, 0.94), rgba(4, 14, 4, 0.86));
+                border-left: 0;
+            }
         }
     </style>
 </head>
 <body>
     <h1>CLASS <span class="rainbow-text">RAM-IFICATIONS</span></h1>
-    <div id="mode-banner"><span id="mode-label">MODE: legacy</span> <button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
+    <div id="mode-banner"><span id="mode-label" style="display:none;"></span><button id="audio-mute-toggle" class="tower-btn" type="button">MUTE: OFF</button><button id="theme-toggle" class="tower-btn" type="button">BRIGHT MODE</button><button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
     <div id="ui-layer">
-        <div>PRECEDENT: <span id="precedent-val">100</span></div>
+        <div><span id="precedent-label">PRECEDENT:</span> <span id="precedent-val">100</span></div>
         <div>LIVES: <span id="lives-val">3</span></div>
         <div>STATUS: <span id="status-val">DISTRICT COURT</span></div>
         <div>YEAR: <span id="year-val">1984</span></div>
@@ -221,10 +480,10 @@
             Barrier loop: Solidarity only works when a barrier is close and chain meets the phase threshold (3, then 5, then 7, then 9).
         </div>
         <div>
-            Controls: Up/Down lanes, Left/A move left, Right or D move right, Space Solidarity, R restart.
+            Controls: Up/Down lanes, Left/A move left, Right or D move right, Space Solidarity (burst through the barrier), R restart.
         </div>
         <div>
-            Obstacle effects: Suits strip extra chain, Cabinets slow movement, Bots lock lane switches.
+            Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.
         </div>
         <button id="runner-help-close" class="tower-btn">GOT IT</button>
     </div>
@@ -232,12 +491,14 @@
         <canvas id="gameCanvas" width="800" height="400"></canvas>
         <div class="crt-overlay"></div>
         <div id="runner-narrative" aria-live="polite" aria-modal="true" role="dialog">
-            <h3 id="runner-narrative-title">Checkpoint</h3>
-            <div id="runner-narrative-body"></div>
-            <button id="runner-narrative-next" class="tower-btn">CONTINUE</button>
+            <div id="runner-narrative-copy">
+                <h3 id="runner-narrative-title">Checkpoint</h3>
+                <div id="runner-narrative-body"></div>
+                <button id="runner-narrative-next" class="tower-btn">PRESS ENTER TO CONTINUE</button>
+            </div>
         </div>
     </div>
-    <div id="runner-legend" style="display:none; width: var(--game-width); margin-top: 8px; font-size: 12px; line-height: 1.35; color:#b7ffb7;"></div>
+    <div id="runner-legend" style="display:none; position:relative; z-index:40; width: var(--game-width); margin-top: 8px; font-size: 12px; line-height: 1.35; color:#b7ffb7;"></div>
     <p id="tower-hint">Coder (Logic) (50) | Boolean Bits | Slows</p>
     <script src="audio.js"></script>
     <script src="mode-loader.js"></script>
