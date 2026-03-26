@@ -1,6 +1,6 @@
 # Pivot Decisions Summary
 
-Last updated: March 21, 2026
+Last updated: March 26, 2026
 Scope: implementation decisions already reflected in repository code/docs.
 
 ## 1. Runtime Strategy
@@ -71,17 +71,18 @@ Rationale:
 
 Decision:
 
-- Keep runner mode readable on smaller screens, but prefer the keyboard-first desktop HUD as the default shell.
+- Keep runner mode readable on smaller screens and add a gesture-first mobile layer without reviving the old touch button shell.
 
 Implementation:
 
 - Responsive legend and narrative layouts remain in `index.html`.
+- Touch-capable devices now get swipe/tap runner controls, a touch-specific hint, and mobile HUD/layout adjustments.
 - Keyboard control and restart/mute/theme flows remain active in `runner_mode.js` and `mode-loader.js`.
-- The earlier hidden touch-control shell was removed during closeout cleanup once the design direction settled on keyboard-first play.
+- The earlier hidden touch-control shell was removed during closeout cleanup instead of being reused.
 
 Rationale:
 
-- Preserves smaller-screen compatibility without carrying dead on-screen control UI that no longer matches the shipped experience.
+- Preserves smaller-screen compatibility without covering the playfield with persistent buttons or carrying dead on-screen control UI that no longer matches the shipped experience.
 
 ## 6. Asset Pipeline And Runtime Source Of Truth
 
@@ -136,10 +137,16 @@ Rationale:
 
 ## 9. Remaining Open Decisions
 
-Not yet finalized:
+Decided (as of March 25–26, 2026):
 
-- Final project/pivot title confirmation.
-- Final solidarity threshold and chain consumption tuning.
-- Whether to keep/move/remove `class_ram_ifications assets/` long-term.
-- First release audio policy (SFX-only vs BGM).
-- Manual live deploy sign-off once full smoke is executed on hosted build.
+- Public title: `Class RAM-ifications` — locked.
+- Audio policy: BGM implemented, non-blocking for release — locked.
+- Mobile parity: swipe/tap gestures, bottom sheet for info cards, dark mode default — implemented.
+- Rounds 3 and 4 difficulty: initial easing pass complete — pending owner acceptance on feel.
+
+Still open:
+
+- `class_ram_ifications assets/` long-term role (maintained mirror vs. source archive) — Sprint 4 decision.
+- Manual live deploy sign-off once hosted build is verified.
+
+See `docs/NEXT_SPRINTS_PLAN.md` for the authoritative sprint breakdown and open questions.

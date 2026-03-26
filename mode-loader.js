@@ -3,6 +3,7 @@
     const compactUiToggle = document.getElementById('compact-ui-toggle');
     const audioMuteToggle = document.getElementById('audio-mute-toggle');
     const themeToggle = document.getElementById('theme-toggle');
+    const restartToggle = document.getElementById('restart-toggle');
     const precedentLabel = document.getElementById('precedent-label');
     const runnerNarrative = document.getElementById('runner-narrative');
     const hint = document.getElementById('tower-hint');
@@ -10,9 +11,12 @@
     const params = new URLSearchParams(window.location.search);
     const rawMode = params.get('mode');
     const mode = rawMode === 'legacy' ? 'legacy' : 'runner';
+    const touchCapable = isLikelyTouchDevice();
+    applyInputMode(touchCapable);
     setupMuteToggle();
     setupThemeToggle();
-    setupCompactUiMode();
+    setupRestartToggle();
+    setupCompactUiMode(touchCapable);
 
     document.body.dataset.mode = mode;
     if (mode === 'runner') {
@@ -20,8 +24,11 @@
         if (runnerNarrative) runnerNarrative.style.display = 'none';
         if (precedentLabel) precedentLabel.textContent = '';
         if (hint) {
-            hint.innerHTML = 'Runner controls: Up/Down lanes, Left/A move left, Right/D move right, Space Solidarity (burst through the barrier).<br>Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.';
+            hint.innerHTML = touchCapable
+                ? 'Touch controls: Swipe up/down to change lanes, swipe left/right to shift position, tap to use Solidarity (burst through the barrier).<br>Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.'
+                : 'Runner controls: Up/Down lanes, Left/A move left, Right/D move right, Space Solidarity (burst through the barrier).<br>Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.';
         }
+        if (restartToggle) restartToggle.style.display = 'inline-block';
         if (window.bgm) {
             window.bgm.setTrack([
                 'assets/DiscoMusic.ogg',
@@ -35,21 +42,24 @@
         if (window.bgm) window.bgm.stop();
         if (runnerNarrative) runnerNarrative.style.display = 'none';
         if (precedentLabel) precedentLabel.textContent = 'PRECEDENT:';
+        if (restartToggle) restartToggle.style.display = 'none';
         loadScript('game.js');
     }
 
     function isLikelyTouchDevice() {
         return (
-            'ontouchstart' in window ||
             navigator.maxTouchPoints > 0 ||
             window.matchMedia('(pointer: coarse)').matches
         );
     }
 
-    function setupCompactUiMode() {
-        if (!compactUiToggle) return;
+    function applyInputMode(touchCapable) {
+        document.body.classList.toggle('touch-ui', touchCapable);
+        document.body.classList.toggle('desktop-ui', !touchCapable);
+    }
 
-        const touchCapable = isLikelyTouchDevice();
+    function setupCompactUiMode(touchCapable) {
+        if (!compactUiToggle) return;
         let compact = localStorage.getItem('compactUiMode') === 'on';
 
         if (touchCapable) {
@@ -106,6 +116,19 @@
         if (themeToggle) {
             themeToggle.textContent = lightMode ? 'DARK MODE' : 'BRIGHT MODE';
         }
+    }
+
+    function setupRestartToggle() {
+        if (!restartToggle) return;
+
+        restartToggle.onclick = () => {
+            const controls = window.runnerControls;
+            if (controls && typeof controls.restart === 'function') {
+                controls.restart();
+                return;
+            }
+            window.location.reload();
+        };
     }
 
     function applyCompactState(compact) {

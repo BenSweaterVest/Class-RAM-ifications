@@ -35,7 +35,11 @@ npx serve .
 - R: restart
 - M: mute
 
-Touch controls are supported and toggleable.
+On touch-capable devices, the runner now supports swipe/tap input:
+
+- Swipe up/down: lane change
+- Swipe left/right: horizontal shift
+- Tap: Solidarity
 
 ## Gameplay Summary
 
@@ -58,6 +62,7 @@ Focused runner smoke (with local server):
 ```bash
 npx http-server . -p 4173 -c-1
 node scripts/smoke_runner_focus.js
+node scripts/smoke_mode_shell.js
 ```
 
 ## Key Docs
@@ -65,6 +70,7 @@ node scripts/smoke_runner_focus.js
 - docs/GDD.md
 - docs/DEVELOPMENT.md
 - docs/MECHANICS_GUIDE.md
+- docs/NEXT_SPRINTS_PLAN.md
 - docs/TODOS.md
 - docs/ROADMAP.md
 - docs/PROGRAM_STATUS.md

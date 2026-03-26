@@ -38,6 +38,8 @@ List each non-blocking issue with:
 - [ ] `node scripts/check_runner_contract.js`
 - [ ] `node scripts/check_smoke_contract.js`
 - [ ] `node scripts/run_all_checks.js`
+- [ ] `node scripts/smoke_runner_focus.js` (with local server)
+- [ ] `node scripts/smoke_mode_shell.js` (with local server)
 
 ### Manual Smoke
 
@@ -47,11 +49,11 @@ List each non-blocking issue with:
 
 ## 5. Release Decision Gates
 
-- [ ] Title/naming copy approved
-- [ ] Difficulty profile approved
+- [x] Title/naming copy approved (`Class RAM-ifications`)
+- [ ] Difficulty profile approved, including the current rounds 3 and 4 easing pass
 - [ ] Solidarity threshold policy approved
 - [ ] Narrative copy/tone approved
-- [ ] Audio policy approved
+- [x] Audio policy approved (`BGM` implemented but non-blocking for release)
 - [ ] Source-asset retention policy approved
 
 ## 6. Post-Decision Actions

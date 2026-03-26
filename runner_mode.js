@@ -1,6 +1,7 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
+const gameContainer = document.getElementById('game-container');
 
 const uiPrecedent = document.getElementById('precedent-val');
 const uiLives = document.getElementById('lives-val');
@@ -11,6 +12,12 @@ const runnerNarrativeTitle = document.getElementById('runner-narrative-title');
 const runnerNarrativeBody = document.getElementById('runner-narrative-body');
 const runnerNarrativeNextButton = document.getElementById('runner-narrative-next');
 const runnerLegend = document.getElementById('runner-legend');
+const runnerTouchHint = document.getElementById('runner-touch-hint');
+const runnerLegendSheet = document.getElementById('runner-legend-sheet');
+const runnerLegendSheetBackdrop = document.getElementById('runner-legend-sheet-backdrop');
+const runnerLegendSheetTitle = document.getElementById('runner-legend-sheet-title');
+const runnerLegendSheetBody = document.getElementById('runner-legend-sheet-body');
+const runnerLegendSheetClose = document.getElementById('runner-legend-sheet-close');
 
 const LANES = [70, 130, 190, 250, 310];
 const RUN_DURATION_MS = 180000;
@@ -66,6 +73,13 @@ let collectedMembers = [];
 let legendExpandedCardId = '';
 let legendRosterRotationIndex = 0;
 let legendRosterRotationInterval = 0;
+let activeTouchGesture = null;
+let touchHintDismissed = false;
+let touchGestureCooldownUntil = 0;
+let runnerLegendItems = [];
+
+const TOUCH_TAP_MAX_DISTANCE = 14;
+const TOUCH_SWIPE_MIN_DISTANCE = 28;
 
 const player = {
     x: 180,
@@ -326,6 +340,7 @@ function resetGame() {
     shownNarrativeKeys.clear();
     legendExpandedCardId = '';
     legendPauseStartedAt = 0;
+    touchGestureCooldownUntil = 0;
 
     player.x = 180;
     player.targetX = 180;
@@ -344,6 +359,62 @@ function resetGame() {
     showNextNarrative();
 
     updateUI();
+}
+
+function updateTouchHintVisibility() {
+    if (!document.body || !runnerTouchHint) return;
+    const hidden = narrativePaused || legendPaused || !gameActive;
+    document.body.classList.toggle('touch-hint-hidden', hidden);
+    document.body.classList.toggle('touch-hint-dismissed', touchHintDismissed);
+}
+
+function dismissTouchHint() {
+    touchHintDismissed = true;
+    updateTouchHintVisibility();
+}
+
+function isMobileLegendSheetMode() {
+    return Boolean(document.body && document.body.classList.contains('touch-ui') && window.innerWidth <= 680);
+}
+
+function escapeHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function formatLegendText(text) {
+    return escapeHtml(text).replace(/\n/g, '<br>');
+}
+
+function updateLegendSheet(item) {
+    if (!runnerLegendSheet || !runnerLegendSheetTitle || !runnerLegendSheetBody) return;
+    if (!item) {
+        runnerLegendSheetTitle.textContent = 'Info';
+        runnerLegendSheetBody.innerHTML = '';
+        return;
+    }
+    runnerLegendSheetTitle.textContent = item.title;
+    const descriptionHtml = item.description
+        ? `<p>${formatLegendText(item.description)}</p>`
+        : '';
+    runnerLegendSheetBody.innerHTML = `${descriptionHtml}${item.expandedHtml || ''}`;
+}
+
+function setLegendSheetOpen(open) {
+    if (!runnerLegendSheet || !document.body) return;
+    runnerLegendSheet.classList.toggle('is-open', open);
+    runnerLegendSheet.setAttribute('aria-hidden', open ? 'false' : 'true');
+    document.body.classList.toggle('legend-sheet-open', open);
+    if (runnerLegendSheetBackdrop) {
+        runnerLegendSheetBackdrop.hidden = !open;
+    }
+    if (open && runnerLegendSheetClose) {
+        runnerLegendSheetClose.focus();
+    }
 }
 
 function enqueueNarrative(key) {
@@ -412,6 +483,7 @@ function advanceNarrative() {
         return;
     }
     narrativePaused = false;
+    touchGestureCooldownUntil = now + 240;
 
     if (pendingVictoryAfterNarrative) {
         pendingVictoryAfterNarrative = false;
@@ -449,18 +521,28 @@ function collapseLegendCards() {
             card.setAttribute('aria-expanded', 'false');
         });
     }
+    updateLegendSheet(null);
+    setLegendSheetOpen(false);
     setLegendPaused(false);
 }
 
 function setLegendExpandedCard(cardId) {
     if (!runnerLegend) return;
     const cards = Array.from(runnerLegend.querySelectorAll('.legend-card'));
+    const usingMobileSheet = isMobileLegendSheetMode();
     legendExpandedCardId = cardId;
     cards.forEach(card => {
         const expanded = card.dataset.cardId === cardId;
         card.classList.toggle('is-expanded', expanded);
         card.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     });
+    if (usingMobileSheet) {
+        const item = runnerLegendItems.find(entry => entry.id === cardId);
+        updateLegendSheet(item || null);
+        setLegendSheetOpen(Boolean(item));
+    } else {
+        setLegendSheetOpen(false);
+    }
     setLegendPaused(Boolean(cardId));
 }
 
@@ -486,6 +568,34 @@ function getCurrentPhaseYear() {
 function getCurrentBackgroundKey() {
     const idx = Math.min(precedentEstablished, PHASE_BACKGROUND_KEY_BY_PRECEDENT.length - 1);
     return PHASE_BACKGROUND_KEY_BY_PRECEDENT[idx];
+}
+
+function getLatePhaseEaseProfile() {
+    if (precedentEstablished >= 3) {
+        return {
+            obstacleDensity: 0.88,
+            wallIntervalMs: 17500,
+            solidarityRangePx: SOLIDARITY_RANGE_PX + 26,
+            tooLateBufferPx: -44,
+            shieldDurationMs: 2050
+        };
+    }
+    if (precedentEstablished >= 2) {
+        return {
+            obstacleDensity: 0.93,
+            wallIntervalMs: 16500,
+            solidarityRangePx: SOLIDARITY_RANGE_PX + 16,
+            tooLateBufferPx: -36,
+            shieldDurationMs: 1925
+        };
+    }
+    return {
+        obstacleDensity: 1,
+        wallIntervalMs: WALL_INTERVAL_MS,
+        solidarityRangePx: SOLIDARITY_RANGE_PX,
+        tooLateBufferPx: -30,
+        shieldDurationMs: 1800
+    };
 }
 
 function handleBarrierClear() {
@@ -562,7 +672,79 @@ function updateUI() {
     if (uiYear) {
         uiYear.textContent = String(getCurrentPhaseYear());
     }
+    updateTouchHintVisibility();
+}
 
+function handleTouchGestureStart(e) {
+    if (!e || e.pointerType !== 'touch' || e.isPrimary === false) return;
+    if (!canvas || !gameContainer) return;
+    if (runnerNarrativePanel && runnerNarrativePanel.contains(e.target)) return;
+    if (legendPaused || narrativePaused) return;
+
+    if (window.sfx) window.sfx.init();
+
+    activeTouchGesture = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        startTime: performance.now()
+    };
+
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+}
+
+function handleTouchGestureMove(e) {
+    if (!activeTouchGesture || !e || e.pointerId !== activeTouchGesture.pointerId) return;
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+}
+
+function handleTouchGestureEnd(e) {
+    if (!activeTouchGesture || !e || e.pointerId !== activeTouchGesture.pointerId) return;
+    const gesture = activeTouchGesture;
+    activeTouchGesture = null;
+
+    const now = performance.now();
+    const dx = e.clientX - gesture.startX;
+    const dy = e.clientY - gesture.startY;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+
+    if (narrativePaused || legendPaused) return;
+    if (now < touchGestureCooldownUntil) return;
+
+    if (absX <= TOUCH_TAP_MAX_DISTANCE && absY <= TOUCH_TAP_MAX_DISTANCE) {
+        dismissTouchHint();
+        if (!gameActive) {
+            resetGame();
+            return;
+        }
+        attemptSolidarityActivation(now);
+        return;
+    }
+
+    if (Math.max(absX, absY) < TOUCH_SWIPE_MIN_DISTANCE) return;
+
+    dismissTouchHint();
+    if (!gameActive) {
+        resetGame();
+        return;
+    }
+
+    if (absY > absX) {
+        if (dy < 0) tryMoveLane(-1);
+        else tryMoveLane(1);
+        return;
+    }
+
+    if (dx < 0) triggerSlow();
+    else triggerDash();
+}
+
+function handleTouchGestureCancel(e) {
+    if (!activeTouchGesture || !e || e.pointerId !== activeTouchGesture.pointerId) return;
+    activeTouchGesture = null;
 }
 
 function renderRunnerLegend() {
@@ -585,7 +767,7 @@ function renderRunnerLegend() {
         )).join('') +
         '</div>';
 
-    const spriteCards = [
+    runnerLegendItems = [
         {
             id: 'contender',
             path: RUNNER_SPRITE_PATHS.player,
@@ -631,7 +813,9 @@ function renderRunnerLegend() {
             title: 'Policy (Barrier Wall)',
             description: 'The Defense Industrial Security Clearance Office didn\'t need to fire you. It just needed to make clearance impossible.\nNo individual decision. No single agent. Just a policy that said gay applicants required expanded review, indefinitely. Only solidarity breaks through. Build your chain and push.'
         }
-    ].map(item => (
+    ];
+
+    const spriteCards = runnerLegendItems.map(item => (
         `<button class="legend-card" type="button" tabindex="0" data-card-id="${item.id}" aria-expanded="false">` +
         `<img ${item.imageId ? `id="${item.imageId}"` : ''} src="${item.path}" alt="${item.label}" ${item.imageStyle ? `style="${item.imageStyle}"` : ''}>` +
         `<span class="legend-card-label">${item.label}</span>` +
@@ -721,8 +905,9 @@ function createObstacle(now, type, lane) {
 function schedulePatterns(now) {
     const elapsed = now - runStart;
     const densityScale = 1 + Math.min(1.4, elapsed / RUN_DURATION_MS);
+    const easeProfile = getLatePhaseEaseProfile();
     const finaleScale = courtroomFinaleActive ? 1.7 : 1;
-    const spawnEvery = 1400 / (densityScale * finaleScale);
+    const spawnEvery = 1400 / (densityScale * finaleScale * easeProfile.obstacleDensity);
     if (now < nextPatternAt) return;
     nextPatternAt = now + spawnEvery;
 
@@ -800,7 +985,10 @@ function spawnMember(now) {
 }
 
 function maybeSpawnWall(now) {
-    const interval = courtroomFinaleActive ? 15000 : WALL_INTERVAL_MS;
+    const easeProfile = getLatePhaseEaseProfile();
+    const interval = courtroomFinaleActive
+        ? Math.max(15500, easeProfile.wallIntervalMs - 1000)
+        : easeProfile.wallIntervalMs;
     if (wall || now - lastWall < interval) return;
     lastWall = now;
     wall = {
@@ -822,6 +1010,7 @@ function getSolidarityState(now) {
     if (!wall) {
         return { ready: false, reason: 'No barrier to activate against' };
     }
+    const easeProfile = getLatePhaseEaseProfile();
     const threshold = getCurrentThreshold();
     if (chainCount < threshold) {
         return {
@@ -831,10 +1020,10 @@ function getSolidarityState(now) {
     }
 
     const distanceToWall = wall.x - player.x;
-    if (distanceToWall > SOLIDARITY_RANGE_PX) {
+    if (distanceToWall > easeProfile.solidarityRangePx) {
         return { ready: false, reason: 'Too early, wait for barrier' };
     }
-    if (distanceToWall < -30) {
+    if (distanceToWall < easeProfile.tooLateBufferPx) {
         return { ready: false, reason: 'Too late, barrier passed' };
     }
 
@@ -846,7 +1035,8 @@ function canActivateSolidarity(now) {
 }
 
 function activateSolidarity(now) {
-    wall.activeUntil = now + 1800;
+    const easeProfile = getLatePhaseEaseProfile();
+    wall.activeUntil = now + easeProfile.shieldDurationMs;
     clearCollectedMembers();
     chainCount = 0;
     playSfx('stageAdvance');
@@ -1406,7 +1596,31 @@ if (runnerLegend) {
 document.addEventListener('pointerdown', e => {
     if (!legendExpandedCardId || !runnerLegend) return;
     if (runnerLegend.contains(e.target)) return;
+    if (runnerLegendSheet && runnerLegendSheet.contains(e.target)) return;
     collapseLegendCards();
+});
+
+if (runnerLegendSheetBackdrop) {
+    runnerLegendSheetBackdrop.addEventListener('click', () => {
+        collapseLegendCards();
+    });
+}
+
+if (runnerLegendSheetClose) {
+    runnerLegendSheetClose.addEventListener('click', () => {
+        collapseLegendCards();
+    });
+}
+
+window.addEventListener('resize', () => {
+    if (!legendExpandedCardId) return;
+    if (isMobileLegendSheetMode()) {
+        const item = runnerLegendItems.find(entry => entry.id === legendExpandedCardId);
+        updateLegendSheet(item || null);
+        setLegendSheetOpen(Boolean(item));
+    } else {
+        setLegendSheetOpen(false);
+    }
 });
 
 window.runnerControls = {
@@ -1483,6 +1697,19 @@ if (canvas) {
     canvas.addEventListener('pointerdown', () => {
         canvas.focus();
     });
+}
+
+if (gameContainer) {
+    gameContainer.style.touchAction = 'none';
+    gameContainer.addEventListener('pointerdown', handleTouchGestureStart, { passive: false });
+    gameContainer.addEventListener('pointermove', handleTouchGestureMove, { passive: false });
+    gameContainer.addEventListener('pointerup', handleTouchGestureEnd, { passive: false });
+    gameContainer.addEventListener('pointercancel', handleTouchGestureCancel, { passive: false });
+    gameContainer.addEventListener('touchmove', e => {
+        if (activeTouchGesture && !narrativePaused && !legendPaused && typeof e.preventDefault === 'function') {
+            e.preventDefault();
+        }
+    }, { passive: false });
 }
 
 if (document.body) {

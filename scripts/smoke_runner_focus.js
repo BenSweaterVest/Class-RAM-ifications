@@ -121,10 +121,13 @@ function fail(msg) {
         return { ok: false, reason: `expected 8 HTG mini cards, found ${htgMiniCards.length}` };
       }
       htgCard.click();
-      if (!hintText.includes('Left/A move left') || !hintText.includes('Right/D move right') || !hintText.includes('Up/Down lanes')) {
+      const hasKeyboardHint = hintText.includes('Left/A move left') && hintText.includes('Right/D move right') && hintText.includes('Up/Down lanes');
+      const hasTouchHint = hintText.includes('Swipe up/down to change lanes') && hintText.includes('swipe left/right to shift position');
+      if (!hasKeyboardHint && !hasTouchHint) {
         return { ok: false, reason: 'runner mode hint text mismatch' };
       }
-      if (!hintText.includes('Space Solidarity (burst through the barrier)') || !hintText.includes('Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.')) {
+      const hasSolidarityHint = hintText.includes('Space Solidarity (burst through the barrier)') || hintText.includes('tap to use Solidarity (burst through the barrier)');
+      if (!hasSolidarityHint || !hintText.includes('Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.')) {
         return { ok: false, reason: 'runner mode hint action text mismatch' };
       }
 
@@ -222,11 +225,128 @@ function fail(msg) {
       fail(`Expected multiple pride-color buckets in member visuals, got ${variation.activeBuckets}.`);
     }
 
+    // 5) Gameplay liveness: control calls must not throw; canvas must update within 1 second.
+    const liveness = await page.evaluate(async () => {
+      const controls = window.runnerControls;
+      if (!controls) return { ok: false, reason: 'runnerControls missing' };
+
+      const methods = ['up', 'down', 'laneUp', 'laneDown', 'slow', 'dash', 'solidarity'];
+      for (const m of methods) {
+        try { controls[m](); } catch (e) {
+          return { ok: false, reason: `runnerControls.${m}() threw: ${e.message}` };
+        }
+      }
+
+      const canvas = document.getElementById('gameCanvas');
+      if (!canvas) return { ok: false, reason: 'canvas missing' };
+      const ctx = canvas.getContext('2d');
+      function hashFrame() {
+        const d = ctx.getImageData(0, 0, Math.min(canvas.width, 200), Math.min(canvas.height, 100)).data;
+        let h = 0;
+        for (let i = 0; i < d.length; i += 16) h = (h * 31 + d[i] + d[i + 1] + d[i + 2]) | 0;
+        return h;
+      }
+      const before = hashFrame();
+      await new Promise(r => setTimeout(r, 1000));
+      const after = hashFrame();
+      if (before === after) return { ok: false, reason: 'canvas unchanged after 1s — game loop may not be running' };
+      return { ok: true };
+    });
+
+    if (!liveness.ok) {
+      fail(`Gameplay liveness check failed: ${liveness.reason}`);
+    }
+
+    // 6) Mobile viewport sanity checks for swipe/tap rollout.
+    const mobilePage = await browser.newPage({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true
+    });
+
+    await mobilePage.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await mobilePage.waitForTimeout(600);
+    await mobilePage.waitForSelector('#runner-narrative', { state: 'visible', timeout: 10000 });
+    await mobilePage.keyboard.press('Enter');
+    await mobilePage.waitForSelector('#runner-narrative', { state: 'hidden', timeout: 10000 });
+    await mobilePage.waitForTimeout(500);
+
+    const mobileCheck = await mobilePage.evaluate(() => {
+      const hintText = (document.getElementById('tower-hint')?.textContent || '').replace(/\s+/g, ' ');
+      const restartDisplay = getComputedStyle(document.getElementById('restart-toggle')).display;
+      const touchAction = getComputedStyle(document.getElementById('game-container')).touchAction;
+      const touchHintOpacity = getComputedStyle(document.getElementById('runner-touch-hint')).opacity;
+      const bodyClassName = document.body.className;
+
+      return {
+        hintText,
+        restartDisplay,
+        touchAction,
+        touchHintOpacity,
+        bodyClassName
+      };
+    });
+
+    if (!mobileCheck.hintText.includes('Swipe up/down to change lanes') || !mobileCheck.hintText.includes('tap to use Solidarity')) {
+      fail('Mobile hint text did not switch to swipe/tap instructions.');
+    }
+    if (mobileCheck.restartDisplay === 'none') {
+      fail('Restart button should be visible in runner mode for mobile.');
+    }
+    if (mobileCheck.touchAction !== 'none') {
+      fail(`Expected game container touch-action to be none, got ${mobileCheck.touchAction}.`);
+    }
+    if (!mobileCheck.bodyClassName.includes('touch-ui')) {
+      fail('Expected touch-ui body class on mobile viewport.');
+    }
+    if (mobileCheck.touchHintOpacity === '0') {
+      fail('Expected touch hint to be visible on initial mobile gameplay state.');
+    }
+
+    await mobilePage.locator('#gameCanvas').tap();
+    await mobilePage.waitForTimeout(250);
+    const touchHintDismissed = await mobilePage.evaluate(() => document.body.classList.contains('touch-hint-dismissed'));
+    if (!touchHintDismissed) {
+      fail('Expected first mobile tap to dismiss the touch hint.');
+    }
+
+    await mobilePage.locator('[data-card-id="htg-members"]').click({ force: true });
+    await mobilePage.waitForTimeout(250);
+    const mobileSheetCheck = await mobilePage.evaluate(() => {
+      const sheet = document.getElementById('runner-legend-sheet');
+      const statusText = (document.getElementById('status-val')?.textContent || '').replace(/\s+/g, ' ').trim();
+      const sheetTitle = (document.getElementById('runner-legend-sheet-title')?.textContent || '').trim();
+      const sheetBody = (document.getElementById('runner-legend-sheet-body')?.textContent || '').replace(/\s+/g, ' ');
+      return {
+        sheetOpen: Boolean(sheet && sheet.classList.contains('is-open')),
+        bodyOpen: document.body.classList.contains('legend-sheet-open'),
+        statusText,
+        sheetTitle,
+        sheetBody
+      };
+    });
+    if (!mobileSheetCheck.sheetOpen || !mobileSheetCheck.bodyOpen) {
+      fail('Expected mobile legend tap to open the bottom sheet.');
+    }
+    if (!mobileSheetCheck.statusText.includes('PAUSED: INFO CARD')) {
+      fail('Expected game to pause when the mobile bottom sheet opens.');
+    }
+    if (mobileSheetCheck.sheetTitle !== 'HTG Members') {
+      fail(`Expected mobile bottom-sheet title to be HTG Members, got ${mobileSheetCheck.sheetTitle}.`);
+    }
+    if (!mobileSheetCheck.sheetBody.includes('original pride flag') || !mobileSheetCheck.sheetBody.includes('Evelyn')) {
+      fail('Expected mobile bottom sheet to include HTG explainer and roster content.');
+    }
+
     console.log('PASS: focused runner smoke checks succeeded.');
     console.log('- Continue control click + Enter fallback: PASS');
     console.log('- Intro court-case context lead paragraph: PASS');
     console.log('- Control semantics + obstacle effect legend wiring: PASS');
     console.log(`- Pride/visual variation buckets detected: ${variation.activeBuckets}`);
+    console.log('- Gameplay liveness (control API + game loop active): PASS');
+    console.log('- Mobile hint/restart/touch-action sanity: PASS');
+    console.log('- Mobile touch hint visibility and dismissal: PASS');
+    console.log('- Mobile bottom-sheet info card pause/readability: PASS');
   } finally {
     await browser.close();
   }

@@ -10,21 +10,27 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 ## 2. Runner Default Validation
 
 - Open `index.html` path.
-- Confirm mode banner reads `MODE: runner`.
-- Confirm runner controls are visible and tower controls are hidden.
+- Confirm tower controls are hidden.
+- Confirm runner legend row appears below the game.
+- Confirm intro history checkpoint appears immediately and blocks gameplay.
 - Validate controls:
   - `ArrowUp` / `ArrowDown` lane movement
   - `ArrowLeft` slow
   - `ArrowRight` or `D` dash
   - `Space` solidarity (near active barrier with sufficient chain)
   - `R` restart
+- Validate shell utilities:
+  - mute toggle
+  - bright/dark mode toggle
+  - restart button
 - Validate narrative checkpoints block and continue as expected.
 
 ## 3. Legacy Regression Validation
 
 - Open `index.html?mode=legacy`.
-- Confirm mode banner reads `MODE: legacy`.
-- Confirm tower controls are visible and runner controls are hidden.
+- Confirm tower controls are visible.
+- Confirm runner narrative overlay is hidden.
+- Confirm tower-defense hint text is present.
 - Validate legacy controls:
   - `1`-`4` select towers
   - click canvas to place tower
@@ -46,12 +52,14 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 - Confirm sprites load in both modes.
 - Confirm no missing-asset hard failures.
 - If possible, inspect console for repeated sprite load errors.
+- On a phone-sized viewport, confirm tapping a runner info card opens a bottom sheet and pauses gameplay.
 
 ## 6. Audio Validation
 
 - Confirm SFX initialize on first user interaction.
 - Confirm mute toggle behavior works.
-- If BGM is enabled for release, confirm autoplay policy-safe start and mute behavior.
+- If BGM starts, confirm autoplay policy-safe start and mute behavior.
+- If BGM does not start, confirm that is treated as non-blocking and the build is still fully usable.
 
 ## 7. Evidence Capture
 

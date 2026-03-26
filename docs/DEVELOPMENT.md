@@ -12,10 +12,12 @@ Last updated: March 25, 2026
 
 ## Current Runner Shell
 
-- Keyboard-first controls are the active runner input path.
-- Top utility bar now holds mute, theme, and compact toggles.
+- Keyboard controls remain supported, and touch-capable devices now get swipe/tap runner input.
+- Top utility bar now holds mute, theme, restart, and compact toggles.
 - Bottom hint text and legend-card rail are the primary on-page teaching surfaces.
 - The earlier hidden touch-control/help shell was removed during closeout cleanup.
+- Touch gesture handling (swipe/tap) is implemented in `runner_mode.js` (`handleTouchGestureStart/Move/End/Cancel`). `docs/MOBILE_GESTURE_PLAN.md` is the historical spec for reference; real-device tuning remains open.
+- Project-level sequencing for the next few sprints lives in `docs/NEXT_SPRINTS_PLAN.md`.
 
 ## Implemented Runner Contracts
 

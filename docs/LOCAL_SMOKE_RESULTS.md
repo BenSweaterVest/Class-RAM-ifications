@@ -9,6 +9,7 @@ Date: March 25, 2026
 - node scripts/check_smoke_contract.js: PASS
 - node scripts/run_all_checks.js: PASS
 - node scripts/smoke_runner_focus.js: PASS
+- node scripts/smoke_mode_shell.js: PASS
 
 ## Focused Smoke Coverage
 
@@ -19,12 +20,16 @@ Date: March 25, 2026
 - Control semantics wiring: PASS
 - Obstacle legend/help coherence: PASS
 - Pride-color visual variation sampling: PASS (latest reruns observed 6-8 active color buckets)
+- Mobile viewport hint/restart/touch-action sanity: PASS
+- Mobile touch-hint visibility and first-gesture dismissal: PASS
+- Mobile bottom-sheet info card behavior and pause state: PASS
+- Runner/legacy mode shell routing sanity: PASS
 
 ## Notes
 
 - Asset sync now validates 44 mirrored PNGs across `assets/processed/` and `class_ram_ifications assets/`.
-- Focused smoke was rerun repeatedly during March 25 UI/art polish and remained green.
+- Focused smoke was rerun repeatedly during March 25 UI/art/mobile polish and remained green, including the bottom-sheet mobile info flow.
 
 ## Manual Smoke
 
-Manual browser/device smoke remains pending owner execution.
+Manual browser/device smoke remains pending owner execution, especially real phone/tablet tuning for swipe thresholds and landscape comfort.

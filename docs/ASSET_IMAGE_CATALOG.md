@@ -67,6 +67,10 @@ Current state:
 - `FOLLOWER_05_HTGFollowerType05_00001_.png`
 - `COLLECTIBLE_01_HTGMemberCollectible_00001_.png`
 
+Current note:
+
+- These files still exist in both mirrored asset folders for archival/repository continuity, but runner mode now derives active ally visuals from the eight named `HTG_0x` sprites instead.
+
 ## Legacy / Shared Pack
 
 - `TOWER_01_CoderTower_00001_.png`

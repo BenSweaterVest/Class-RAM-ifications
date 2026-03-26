@@ -1,7 +1,7 @@
 # Release Notes Draft
 
 Version: Runner RC Draft 1
-Date: March 22, 2026
+Date: March 25, 2026
 
 ## Summary
 
@@ -18,6 +18,8 @@ This release candidate shifts the primary experience to the runner pivot while p
 - Solidarity feedback now explains readiness and failure reasons.
 - Sprite-backed rendering is active with geometry fallback resilience in both runner and legacy.
 - Runner people readability is improved with member/suit scale variation and pride-color member variation.
+- New phase backgrounds, historical checkpoint cards, and eight named HTG member sprites are installed.
+- Runner now includes mute, dark/bright theme, restart, richer legend cards, and first-pass mobile swipe/tap support.
 
 ## Verification Improvements
 
@@ -36,11 +38,10 @@ This release candidate shifts the primary experience to the runner pivot while p
 
 ## Known Open Decision Gates
 
-- Final public title and naming copy
-- Difficulty and tuning profile (including solidarity threshold policy)
-- Narrative tone/reading-length preference
-- Audio release policy (SFX-only vs include BGM)
+- Final acceptance on the rounds 3 and 4 easing pass
+- Mobile bottom-sheet conversion for the info-card row
 - Long-term handling of source asset folder
+- Post-release cleanup of retired generic runner follower/collectible art
 
 ## Planned Before Release Sign-Off
 

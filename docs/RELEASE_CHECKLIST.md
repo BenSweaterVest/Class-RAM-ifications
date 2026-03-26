@@ -12,13 +12,14 @@ Companion references:
 - [ ] The full 1984 to 1995 run is playable without blocking bugs
 - [ ] Sprite alignment is good enough that gameplay reads clearly
 - [ ] HUD text, tower hint text, and end screens are readable
-- [ ] Difficulty feels acceptable through at least one full run
+- [ ] Difficulty feels acceptable through at least one full run, including the intended slight easing of rounds 3 and 4
 
 ## Runner Pivot Readiness
 
 - [ ] `index.html` (runner default) is playable with no blocking errors
 - [ ] `index.html?mode=legacy` remains playable as regression reference
 - [ ] Lane switching and dash controls are responsive on desktop and mobile
+- [ ] Mobile info cards use the intended bottom-sheet treatment and pause gameplay when open
 - [ ] Solidarity threshold and barrier timing are understandable without external explanation
 - [ ] Precedent shield behavior is visually and mechanically clear
 - [ ] Historical finale messaging and Executive Order transition are correct
@@ -32,8 +33,8 @@ Companion references:
 
 ## Audio Readiness
 
-- [ ] A decision has been made to ship SFX-only or include BGM
-- [ ] If BGM is included, the asset and mute behavior are verified
+- [x] Release stance recorded: BGM remains implemented but is non-blocking for release
+- [ ] If BGM starts in the release build, the asset and mute behavior are verified
 
 ## Deployment Readiness
 

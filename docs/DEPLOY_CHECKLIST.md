@@ -26,9 +26,11 @@ Companion references:
 
 - [ ] Open the deployed URL
 - [ ] Run the startup, control, gameplay flow, and stage progression checks from [docs/SMOKE_TEST.md](SMOKE_TEST.md)
+- [ ] Confirm the mobile bottom-sheet info flow still works on a phone-sized viewport
 - [ ] Confirm runtime sprites load correctly on the live build
 - [ ] Confirm mute and restart behavior still work on the live build
-- [ ] If BGM is enabled in the release, confirm music behavior is correct on first user gesture
+- [ ] If BGM starts in the live build, confirm music behavior is correct on first user gesture
+- [ ] If BGM does not start, confirm the build is still acceptable under the non-blocking audio policy
 
 ## Sign-Off
 

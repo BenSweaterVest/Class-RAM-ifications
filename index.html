@@ -13,7 +13,13 @@
             flex-direction: column; 
             align-items: center; 
             margin: 0;
+            min-height: 100vh;
             overflow: hidden;
+        }
+        body.touch-ui {
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         body.light-mode {
             background: #f2efe4;
@@ -39,8 +45,19 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
+            flex-wrap: wrap;
             gap: 8px;
             margin-top: 8px;
+        }
+        body.touch-ui #mode-banner {
+            position: sticky;
+            top: 0;
+            z-index: 80;
+            padding: 8px 0 4px;
+            background: linear-gradient(180deg, rgba(10, 10, 10, 0.98), rgba(10, 10, 10, 0.88));
+        }
+        body.touch-ui.light-mode #mode-banner {
+            background: linear-gradient(180deg, rgba(242, 239, 228, 0.98), rgba(242, 239, 228, 0.9));
         }
         body.compact-ui .tower-btn {
             padding: 4px 8px;
@@ -79,6 +96,22 @@
         }
         #ui-layer {
             width: var(--game-width); padding: 10px; display: flex; justify-content: space-between; flex-wrap: wrap;
+        }
+        body.touch-ui #ui-layer {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            padding: 8px 0;
+        }
+        body.touch-ui #ui-layer > div {
+            padding: 6px 8px;
+            border: 1px solid #295029;
+            background: rgba(5, 18, 5, 0.85);
+            text-align: center;
+        }
+        body.touch-ui.light-mode #ui-layer > div {
+            border-color: #96a996;
+            background: rgba(255, 252, 244, 0.94);
         }
         body.light-mode #ui-layer,
         body.light-mode #tower-hint {
@@ -125,6 +158,10 @@
         #audio-mute-toggle {
             margin-left: 8px;
         }
+        #restart-toggle {
+            margin-left: 8px;
+            display: none;
+        }
         #runner-narrative {
             display: none;
             position: absolute;
@@ -143,6 +180,8 @@
             background-position: center;
             background-repeat: no-repeat;
             overflow: hidden;
+            max-height: min(85vh, 760px);
+            overflow-y: auto;
         }
         #runner-narrative-copy {
             width: min(52%, 320px);
@@ -163,6 +202,39 @@
         }
         #runner-narrative .tower-btn {
             margin-top: 12px;
+        }
+        #runner-touch-hint {
+            position: absolute;
+            left: 12px;
+            bottom: 12px;
+            max-width: min(72%, 320px);
+            padding: 7px 10px;
+            border: 1px solid rgba(120, 210, 120, 0.36);
+            background: rgba(3, 18, 3, 0.82);
+            color: #e3ffe3;
+            font-size: 11px;
+            line-height: 1.3;
+            box-shadow: 0 0 16px rgba(0, 255, 0, 0.12);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 180ms ease, transform 180ms ease;
+            z-index: 12;
+        }
+        body.touch-ui #runner-touch-hint {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        body.touch-ui.touch-hint-dismissed #runner-touch-hint,
+        body.touch-ui.touch-hint-hidden #runner-touch-hint {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        body.light-mode #runner-touch-hint {
+            border-color: rgba(90, 120, 90, 0.28);
+            background: rgba(255, 252, 244, 0.92);
+            color: #183818;
+            box-shadow: 0 0 16px rgba(70, 110, 70, 0.1);
         }
         #runner-narrative.runner-narrative-theme-neutral {
             border-color: #2a5a2a;
@@ -216,6 +288,7 @@
             min-width: 0;
             cursor: pointer;
             transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+            min-height: 42px;
         }
         body.light-mode .legend-card {
             border-color: #9fb09f;
@@ -260,6 +333,7 @@
             z-index: 30;
             line-height: 1.35;
             white-space: pre-line;
+            overscroll-behavior: contain;
         }
         body.light-mode .legend-tooltip {
             border-color: #8ca98c;
@@ -361,7 +435,7 @@
         .legend-card.is-expanded .legend-tooltip {
             opacity: 1;
             transform: translateY(-8px);
-            max-height: 520px;
+            max-height: min(520px, 72vh);
         }
         .legend-card.is-expanded {
             transform: translateY(8px);
@@ -390,6 +464,16 @@
         @media (max-width: 680px) {
             .runner-legend-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+            .legend-card {
+                min-height: 48px;
+            }
+            body.touch-ui .legend-card .legend-tooltip {
+                display: none;
+            }
+            body.touch-ui .legend-card.is-expanded {
+                transform: none;
             }
             #runner-narrative {
                 width: min(96vw, 520px);
@@ -401,12 +485,117 @@
                 background: linear-gradient(180deg, rgba(4, 14, 4, 0.94), rgba(4, 14, 4, 0.86));
                 border-left: 0;
             }
+            #runner-touch-hint {
+                left: 8px;
+                right: 8px;
+                bottom: 8px;
+                max-width: none;
+            }
+            #tower-hint {
+                width: min(94vw, 520px);
+                margin-top: 8px;
+                padding: 0 0 10px;
+                font-size: 12px;
+            }
+            body.touch-ui h1 {
+                font-size: 24px;
+                margin: 10px 0 4px;
+            }
+        }
+        #runner-legend-sheet {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 95;
+            transform: translateY(102%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 180ms ease, opacity 180ms ease;
+        }
+        #runner-legend-sheet.is-open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #runner-legend-sheet-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(1, 10, 1, 0.48);
+            z-index: 94;
+        }
+        body.touch-ui.legend-sheet-open #runner-legend-sheet-backdrop {
+            display: block;
+        }
+        #runner-legend-sheet-panel {
+            width: min(100%, 560px);
+            margin: 0 auto;
+            max-height: min(72vh, 680px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            border: 1px solid #4f8f4f;
+            border-bottom: 0;
+            border-radius: 18px 18px 0 0;
+            background: rgba(3, 18, 3, 0.985);
+            box-shadow: 0 -12px 36px rgba(0, 255, 0, 0.16);
+            padding: 12px 14px 18px;
+            color: #d8ffd8;
+        }
+        body.light-mode #runner-legend-sheet-panel {
+            border-color: #8ca98c;
+            background: rgba(255, 253, 247, 0.985);
+            box-shadow: 0 -12px 32px rgba(70, 110, 70, 0.12);
+            color: #173317;
+        }
+        #runner-legend-sheet-grab {
+            width: 52px;
+            height: 4px;
+            margin: 0 auto 10px;
+            border-radius: 999px;
+            background: rgba(160, 230, 160, 0.45);
+        }
+        body.light-mode #runner-legend-sheet-grab {
+            background: rgba(80, 110, 80, 0.28);
+        }
+        #runner-legend-sheet-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        #runner-legend-sheet-title {
+            margin: 0;
+            color: #9dff9d;
+            font-size: 16px;
+            line-height: 1.2;
+        }
+        body.light-mode #runner-legend-sheet-title {
+            color: #244824;
+        }
+        #runner-legend-sheet-body {
+            font-size: 13px;
+            line-height: 1.42;
+            white-space: normal;
+        }
+        #runner-legend-sheet-body p {
+            margin: 0 0 10px 0;
+        }
+        #runner-legend-sheet-body p:last-child {
+            margin-bottom: 0;
+        }
+        @media (min-width: 681px) {
+            #runner-legend-sheet,
+            #runner-legend-sheet-backdrop {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body>
     <h1>CLASS <span class="rainbow-text">RAM-IFICATIONS</span></h1>
-    <div id="mode-banner"><span id="mode-label" style="display:none;"></span><button id="audio-mute-toggle" class="tower-btn" type="button">MUTE: OFF</button><button id="theme-toggle" class="tower-btn" type="button">BRIGHT MODE</button><button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
+    <div id="mode-banner"><span id="mode-label" style="display:none;"></span><button id="audio-mute-toggle" class="tower-btn" type="button">MUTE: OFF</button><button id="theme-toggle" class="tower-btn" type="button">BRIGHT MODE</button><button id="restart-toggle" class="tower-btn" type="button">RESTART</button><button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
     <div id="ui-layer">
         <div><span id="precedent-label">PRECEDENT:</span> <span id="precedent-val">100</span></div>
         <div>LIVES: <span id="lives-val">3</span></div>
@@ -422,6 +611,7 @@
     <div id="game-container">
         <canvas id="gameCanvas" width="800" height="400"></canvas>
         <div class="crt-overlay"></div>
+        <div id="runner-touch-hint">Swipe to move. Tap to use Solidarity when your chain is ready.</div>
         <div id="runner-narrative" aria-live="polite" aria-modal="true" role="dialog">
             <div id="runner-narrative-copy">
                 <h3 id="runner-narrative-title">Checkpoint</h3>
@@ -431,6 +621,17 @@
         </div>
     </div>
     <div id="runner-legend" style="display:none; position:relative; z-index:40; width: var(--game-width); margin-top: 8px; font-size: 12px; line-height: 1.35; color:#b7ffb7;"></div>
+    <div id="runner-legend-sheet-backdrop" hidden></div>
+    <div id="runner-legend-sheet" aria-hidden="true">
+        <div id="runner-legend-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="runner-legend-sheet-title">
+            <div id="runner-legend-sheet-grab"></div>
+            <div id="runner-legend-sheet-header">
+                <h3 id="runner-legend-sheet-title">Info</h3>
+                <button id="runner-legend-sheet-close" class="tower-btn" type="button">CLOSE</button>
+            </div>
+            <div id="runner-legend-sheet-body"></div>
+        </div>
+    </div>
     <p id="tower-hint">Coder (Logic) (50) | Boolean Bits | Slows</p>
     <script src="audio.js"></script>
     <script src="mode-loader.js"></script>
