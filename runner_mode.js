@@ -324,7 +324,7 @@ function resetGame() {
 
     runStart = performance.now();
     lastSpawn = runStart;
-    lastMemberSpawn = runStart;
+    lastMemberSpawn = runStart - 1400;
     lastWall = runStart;
     nextPatternAt = runStart;
 
@@ -573,20 +573,20 @@ function getCurrentBackgroundKey() {
 function getLatePhaseEaseProfile() {
     if (precedentEstablished >= 3) {
         return {
-            obstacleDensity: 0.88,
-            wallIntervalMs: 17500,
-            solidarityRangePx: SOLIDARITY_RANGE_PX + 26,
-            tooLateBufferPx: -44,
-            shieldDurationMs: 2050
+            obstacleDensity: 0.75,
+            wallIntervalMs: 19500,
+            solidarityRangePx: SOLIDARITY_RANGE_PX + 34,
+            tooLateBufferPx: -50,
+            shieldDurationMs: 2300
         };
     }
     if (precedentEstablished >= 2) {
         return {
-            obstacleDensity: 0.93,
-            wallIntervalMs: 16500,
-            solidarityRangePx: SOLIDARITY_RANGE_PX + 16,
-            tooLateBufferPx: -36,
-            shieldDurationMs: 1925
+            obstacleDensity: 0.80,
+            wallIntervalMs: 18000,
+            solidarityRangePx: SOLIDARITY_RANGE_PX + 22,
+            tooLateBufferPx: -42,
+            shieldDurationMs: 2100
         };
     }
     return {
@@ -906,7 +906,7 @@ function schedulePatterns(now) {
     const elapsed = now - runStart;
     const densityScale = 1 + Math.min(1.4, elapsed / RUN_DURATION_MS);
     const easeProfile = getLatePhaseEaseProfile();
-    const finaleScale = courtroomFinaleActive ? 1.7 : 1;
+    const finaleScale = courtroomFinaleActive ? 1.35 : 1;
     const spawnEvery = 1400 / (densityScale * finaleScale * easeProfile.obstacleDensity);
     if (now < nextPatternAt) return;
     nextPatternAt = now + spawnEvery;
