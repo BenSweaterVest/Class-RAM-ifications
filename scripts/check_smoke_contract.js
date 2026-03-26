@@ -25,8 +25,9 @@ function main() {
   expectContains(indexHtml, 'id="gameCanvas"', 'game canvas', failures);
   expectContains(indexHtml, 'id="mode-banner"', 'mode banner', failures);
   expectContains(indexHtml, 'id="tower-select"', 'legacy tower controls container', failures);
-  expectContains(indexHtml, 'id="runner-controls"', 'runner controls container', failures);
-  expectContains(indexHtml, 'id="runner-help"', 'runner help panel', failures);
+  expectContains(indexHtml, 'id="runner-legend"', 'runner legend container', failures);
+  expectContains(indexHtml, 'id="audio-mute-toggle"', 'runner mute button', failures);
+  expectContains(indexHtml, 'id="theme-toggle"', 'runner theme button', failures);
 
   // Mode-router checks.
   expectContains(loader, "const mode = rawMode === 'legacy' ? 'legacy' : 'runner';", 'runner-default mode selection', failures);

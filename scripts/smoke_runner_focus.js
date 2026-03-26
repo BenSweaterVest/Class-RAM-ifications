@@ -74,10 +74,6 @@ function fail(msg) {
       const legendText = (document.getElementById('runner-legend')?.textContent || '').replace(/\s+/g, ' ');
       const hintText = (document.getElementById('tower-hint')?.textContent || '').replace(/\s+/g, ' ');
 
-      const hasTouchControls = ['runner-left-btn', 'runner-right-btn', 'runner-dash-btn', 'runner-lane-down-btn']
-        .every(id => !!document.getElementById(id));
-
-      if (!hasTouchControls) return { ok: false, reason: 'expected runner touch control buttons missing' };
       if (!legendText.includes('Timothy Dooling (Contender)') || !legendText.includes('HTG Members (Ally Chain)') || !legendText.includes('Suit (Damage)')) {
         return { ok: false, reason: 'runner legend sprite photo labels missing' };
       }
@@ -134,7 +130,6 @@ function fail(msg) {
 
       return {
         ok: true,
-        hasTouchControls,
         hasControlSemantics: true,
         hasHoverCards: true
       };

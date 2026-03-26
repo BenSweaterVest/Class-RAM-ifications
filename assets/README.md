@@ -8,7 +8,6 @@ Current expected contents:
 
 - `processed/` for gameplay sprites and projectiles
 - optional BGM file such as `bgm.ogg` or `bgm.mp3`
-- `New/` may be used as a temporary staging folder before PNGs are promoted into the mirrored canonical folders
 
 ## Canonical Image Documentation
 

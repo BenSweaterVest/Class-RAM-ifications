@@ -13,6 +13,9 @@ Last updated: March 25, 2026
 - Phase background selection now uses promoted location-specific art.
 - Narrative popup cards are installed and rendered behind the historical text.
 - Runner collectible/follower art now uses the eight named HTG pride-roster members.
+- Runner legend now uses six equal-width info cards with expanded historical text.
+- Utility bar now includes mute and bright/dark mode toggles.
+- Earlier hidden runner help/touch-control shell has been pruned from the codebase.
 
 ## Verification State
 

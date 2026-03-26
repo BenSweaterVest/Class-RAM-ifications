@@ -1,14 +1,9 @@
 (function () {
-    const modeBanner = document.getElementById('mode-banner');
-    const modeLabel = document.getElementById('mode-label');
     const towerSelect = document.getElementById('tower-select');
-    const runnerControls = document.getElementById('runner-controls');
-    const runnerControlsToggle = document.getElementById('runner-controls-toggle');
     const compactUiToggle = document.getElementById('compact-ui-toggle');
     const audioMuteToggle = document.getElementById('audio-mute-toggle');
     const themeToggle = document.getElementById('theme-toggle');
     const precedentLabel = document.getElementById('precedent-label');
-    const runnerHelp = document.getElementById('runner-help');
     const runnerNarrative = document.getElementById('runner-narrative');
     const hint = document.getElementById('tower-hint');
 
@@ -22,8 +17,6 @@
     document.body.dataset.mode = mode;
     if (mode === 'runner') {
         if (towerSelect) towerSelect.style.display = 'none';
-        if (runnerControls) runnerControls.style.display = 'none';
-        if (runnerHelp) runnerHelp.style.display = 'none';
         if (runnerNarrative) runnerNarrative.style.display = 'none';
         if (precedentLabel) precedentLabel.textContent = '';
         if (hint) {
@@ -40,9 +33,7 @@
         loadScript('runner_mode.js');
     } else {
         if (window.bgm) window.bgm.stop();
-        if (runnerHelp) runnerHelp.style.display = 'none';
         if (runnerNarrative) runnerNarrative.style.display = 'none';
-        if (runnerControls) runnerControls.style.display = 'none';
         if (precedentLabel) precedentLabel.textContent = 'PRECEDENT:';
         loadScript('game.js');
     }

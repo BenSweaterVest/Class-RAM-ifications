@@ -14,15 +14,16 @@ Date: March 25, 2026
 
 - Narrative continue via click: PASS
 - Narrative continue via Enter fallback: PASS
+- Space does not dismiss history checkpoints: PASS
 - Intro narrative copy assertion (Timothy Dooling lead): PASS
 - Control semantics wiring: PASS
 - Obstacle legend/help coherence: PASS
-- Pride-color visual variation sampling: PASS (6 active color buckets after roster-art promotion)
+- Pride-color visual variation sampling: PASS (latest reruns observed 6-8 active color buckets)
 
 ## Notes
 
 - Asset sync now validates 44 mirrored PNGs across `assets/processed/` and `class_ram_ifications assets/`.
-- Focused smoke was rerun after installing the March 25 background, card, and HTG member art.
+- Focused smoke was rerun repeatedly during March 25 UI/art polish and remained green.
 
 ## Manual Smoke
 

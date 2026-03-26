@@ -46,6 +46,7 @@ Executed:
 Result:
 
 - PASS: narrative continue reliability (click + Enter fallback)
+- PASS: Space key no longer skips history checkpoints
 - PASS: intro historical framing starts with court-case context
 - PASS: control semantics + obstacle-effect legend/hint/help wiring
 - PASS: pride-color visual variation signal (6 active color buckets)
@@ -90,5 +91,5 @@ Reference: `docs/RELEASE_CHECKLIST.md`
 ## Suggested Immediate Next Actions
 
 1. Execute full local manual smoke and convert `docs/LOCAL_SMOKE_RESULTS.md` manual sections from pending to pass/fail.
-2. Apply any non-blocking polish fixes found during smoke.
+2. Decide whether to delete archived generic follower/collectible assets after release.
 3. Use `docs/LIVE_VERIFICATION_RUNBOOK.md` after deploy and populate `docs/GO_NO_GO_TEMPLATE.md`.

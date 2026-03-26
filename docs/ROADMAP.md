@@ -1,6 +1,6 @@
 # Roadmap
 
-Last updated: March 22, 2026
+Last updated: March 25, 2026
 
 ## Completed
 
@@ -10,6 +10,8 @@ Last updated: March 22, 2026
 - 5-card historical narrative flow implemented.
 - Dynamic phase thresholds (3/5/7/9) implemented.
 - Tone-specific popup visuals and SFX implemented.
+- Promoted phase backgrounds, checkpoint cards, and named HTG roster art installed.
+- Runner HUD, legend cards, theme toggle, and checkpoint UX polished.
 - Verification scripts and focused smoke in place.
 
 ## In Progress
@@ -19,7 +21,7 @@ Last updated: March 22, 2026
 
 ## Next
 
-1. Add phase background art assets (optional but recommended).
-2. Complete manual smoke matrix and log pass/fail evidence.
-3. Run live verification and finalize go/no-go.
-4. Expand end-to-end Playwright coverage.
+1. Complete manual smoke matrix and log pass/fail evidence.
+2. Run live verification and finalize go/no-go.
+3. Expand end-to-end Playwright coverage.
+4. Decide whether retired generic follower/collectible assets stay archived or get deleted.

@@ -10,6 +10,9 @@ Last updated: March 25, 2026
 - [x] Updated follower chain rendering to reuse collected HTG identities.
 - [x] Replaced stale prompt-heavy asset metadata with current lightweight manifest/roster documents.
 - [x] Synchronized core docs to the promoted March 25 art set.
+- [x] Polished runner HUD, legend-card system, checkpoint interaction flow, and theme/audio controls.
+- [x] Installed new cabinet/bot obstacle art and revised all legend card historical copy.
+- [x] Removed obsolete hidden runner help/touch-control shell and updated smoke/contracts accordingly.
 
 ## Remaining (Autonomous)
 

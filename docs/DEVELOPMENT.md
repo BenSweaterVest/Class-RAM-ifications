@@ -10,6 +10,13 @@ Last updated: March 25, 2026
 - index.html: UI shell and narrative theme styles
 - game.js: legacy reference mode
 
+## Current Runner Shell
+
+- Keyboard-first controls are the active runner input path.
+- Top utility bar now holds mute, theme, and compact toggles.
+- Bottom hint text and legend-card rail are the primary on-page teaching surfaces.
+- The earlier hidden touch-control/help shell was removed during closeout cleanup.
+
 ## Implemented Runner Contracts
 
 - 5 narrative keys in NARRATIVE_COPY

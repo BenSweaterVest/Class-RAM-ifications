@@ -71,16 +71,17 @@ Rationale:
 
 Decision:
 
-- Ensure touch controls are available in runner mode.
+- Keep runner mode readable on smaller screens, but prefer the keyboard-first desktop HUD as the default shell.
 
 Implementation:
 
-- Added touch buttons in `index.html`.
-- Wired pointer handlers in `runner_mode.js` for slow/dash/lane up/lane down/restart.
+- Responsive legend and narrative layouts remain in `index.html`.
+- Keyboard control and restart/mute/theme flows remain active in `runner_mode.js` and `mode-loader.js`.
+- The earlier hidden touch-control shell was removed during closeout cleanup once the design direction settled on keyboard-first play.
 
 Rationale:
 
-- Mobile-first requirement from pivot specification.
+- Preserves smaller-screen compatibility without carrying dead on-screen control UI that no longer matches the shipped experience.
 
 ## 6. Asset Pipeline And Runtime Source Of Truth
 

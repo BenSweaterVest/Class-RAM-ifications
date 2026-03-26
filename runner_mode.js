@@ -6,14 +6,6 @@ const uiPrecedent = document.getElementById('precedent-val');
 const uiLives = document.getElementById('lives-val');
 const uiStatus = document.getElementById('status-val');
 const uiYear = document.getElementById('year-val');
-const solidarityButton = document.getElementById('solidarity-btn');
-const runnerLeftButton = document.getElementById('runner-left-btn');
-const runnerRightButton = document.getElementById('runner-right-btn');
-const runnerDashButton = document.getElementById('runner-dash-btn');
-const runnerLaneDownButton = document.getElementById('runner-lane-down-btn');
-const runnerRestartButton = document.getElementById('runner-restart-btn');
-const runnerHelpPanel = document.getElementById('runner-help');
-const runnerHelpCloseButton = document.getElementById('runner-help-close');
 const runnerNarrativePanel = document.getElementById('runner-narrative');
 const runnerNarrativeTitle = document.getElementById('runner-narrative-title');
 const runnerNarrativeBody = document.getElementById('runner-narrative-body');
@@ -59,7 +51,6 @@ let obstacles = [];
 let members = [];
 let wall = null;
 let particles = [];
-let runnerHelpDismissed = false;
 let solidarityFeedbackText = '';
 let solidarityFeedbackUntil = 0;
 let laneLockFeedbackText = '';
@@ -572,26 +563,6 @@ function updateUI() {
         uiYear.textContent = String(getCurrentPhaseYear());
     }
 
-    if (solidarityButton) {
-        const now = performance.now();
-        const solidarityState = getSolidarityState(now);
-        const canUse = solidarityState.ready;
-        const urgent = canUse && wall && wall.x - player.x < 70;
-        const uiSpriteKey = urgent
-            ? 'uiSolidarityUrgent'
-            : canUse
-                ? 'uiSolidarityActive'
-                : 'uiSolidarityInactive';
-        const uiSpritePath = RUNNER_SPRITE_PATHS[uiSpriteKey];
-        if (uiSpritePath) {
-            solidarityButton.style.backgroundImage = `url(${uiSpritePath})`;
-            solidarityButton.style.backgroundSize = 'cover';
-            solidarityButton.style.backgroundPosition = 'center';
-        }
-        solidarityButton.disabled = false;
-        solidarityButton.style.opacity = canUse ? '1' : '0.78';
-        solidarityButton.title = canUse ? 'Solidarity ready' : solidarityState.reason;
-    }
 }
 
 function renderRunnerLegend() {
@@ -1308,15 +1279,8 @@ function triggerSlow() {
     tryMoveHorizontal(-1);
 }
 
-function dismissRunnerHelp() {
-    if (!runnerHelpPanel || runnerHelpDismissed) return;
-    runnerHelpDismissed = true;
-    runnerHelpPanel.style.display = 'none';
-}
-
 function handleRunnerKeydown(e) {
     if (window.sfx) window.sfx.init();
-    dismissRunnerHelp();
 
     const key = e.key;
     const code = e.code;
@@ -1406,46 +1370,9 @@ function handleRunnerKeydown(e) {
     }
 }
 
-function bindRunnerButton(button, action) {
-    if (!button) return;
-
-    const runAction = e => {
-        if (e) e.preventDefault();
-        if (window.sfx) window.sfx.init();
-        dismissRunnerHelp();
-
-        if (!gameActive && button !== runnerRestartButton) {
-            resetGame();
-            return;
-        }
-
-        action();
-    };
-
-    button.addEventListener('pointerdown', runAction);
-    button.addEventListener('click', runAction);
-    button.addEventListener('touchstart', runAction, { passive: false });
-
-    // Fallback binding for environments where addEventListener hooks are unreliable.
-    button.onclick = runAction;
-}
-
 window.addEventListener('keydown', handleRunnerKeydown);
 document.addEventListener('keydown', handleRunnerKeydown);
 document.onkeydown = handleRunnerKeydown;
-
-bindRunnerButton(solidarityButton, () => attemptSolidarityActivation(performance.now()));
-bindRunnerButton(runnerLeftButton, () => triggerSlow());
-bindRunnerButton(runnerRightButton, () => triggerDash());
-bindRunnerButton(runnerDashButton, () => tryMoveLane(-1));
-bindRunnerButton(runnerLaneDownButton, () => tryMoveLane(1));
-bindRunnerButton(runnerRestartButton, () => resetGame());
-
-if (runnerHelpCloseButton) {
-    runnerHelpCloseButton.addEventListener('click', () => {
-        dismissRunnerHelp();
-    });
-}
 
 if (runnerNarrativeNextButton) {
     runnerNarrativeNextButton.addEventListener('pointerdown', handleNarrativeContinue);

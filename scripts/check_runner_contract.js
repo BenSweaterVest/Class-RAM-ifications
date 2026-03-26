@@ -20,9 +20,10 @@ function main() {
   const loader = read('mode-loader.js');
   const runner = read('runner_mode.js');
 
-  expectContains(indexHtml, 'id="runner-controls"', 'runner controls container', failures);
-  expectContains(indexHtml, 'id="solidarity-btn"', 'solidarity button', failures);
   expectContains(indexHtml, 'id="runner-narrative"', 'narrative modal', failures);
+  expectContains(indexHtml, 'id="runner-legend"', 'runner legend container', failures);
+  expectContains(indexHtml, 'id="audio-mute-toggle"', 'audio mute toggle', failures);
+  expectContains(indexHtml, 'id="theme-toggle"', 'theme toggle', failures);
 
   expectContains(loader, "const mode = rawMode === 'legacy' ? 'legacy' : 'runner';", 'runner-default mode routing', failures);
   expectContains(loader, 'bindRunnerKeyboardFallback()', 'loader keyboard fallback', failures);

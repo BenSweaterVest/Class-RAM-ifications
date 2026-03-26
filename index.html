@@ -31,7 +31,6 @@
             padding: 6px 8px;
             font-size: 12px;
         }
-        body.compact-ui #runner-help,
         body.compact-ui #tower-hint {
             display: none !important;
         }
@@ -42,13 +41,6 @@
             align-items: center;
             gap: 8px;
             margin-top: 8px;
-        }
-        body.compact-ui #runner-controls {
-            margin-top: 4px !important;
-        }
-        body.compact-ui #runner-touch {
-            margin-top: 4px;
-            gap: 6px;
         }
         body.compact-ui .tower-btn {
             padding: 4px 8px;
@@ -126,40 +118,12 @@
             border-color: #2d6b2d;
             background: #dfead9;
         }
-        #runner-touch {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-        #runner-controls-toggle {
-            margin-left: 8px;
-        }
         #compact-ui-toggle {
             margin-left: 8px;
             display: none;
         }
         #audio-mute-toggle {
             margin-left: 8px;
-        }
-        #runner-help {
-            display: none;
-            width: var(--game-width);
-            margin-top: 10px;
-            border: 2px solid #1f3a1f;
-            background: rgba(0, 20, 0, 0.7);
-            padding: 10px 12px;
-            box-sizing: border-box;
-            font-size: 13px;
-            line-height: 1.35;
-        }
-        #runner-help h3 {
-            margin: 0 0 6px 0;
-            color: #9dff9d;
-            font-size: 14px;
-        }
-        #runner-help .tower-btn {
-            margin-top: 8px;
         }
         #runner-narrative {
             display: none;
@@ -417,9 +381,7 @@
         @media (max-width: 900px) {
             #ui-layer { width: 96vw; }
             #game-container { margin-top: 12px; }
-            #runner-touch .tower-btn { min-width: 76px; }
             canvas { max-width: 96vw; height: auto; }
-            #runner-help { width: 96vw; }
             #runner-narrative-copy { width: min(60%, 320px); }
             .runner-legend-grid {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -456,36 +418,6 @@
         <button class="tower-btn" data-tower="2" title="Attorney (Litigation) - Precedents, heavy damage">2 Attorney (75)</button>
         <button class="tower-btn" data-tower="3" title="Activist (Community) - Heals Burden on nearby files">3 Activist (60)</button>
         <button class="tower-btn" data-tower="4" title="Encryption Expert - Firewall, protects towers from Subpoenas">4 Encryption (80)</button>
-    </div>
-    <div id="runner-controls" style="display:none; margin-top: 8px;">
-        <button id="solidarity-btn" class="tower-btn" disabled onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.solidarity){window.runnerControls.solidarity();}">SOLIDARITY</button>
-        <button id="runner-controls-toggle" class="tower-btn" style="display:none;" type="button">SHOW TOUCH CONTROLS</button>
-        <div id="runner-touch">
-            <button id="runner-left-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.slow){window.runnerControls.slow();}">LEFT</button>
-            <button id="runner-right-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.dash){window.runnerControls.dash();}">RIGHT</button>
-            <button id="runner-dash-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.laneUp){window.runnerControls.laneUp();}">LANE UP</button>
-            <button id="runner-lane-down-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.laneDown){window.runnerControls.laneDown();}">LANE DOWN</button>
-            <button id="runner-restart-btn" class="tower-btn" onclick="if(window.sfx){window.sfx.init();} if(window.runnerControls && window.runnerControls.restart){window.runnerControls.restart();}">RESTART</button>
-        </div>
-    </div>
-    <div id="runner-help" aria-live="polite">
-        <h3>How Runner Mode Works</h3>
-        <div>
-            Goal: clear 4 barriers and establish 4 precedents by activating Solidarity at each phase gate.
-        </div>
-        <div>
-            Build chain: collect HTG members (small yellow/pink allies). Do not collide with suits, cabinets, or bots.
-        </div>
-        <div>
-            Barrier loop: Solidarity only works when a barrier is close and chain meets the phase threshold (3, then 5, then 7, then 9).
-        </div>
-        <div>
-            Controls: Up/Down lanes, Left/A move left, Right or D move right, Space Solidarity (burst through the barrier), R restart.
-        </div>
-        <div>
-            Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.
-        </div>
-        <button id="runner-help-close" class="tower-btn">GOT IT</button>
     </div>
     <div id="game-container">
         <canvas id="gameCanvas" width="800" height="400"></canvas>
