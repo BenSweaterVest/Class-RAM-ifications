@@ -28,13 +28,15 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 
 ## Runner Pivot Controls
 
-- [ ] Press `ArrowUp` and `ArrowDown` to change lanes
-- [ ] Press `ArrowLeft` and confirm temporary slow effect
-- [ ] Press `ArrowRight` and `D` and confirm dash behavior
+- [ ] Press `ArrowUp` / `W` and `ArrowDown` / `S` to change lanes
+- [ ] Press `ArrowLeft` / `A` to move left
+- [ ] Press `ArrowRight` / `D` to move right
 - [ ] Press `Space` near a barrier when chain threshold is met and confirm Solidarity activation
+- [ ] Press `Escape` and confirm game pauses (HUD shows "PAUSED"); press again to unpause
 - [ ] Press `R` to restart run after fail or success
 - [ ] Press `M` and confirm mute toggles
 - [ ] Toggle bright/dark mode and confirm the UI shell updates cleanly
+- [ ] Change difficulty selector and confirm it takes effect after next restart
 
 ## Runner Pivot Mobile Touch Controls
 
@@ -46,12 +48,14 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 
 ## Runner Narrative Checkpoints
 
-- [ ] Confirm intro narrative card appears at run start and blocks gameplay until `PRESS ENTER TO CONTINUE` or click/tap continue
-- [ ] Confirm first precedent narrative card appears after first successful barrier pass
-- [ ] Confirm second precedent narrative card appears after second successful barrier pass
-- [ ] Confirm courtroom narrative card appears at courtroom transition
+- [ ] Confirm intro narrative card (CARD_01) appears at run start and blocks gameplay until continue
+- [ ] Confirm phase1Clear narrative card appears after first successful barrier pass
+- [ ] Confirm phase2Clear narrative card appears after second successful barrier pass
+- [ ] Confirm phase3Clear narrative card appears after third successful barrier pass
+- [ ] Confirm phase4Clear (EO 12968 victory card) appears after fourth barrier pass and resolves to win state
 - [ ] Confirm `Enter` and the continue button advance narrative cards
 - [ ] Confirm `Space` does not dismiss narrative cards
+- [ ] Confirm BGM ducks during popup and restores on close
 
 ## Runner Pivot Core Flow
 

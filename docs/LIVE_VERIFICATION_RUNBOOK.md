@@ -14,16 +14,20 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 - Confirm runner legend row appears below the game.
 - Confirm intro history checkpoint appears immediately and blocks gameplay.
 - Validate controls:
-  - `ArrowUp` / `ArrowDown` lane movement
-  - `ArrowLeft` slow
-  - `ArrowRight` or `D` dash
-  - `Space` solidarity (near active barrier with sufficient chain)
+  - `ArrowUp` / `W` and `ArrowDown` / `S` lane change
+  - `ArrowLeft` / `A` move left
+  - `ArrowRight` / `D` move right
+  - `Space` Solidarity (near active barrier, chain meets phase threshold)
+  - `Escape` pause / unpause
   - `R` restart
 - Validate shell utilities:
   - mute toggle
   - bright/dark mode toggle
+  - difficulty selector (story / organize / resist)
   - restart button
 - Validate narrative checkpoints block and continue as expected.
+- Confirm BGM ducks during popup open and restores on close.
+- Confirm Escape key pauses and unpauses; HUD shows "PAUSED".
 
 ## 3. Legacy Regression Validation
 
@@ -53,6 +57,8 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 - Confirm no missing-asset hard failures.
 - If possible, inspect console for repeated sprite load errors.
 - On a phone-sized viewport, confirm tapping a runner info card opens a bottom sheet and pauses gameplay.
+- Confirm manifest.json is served correctly (PWA installability prompt in Chrome/Edge).
+- Confirm sw.js registers without console errors (cache name: class-ram-v2).
 
 ## 6. Audio Validation
 

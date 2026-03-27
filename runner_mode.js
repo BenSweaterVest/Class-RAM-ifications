@@ -364,6 +364,7 @@ function resetGame() {
     wall = null;
     particles = [];
     pendingSpawns = [];
+    if (window.sfx) window.sfx.cancelBarrierWarning();
     clearCollectedMembers();
     narrativePaused = false;
     legendPaused = false;
@@ -694,6 +695,8 @@ function applyPauseCompensation(deltaMs) {
     player.horizontalCooldownUntil = shiftTimer(player.horizontalCooldownUntil, deltaMs);
 
     laneLockFeedbackUntil = shiftTimer(laneLockFeedbackUntil, deltaMs);
+    phaseFlashUntil = shiftTimer(phaseFlashUntil, deltaMs);
+    postBarrierInvulnerabilityUntil = shiftTimer(postBarrierInvulnerabilityUntil, deltaMs);
 
     if (wall) {
         wall.warningUntil = shiftTimer(wall.warningUntil, deltaMs);

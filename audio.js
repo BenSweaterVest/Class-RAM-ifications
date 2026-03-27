@@ -9,6 +9,7 @@
     let muted = false;
     let bgmAudio = null;
     let bgmArmed = false;
+    let barrierWarnGen = 0;
 
     function getContext() {
         if (ctx) return ctx;

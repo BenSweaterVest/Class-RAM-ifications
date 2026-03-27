@@ -1,7 +1,7 @@
 # Game Design Document
 
 Project: Class RAM-ifications
-Last updated: March 22, 2026
+Last updated: March 27, 2026
 Direction: Runner-first historical arcade experience
 
 ## Design Intent
@@ -24,9 +24,9 @@ Model legal/political struggle as readable arcade systems:
 ## Phase Model
 
 - Phase 1 threshold: 3
-- Phase 2 threshold: 5
-- Phase 3 threshold: 7
-- Phase 4 threshold: 9
+- Phase 2 threshold: 4
+- Phase 3 threshold: 5
+- Phase 4 threshold: 6
 
 Narrative checkpoints (5 total):
 - Intro
@@ -38,11 +38,11 @@ Narrative checkpoints (5 total):
 ## Win / Lose
 
 Win:
-- Clear 4 barriers (4 precedents) and complete final narrative card.
+- Clear 4 barriers (4 precedents) and complete final narrative card (popup 5, phase4Clear / EO 12968). No separate win canvas overlay.
 
 Lose:
 - Hit live barrier without active shield.
-- Timer expires before required clears.
+- Lose all 3 lives.
 
 ## Systems Snapshot
 
@@ -51,7 +51,11 @@ Lose:
 - Barrier cadence: 25s baseline, 15s in late pressure segment.
 - Solidarity gating: distance + phase threshold.
 - Backgrounds: phase-based key selection with fallback.
-- Narrative: modal checkpoints with pause-time compensation.
+- Narrative: modal checkpoints with pause-time compensation; BGM ducks to 5% on open.
+- Difficulty modes: story / organize (default) / resist — scalars on wall interval, threshold, obstacle speed, spawn density.
+- Pause: Escape key toggles; all active timers compensated on resume.
+- PWA: manifest.json + sw.js service worker (cache name class-ram-v2).
+- Attempt counter and totalAlliesGathered shown on You Lose screen.
 
 ## UX/Tone
 

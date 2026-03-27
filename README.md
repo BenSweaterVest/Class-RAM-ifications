@@ -19,20 +19,22 @@ npx serve .
 
 ## Current Runner Targets
 
-- Run length: 180 seconds
 - Barrier clears required for victory: 4
-- Phase chain thresholds: 3 -> 5 -> 7 -> 9
+- Phase chain thresholds: 3 -> 4 -> 5 -> 6 (base; scaled by difficulty mode)
+- Difficulty modes: story / organize (default) / resist
 - Narrative checkpoints: 5 (intro, phase 1 clear, phase 2 clear, phase 3 clear, final EO 12968 card)
 - Narrative popup cards: illustrated card backplates with live text overlay
 - HTG roster: eight named pride-flag members reused for pickups and follower chain
+- PWA: installable via manifest.json + sw.js service worker
 
 ## Controls
 
-- Up/Down: lane change
-- Left/A: move left
-- Right/D: move right
+- Up / W or Down / S: lane change
+- Left / A: move left
+- Right / D: move right
 - Space: Solidarity
-- R: restart
+- Escape: pause / unpause
+- R / Enter: restart (on lose or win screen)
 - M: mute
 
 On touch-capable devices, the runner now supports swipe/tap input:

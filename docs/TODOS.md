@@ -1,6 +1,6 @@
 # TODOs
 
-Last updated: March 26, 2026
+Last updated: March 27, 2026
 
 ## Completed This Session
 
@@ -17,25 +17,30 @@ Last updated: March 26, 2026
 - [x] Removed obsolete hidden runner help/touch-control shell and updated smoke/contracts accordingly.
 - [x] Implemented a first-pass mobile runner layer: swipe/tap controls, touch hint, mobile HUD polish, and narrow-screen legend rail behavior.
 - [x] Captured current product decisions for title, audio stance, mobile UX direction, and difficulty-adjustment targets.
+- [x] Replaced the narrow-screen legend rail with the mobile bottom-sheet pattern opened from the existing card row.
+- [x] Made the mobile bottom sheet pause gameplay cleanly and resume cleanly on close.
+- [x] Tuned rounds 3 and 4 slightly easier while preserving the current feel of rounds 1 and 2.
+- [x] Redesigned difficulty system: unified ROUND_PROFILES table + DIFFICULTY_MODES scalars; Story/Organize/Resist dropdown; default fallback to 'organize'.
+- [x] Expanded Playwright smoke: gameplay liveness check added (control API + canvas frame-change assertion).
+- [x] Consolidated duplicated release/readiness notes: BACKLOG_TRIAGE.md removed, PIVOT_DECISIONS_SUMMARY.md updated, MOBILE_GESTURE_PLAN.md marked as implemented spec, DEVELOPMENT.md refreshed.
+- [x] Completed post-release cleanup pass: removed retired generic follower/collectible PNGs from both mirrored asset folders.
+- [x] Implemented Escape key pause/unpause with full applyPauseCompensation() coverage (phaseFlashUntil, postBarrierInvulnerabilityUntil, and all other active timers).
+- [x] Implemented barrier-clear effects: white flash overlay, rainbow sparkle particles, 3-second post-barrier invulnerability with glow arc.
+- [x] Implemented barrierWarning SFX: 8-pulse escalating beep with generation counter for clean cancellation on restart.
+- [x] Distinguished chainLoss SFX (square beep, tail hit) from lifeLost SFX (sawtooth 2-tone, direct player hit).
+- [x] Added attempt counter (localStorage 'classRamAttempts') and totalAlliesGathered stat; both shown on You Lose screen.
+- [x] Added BGM ducking during narrative popups (5% on open, restores to 24% on close).
+- [x] Added debug shortcuts: F2 overlay, Alt+1–5 force narrative popups, Alt+0 force You Lose state.
+- [x] Added PWA support: manifest.json, sw.js service worker (cache name class-ram-v2), favicon set in assets/favicon/.
+- [x] Added Open Graph and Twitter Card meta tags.
+- [x] Fixed touch guard: tap on paused game does nothing (guard in handleTouchGestureEnd).
+- [x] Fixed difficulty default fallback to 'organize' when no selection is stored.
+- [x] Simplified win screen: popup 5 (phase4Clear) is the win moment; no separate win canvas overlay.
+- [x] Retuned narrativeSomber SFX to sine wave (mournful, distinct from game-over).
 
-## Remaining (Autonomous)
+## Remaining (Needs Owner Action Only)
 
-- [x] Replace the current narrow-screen legend rail with the decided mobile bottom-sheet pattern opened from the existing card row.
-- [x] Make the mobile bottom sheet pause gameplay cleanly and resume cleanly on close.
-- [x] Tune rounds 3 and 4 slightly easier while preserving the current feel of rounds 1 and 2.
-- [x] Redesign difficulty system: unified ROUND_PROFILES table + DIFFICULTY_MODES scalars replacing the old independent time-ramp and ease profile; per-round ramp that resets on barrier clear; Story/Organize/Resist dropdown in top bar.
-- [x] Update focused smoke and docs after the mobile bottom-sheet implementation lands.
-- [x] Expand Playwright smoke: gameplay liveness check added (control API + canvas frame-change assertion).
-- [x] Consolidate duplicated release/readiness notes: BACKLOG_TRIAGE.md removed, PIVOT_DECISIONS_SUMMARY.md updated, MOBILE_GESTURE_PLAN.md and DEVELOPMENT.md refreshed.
-- [ ] Tune swipe/tap thresholds and move cadence on real mobile devices.
-- [x] Prepare the post-release cleanup pass that removes retired generic follower/collectible PNGs from both mirrored asset folders.
-
-## Remaining (Needs Owner Input)
-
-- [x] Public release title: `Class RAM-ifications`.
-- [x] Audio stance: keep BGM implemented, but non-blocking for release if it fails to start.
-- [x] Mobile default theme: dark mode.
-- [x] Mobile info pattern: bottom sheet from the existing card row, and it should pause gameplay.
-- [ ] Final acceptance check on rounds 3 and 4 after the easing pass lands.
-- [ ] Real-phone/real-tablet spot checks for swipe comfort and readability.
+- [ ] Real-phone and real-tablet spot checks for swipe comfort, readability, and pause behavior.
+- [ ] Final acceptance check on rounds 3 and 4 feel after the easing pass.
+- [ ] Run `node scripts/run_all_checks.js` immediately before deploying to confirm all checks are green.
 - [ ] Live environment go/no-go signoff.
