@@ -62,6 +62,7 @@ let laneLockedUntil = 0;
 let laneLockCooldownUntil = 0;
 let courtroomFinaleActive = false;
 let pendingVictoryAfterNarrative = false;
+let gameEndedAt = 0;
 
 let runStart = 0;
 let roundStart = 0;
@@ -94,6 +95,12 @@ let legendRosterRotationInterval = 0;
 let activeTouchGesture = null;
 let touchHintDismissed = false;
 let touchGestureCooldownUntil = 0;
+let gamePaused = false;
+let gamePauseStartedAt = 0;
+let phaseFlashUntil = 0;
+let postBarrierInvulnerabilityUntil = 0;
+let totalAlliesGathered = 0;
+let currentAttemptNumber = 0;
 let runnerLegendItems = [];
 
 const TOUCH_TAP_MAX_DISTANCE = 14;
@@ -179,8 +186,8 @@ const RUNNER_SPRITE_PATHS = {
     htgRobin: 'assets/processed/HTG_07_HTGMemberRobin_00001_.png',
     htgEvelyn: 'assets/processed/HTG_08_HTGMemberEvelyn_00001_.png',
     suit: 'assets/processed/ENEMY_02_CorporateSuit_00001_.png',
-    cabinet: 'assets/processed/ENEMY_03_FilingCabinet_00001_.png',
-    bot: 'assets/processed/ENEMY_04_PolygraphBot_00001_.png',
+    cabinet: 'assets/processed/VintageSLOW_CABINET_v4_SlowObstacle-FilingCabinet_00001_.png',
+    bot: 'assets/processed/LOCK_BOT_v3_LaneLockObstacle-SurveillanceBot_00001_.png',
     wall: 'assets/processed/BARRIER_v5_BarrierWall-SecurityDoor_00001_.png',
     heartFx: 'assets/processed/FX_01_SolidarityHeart_00001_.png',
     shieldFx: 'assets/processed/FX_02_PrecedentShield_00001_.png',
@@ -315,6 +322,7 @@ function clearCollectedMembers() {
 function addCollectedMember(memberVariant) {
     collectedMembers.unshift(memberVariant);
     chainCount = collectedMembers.length;
+    totalAlliesGathered += 1;
 }
 
 function trimCollectedMembers(count = 1) {
@@ -335,13 +343,14 @@ function resetGame() {
     precedentEstablished = 0;
     gameActive = true;
     gameWon = false;
+    gameEndedAt = 0;
     laneLockedUntil = 0;
     laneLockCooldownUntil = 0;
     courtroomFinaleActive = false;
     pendingVictoryAfterNarrative = false;
 
     const diffSelect = document.getElementById('difficulty-select');
-    activeDifficulty = (diffSelect && diffSelect.value) || 'normal';
+    activeDifficulty = (diffSelect && diffSelect.value) || 'organize';
 
     runStart = performance.now();
     roundStart = runStart;
@@ -363,6 +372,13 @@ function resetGame() {
     legendExpandedCardId = '';
     legendPauseStartedAt = 0;
     touchGestureCooldownUntil = 0;
+    gamePaused = false;
+    gamePauseStartedAt = 0;
+    phaseFlashUntil = 0;
+    postBarrierInvulnerabilityUntil = 0;
+    totalAlliesGathered = 0;
+    currentAttemptNumber = (parseInt(localStorage.getItem('classRamAttempts') || '0')) + 1;
+    localStorage.setItem('classRamAttempts', String(currentAttemptNumber));
 
     player.x = 180;
     player.targetX = 180;
@@ -445,6 +461,15 @@ function enqueueNarrative(key) {
     narrativeQueue.push(key);
 }
 
+function debugForceNarrative(key) {
+    // Force-show a narrative card regardless of whether it was already seen.
+    // Clears any currently queued narratives first so the target shows immediately.
+    narrativeQueue = [];
+    shownNarrativeKeys.delete(key);
+    enqueueNarrative(key);
+    showNextNarrative();
+}
+
 function showNextNarrative() {
     if (!runnerNarrativePanel || !narrativeQueue.length) {
         narrativePaused = false;
@@ -468,6 +493,7 @@ function showNextNarrative() {
 
     narrativePaused = true;
     narrativePauseStartedAt = performance.now();
+    if (window.bgm) window.bgm.setVolume(0.05);
     if (runnerNarrativePanel) {
         runnerNarrativePanel.classList.remove(
             'runner-narrative-theme-neutral',
@@ -505,12 +531,14 @@ function advanceNarrative() {
         return;
     }
     narrativePaused = false;
+    if (window.bgm) window.bgm.setVolume(0.24);
     touchGestureCooldownUntil = now + 240;
 
     if (pendingVictoryAfterNarrative) {
         pendingVictoryAfterNarrative = false;
         gameActive = false;
         gameWon = true;
+        gameEndedAt = performance.now();
     }
 
     updateUI();
@@ -607,11 +635,30 @@ function getRoundProfile() {
     };
 }
 
+function spawnRainbowSparkles(now) {
+    const colors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff7f', '#00aaff', '#8b00ff', '#ff1493'];
+    for (let i = 0; i < 48; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 5,
+            vy: (Math.random() - 0.5) * 5,
+            life: now + 350 + Math.random() * 500,
+            rainbow: true,
+            color: colors[i % colors.length]
+        });
+    }
+}
+
 function handleBarrierClear() {
-    roundStart = performance.now();
+    const clearNow = performance.now();
+    roundStart = clearNow;
     precedentEstablished += 1;
     score += 100;
     courtroomFinaleActive = precedentEstablished >= 3;
+    phaseFlashUntil = clearNow + 600;
+    postBarrierInvulnerabilityUntil = clearNow + 3000;
+    spawnRainbowSparkles(clearNow);
 
     if (precedentEstablished === 1) enqueueNarrative('phase1Clear');
     if (precedentEstablished === 2) enqueueNarrative('phase2Clear');
@@ -675,6 +722,7 @@ function updateUI() {
         else if (!gameActive) uiStatus.textContent = 'RUN FAILED';
         else if (narrativePaused) uiStatus.textContent = 'PAUSED: STORY CHECKPOINT';
         else if (legendPaused) uiStatus.textContent = 'PAUSED: INFO CARD';
+        else if (gamePaused) uiStatus.textContent = 'PAUSED';
         else if (courtroomFinaleActive) uiStatus.textContent = 'COURTROOM GAUNTLET';
         else if (laneLockedUntil > performance.now()) uiStatus.textContent = 'LANE LOCKED';
         else if (wall) uiStatus.textContent = 'BARRIER ACTIVE';
@@ -723,11 +771,13 @@ function handleTouchGestureEnd(e) {
     if (typeof e.preventDefault === 'function') e.preventDefault();
 
     if (narrativePaused || legendPaused) return;
+    if (gamePaused) return;
     if (now < touchGestureCooldownUntil) return;
 
     if (absX <= TOUCH_TAP_MAX_DISTANCE && absY <= TOUCH_TAP_MAX_DISTANCE) {
         dismissTouchHint();
         if (!gameActive) {
+            if (now - gameEndedAt < 1500) return;
             resetGame();
             return;
         }
@@ -739,6 +789,7 @@ function handleTouchGestureEnd(e) {
 
     dismissTouchHint();
     if (!gameActive) {
+        if (now - gameEndedAt < 1500) return;
         resetGame();
         return;
     }
@@ -1009,6 +1060,7 @@ function maybeSpawnWall(now) {
         activeUntil: 0,
         passed: false
     };
+    playSfx('barrierWarning');
 }
 
 function getSolidarityState(now) {
@@ -1079,9 +1131,12 @@ function collide(a, b) {
 
 function getFollowerHitboxes() {
     const boxes = [];
+    // Tighten spacing as chain grows so tail followers keep up and don't lag
+    // into obstacles. Chain 1-2: 6 steps; chain 3-5: 5; chain 6-8: 4; chain 9+: 3.
+    const trailStep = Math.max(3, 6 - Math.floor(chainCount / 3));
     for (let i = 0; i < chainCount; i++) {
-        const idx = Math.max(0, player.trail.length - 1 - i * 6);
-        const t = player.trail[idx] || { x: player.x - i * 8, y: player.y };
+        const idx = Math.max(0, player.trail.length - 1 - i * trailStep);
+        const t = player.trail[idx] || { x: player.x - i * 6, y: player.y };
         boxes.push({ x: t.x - 4, y: t.y, w: 8, h: 12 });
     }
     return boxes;
@@ -1089,7 +1144,7 @@ function getFollowerHitboxes() {
 
 function applyTailLoss() {
     if (trimCollectedMembers(1)) {
-        playSfx('auditorHit');
+        playSfx('chainLoss');
         updateUI();
         return true;
     }
@@ -1124,11 +1179,13 @@ function update(now) {
     if (!gameActive) return;
     if (narrativePaused) return;
     if (legendPaused) return;
+    if (gamePaused) return;
 
     const elapsed = now - runStart;
     if (elapsed >= RUN_DURATION_MS && !gameWon) {
         gameActive = false;
         gameWon = precedentEstablished >= PRECEDENT_TARGET;
+        gameEndedAt = performance.now();
         if (gameWon) playSfx('win');
         else playSfx('gameOver');
         updateUI();
@@ -1141,7 +1198,6 @@ function update(now) {
     maybeSpawnWall(now);
 
     const isSlowed = player.slowUntil > now;
-    const worldSpeedScale = 1.0;
 
     if (player.targetX !== player.x) {
         const dx = player.targetX - player.x;
@@ -1170,16 +1226,16 @@ function update(now) {
     if (player.trail.length > 60) player.trail.shift();
 
     obstacles.forEach(o => {
-        o.x -= o.speed * worldSpeedScale;
+        o.x -= o.speed;
     });
     obstacles = obstacles.filter(o => o.x + o.w > -20);
 
-    members.forEach(m => { m.x -= m.speed * worldSpeedScale; });
+    members.forEach(m => { m.x -= m.speed; });
     members = members.filter(m => m.x + m.w > -20);
 
     if (wall) {
         if (now > wall.warningUntil) {
-            wall.x -= wall.speed * worldSpeedScale;
+            wall.x -= wall.speed;
         }
         if (wall.x + wall.w < -20) wall = null;
     }
@@ -1189,6 +1245,7 @@ function update(now) {
 
     for (const o of obstacles) {
         if (o.telegraphUntil > now) continue;
+        if (now < postBarrierInvulnerabilityUntil) continue;
 
         let consumedByChain = false;
         for (const follower of followerHitboxes) {
@@ -1205,9 +1262,10 @@ function update(now) {
             if (!chainAbsorbed) {
                 lives -= 1;
                 player.hitFlashUntil = now + 200;
-                playSfx('auditorHit');
+                playSfx('lifeLost');
                 if (lives <= 0) {
                     gameActive = false;
+                    gameEndedAt = performance.now();
                     playSfx('gameOver');
                 }
             }
@@ -1232,8 +1290,9 @@ function update(now) {
         const wallHit = playerHitbox.x + playerHitbox.w > wall.x && playerHitbox.x < wall.x + wall.w;
         const shieldActive = wall.activeUntil > now;
         const wallLive = now > wall.warningUntil;
-        if (wallHit && wallLive && !shieldActive) {
+        if (wallHit && wallLive && !shieldActive && now >= postBarrierInvulnerabilityUntil) {
             gameActive = false;
+            gameEndedAt = performance.now();
             playSfx('gameOver');
             updateUI();
         }
@@ -1330,10 +1389,10 @@ function draw() {
             ctx.fillStyle = active ? 'rgba(255,105,180,0.4)' : 'rgba(180,30,30,0.85)';
             ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
         }
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '12px Courier New';
-        ctx.fillText(warning ? 'BARRIER WARNING' : 'GAY INVESTIGATION UNIT', wall.x + 6, wall.y + 22);
         if (warning) {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '12px Courier New';
+            ctx.fillText('BARRIER WARNING', wall.x + 6, wall.y + 22);
             ctx.fillStyle = '#ff3333';
             ctx.fillRect(0, canvas.height - 14, canvas.width, 14);
             ctx.fillStyle = '#ffffff';
@@ -1347,9 +1406,10 @@ function draw() {
         }
     }
 
+    const trailStep = Math.max(3, 6 - Math.floor(chainCount / 3));
     for (let i = 0; i < chainCount; i++) {
-        const idx = Math.max(0, player.trail.length - 1 - i * 6);
-        const t = player.trail[idx] || { x: player.x - i * 8, y: player.y };
+        const idx = Math.max(0, player.trail.length - 1 - i * trailStep);
+        const t = player.trail[idx] || { x: player.x - i * 6, y: player.y };
         const followerMember = getCollectedMemberForFollower(i);
         drawRunnerSprite(followerMember.key, t.x, t.y, () => {
             ctx.fillStyle = followerMember.color;
@@ -1357,13 +1417,27 @@ function draw() {
         }, { w: 14, h: 20 });
     }
 
+    if (performance.now() < postBarrierInvulnerabilityUntil) {
+        ctx.save();
+        ctx.globalAlpha = 0.18;
+        ctx.fillStyle = '#88ffcc';
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
     drawRunnerSprite('player', player.x, player.y, () => {
         ctx.fillStyle = player.hitFlashUntil > performance.now() ? '#ff4444' : '#d9c38a';
         ctx.fillRect(player.x - 8, player.y - 11, 16, 22);
     });
 
-    ctx.fillStyle = '#ff99cc';
     particles.forEach(p => {
+        if (p.rainbow) {
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+            return;
+        }
         if (p.warning) {
             drawRunnerSprite('tapeFx', p.x, p.y, () => {
                 ctx.fillStyle = '#ff9900';
@@ -1377,6 +1451,16 @@ function draw() {
             ctx.fillRect(p.x, p.y, 3, 3);
         });
     });
+
+    if (phaseFlashUntil > 0) {
+        const flashRemaining = phaseFlashUntil - performance.now();
+        if (flashRemaining > 0) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${((flashRemaining / 600) * 0.88).toFixed(3)})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        } else {
+            phaseFlashUntil = 0;
+        }
+    }
 
     ctx.fillStyle = '#00ff00';
     ctx.font = '12px Courier New';
@@ -1398,23 +1482,53 @@ function draw() {
         ctx.fillText(laneLockFeedbackText, canvas.width - 240, 34);
     }
     if (solidarityFeedbackUntil > performance.now()) {
+        ctx.save();
+        ctx.textAlign = 'center';
         ctx.fillStyle = '#fff176';
-        ctx.fillText(solidarityFeedbackText, canvas.width / 2 - 120, 64);
+        ctx.fillText(solidarityFeedbackText, canvas.width / 2, 64);
+        ctx.restore();
     }
     if (courtroomFinaleActive && gameActive && !gameWon) {
         ctx.fillStyle = '#ff4444';
         ctx.fillText('COURTROOM FINALE: WASHINGTON DC', canvas.width / 2 - 126, 18);
     }
-    if (!gameActive) {
-        const msg = gameWon ? 'PRECEDENT ESTABLISHED' : 'RUN FAILED';
-        ctx.font = '20px Courier New';
-        ctx.fillText(msg, canvas.width / 2 - 120, canvas.height / 2);
-        if (gameWon) {
-            ctx.font = '14px Courier New';
-            ctx.fillText('EO 12968 pathway secured', canvas.width / 2 - 95, canvas.height / 2 + 22);
-        }
+    if (gamePaused) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#00ff00';
+        ctx.font = '22px Courier New';
+        ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2 - 10);
         ctx.font = '12px Courier New';
-        ctx.fillText('Press R to restart', canvas.width / 2 - 65, canvas.height / 2 + 40);
+        ctx.fillText('Press Escape to resume', canvas.width / 2, canvas.height / 2 + 16);
+        ctx.restore();
+    }
+
+    if (!gameActive) {
+        ctx.save();
+        ctx.textAlign = 'center';
+        if (gameWon) {
+            ctx.fillStyle = '#00ff00';
+            ctx.font = '11px Courier New';
+            const isTouchUi = document.body && document.body.classList.contains('touch-ui');
+            ctx.fillText(isTouchUi ? 'Tap to restart' : 'Press R or Enter to restart', canvas.width / 2, canvas.height - 10);
+        } else {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+            ctx.fillRect(canvas.width / 2 - 230, canvas.height / 2 - 46, 460, 126);
+            ctx.fillStyle = '#00ff00';
+            ctx.font = '20px Courier New';
+            ctx.fillText('You Lose', canvas.width / 2, canvas.height / 2 - 28);
+            ctx.font = '14px Courier New';
+            ctx.fillText('The real fight took eleven years.', canvas.width / 2, canvas.height / 2 - 2);
+            ctx.fillText("You've got another few minutes.", canvas.width / 2, canvas.height / 2 + 18);
+            ctx.font = '12px Courier New';
+            ctx.fillText('Press R to try again.', canvas.width / 2, canvas.height / 2 + 42);
+            ctx.font = '11px Courier New';
+            ctx.fillStyle = '#aaffaa';
+            ctx.fillText(`Allies gathered: ${totalAlliesGathered}  ·  Attempt: ${currentAttemptNumber}`, canvas.width / 2, canvas.height / 2 + 62);
+        }
+        ctx.restore();
     }
 
     if (debugOverlayEnabled) {
@@ -1425,9 +1539,9 @@ function draw() {
 function drawDebugOverlay() {
     const now = performance.now();
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-    ctx.fillRect(canvas.width - 250, 6, 244, 150);
+    ctx.fillRect(canvas.width - 250, 6, 244, 230);
     ctx.strokeStyle = '#55ff55';
-    ctx.strokeRect(canvas.width - 250, 6, 244, 150);
+    ctx.strokeRect(canvas.width - 250, 6, 244, 230);
 
     ctx.fillStyle = '#a7ffa7';
     ctx.font = '11px Courier New';
@@ -1442,6 +1556,13 @@ function drawDebugOverlay() {
     ctx.fillText(`wall dx: ${wallDx}`, canvas.width - 236, 122);
     const profile = getRoundProfile();
     ctx.fillText(`wallMs: ${profile.wallIntervalMs}  spawnBase: ${profile.obstacleBase.toFixed(2)}`, canvas.width - 236, 136);
+    ctx.fillStyle = '#55ff55';
+    ctx.fillText('── debug shortcuts ──', canvas.width - 236, 158);
+    ctx.fillStyle = '#a7ffa7';
+    ctx.fillText('Alt+1..5  narrative cards', canvas.width - 236, 174);
+    ctx.fillText('Alt+0     you-lose screen', canvas.width - 236, 188);
+    ctx.fillText('Escape    pause / unpause', canvas.width - 236, 202);
+    ctx.fillText('F2        toggle this overlay', canvas.width - 236, 216);
 }
 
 function loop(now) {
@@ -1509,16 +1630,57 @@ function handleRunnerKeydown(e) {
         return;
     }
 
+    if (key === 'Escape') {
+        e.preventDefault();
+        if (!gameActive || narrativePaused || legendPaused) return;
+        const now = performance.now();
+        if (gamePaused) {
+            applyPauseCompensation(Math.max(0, now - gamePauseStartedAt));
+            gamePauseStartedAt = 0;
+            gamePaused = false;
+        } else {
+            gamePaused = true;
+            gamePauseStartedAt = now;
+        }
+        updateUI();
+        return;
+    }
+
+    // Debug scene shortcuts — Alt+1..5 = force-show narrative cards, Alt+0 = you-lose
+    if (e.altKey) {
+        const debugNarrativeMap = {
+            '1': 'intro',
+            '2': 'phase1Clear',
+            '3': 'phase2Clear',
+            '4': 'phase3Clear',
+            '5': 'phase4Victory'
+        };
+        if (debugNarrativeMap[key]) {
+            e.preventDefault();
+            debugForceNarrative(debugNarrativeMap[key]);
+            return;
+        }
+        if (key === '0') {
+            e.preventDefault();
+            gameActive = false;
+            gameWon = false;
+            gameEndedAt = performance.now();
+            updateUI();
+            return;
+        }
+    }
+
     if (!gameActive) {
+        // Only restart on explicit confirm keys (Enter) or movement keys.
+        // Space is excluded — it fires solidarity and should not accidentally restart.
         if (
+            key === 'Enter' ||
             key === 'ArrowDown' ||
             key === 'ArrowLeft' ||
             key === 'ArrowRight' ||
             key === 'ArrowUp' ||
             key === 'd' ||
-            key === 'D' ||
-            key === ' ' ||
-            code === 'Space'
+            key === 'D'
         ) {
             e.preventDefault();
             resetGame();
@@ -1689,10 +1851,9 @@ window.runnerControls = {
         tryMoveHorizontal(1);
     },
     solidarity: () => {
-        if (!gameActive) {
-            resetGame();
-            return;
-        }
+        // Space/solidarity intentionally does NOT restart — use Enter, R, or the
+        // Restart button so players aren't accidentally bounced past the fail screen.
+        if (!gameActive) return;
         attemptSolidarityActivation(performance.now());
     },
     restart: () => {

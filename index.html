@@ -4,22 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class RAM-ifications</title>
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Class RAM-ifications">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png">
+    <meta property="og:title" content="Class RAM-ifications">
+    <meta property="og:description" content="A browser runner game about the 11-year legal fight for LGBTQ+ security clearance rights.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="assets/favicon/android-chrome-512x512.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Class RAM-ifications">
+    <meta name="twitter:description" content="A browser runner game about the 11-year legal fight for LGBTQ+ security clearance rights.">
     <style>
-        body { 
-            background: #0a0a0a; 
-            color: #00ff00; 
+        body {
+            background: #0a0a0a;
+            color: #00ff00;
             font-family: 'Courier New', Courier, monospace;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin: 0;
             min-height: 100vh;
-            overflow: hidden;
-        }
-        body.touch-ui {
+            /* Allow vertical scroll on short viewports rather than crushing the canvas */
             overflow-x: hidden;
             overflow-y: auto;
+        }
+        body.touch-ui {
             -webkit-overflow-scrolling: touch;
+            /* Full viewport width on genuine mobile/tablet (≤900px, coarse pointer) */
+            --game-width: 100vw;
         }
         body.light-mode {
             background: #f2efe4;
@@ -68,6 +86,13 @@
         }
         :root {
             --game-width: min(95vw, 1200px);
+        }
+        /* On desktop, also cap width by viewport height so the canvas ideally fits
+           without scrolling. Canvas is 2:1 (800×400), so canvas height = game-width / 2.
+           Floor of 900px keeps the game a full, usable size on short-viewport laptops;
+           those screens can scroll the small excess rather than seeing a cramped canvas. */
+        body:not(.touch-ui) {
+            --game-width: min(95vw, 1200px, max(900px, calc((100vh - 280px) * 2)));
         }
         #game-container {
             position: relative;
@@ -486,9 +511,34 @@
             body.touch-ui .legend-card.is-expanded {
                 transform: none;
             }
+            /* On touch/mobile, legend cards are icon-only tap targets that open the
+               bottom sheet — labels are shown there instead. */
+            body.touch-ui .legend-card {
+                min-height: 36px;
+                justify-content: center;
+                padding: 4px 5px;
+                gap: 4px;
+            }
+            body.touch-ui .legend-card-label {
+                display: none;
+            }
+            body.touch-ui .legend-card img {
+                width: 26px;
+                height: 26px;
+            }
+            /* Narrative modal: full-screen overlay on mobile so it doesn't overflow
+               the small canvas container and bleed over the legend cards below. */
             #runner-narrative {
-                width: min(96vw, 520px);
+                position: fixed;
+                inset: 0;
+                width: 100%;
+                max-width: 100%;
+                max-height: 100%;
+                transform: none;
                 padding: 10px;
+                z-index: 100;
+                border-left: none;
+                border-right: none;
             }
             #runner-narrative-copy {
                 width: 100%;
@@ -606,7 +656,7 @@
 </head>
 <body>
     <h1>CLASS <span class="rainbow-text">RAM-IFICATIONS</span></h1>
-    <div id="mode-banner"><span id="mode-label" style="display:none;"></span><button id="audio-mute-toggle" class="tower-btn" type="button">MUTE: OFF</button><button id="theme-toggle" class="tower-btn" type="button">BRIGHT MODE</button><select id="difficulty-select" title="Difficulty (takes effect on next restart)"><option value="story">STORY</option><option value="organize" selected>ORGANIZE</option><option value="resist">RESIST</option></select><button id="restart-toggle" class="tower-btn" type="button">RESTART</button><button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
+    <div id="mode-banner"><span id="mode-label" style="display:none;"></span><button id="audio-mute-toggle" class="tower-btn" type="button">MUTE: OFF</button><button id="theme-toggle" class="tower-btn" type="button">BRIGHT MODE</button><select id="difficulty-select" title="Difficulty (takes effect on next restart)"><option value="story">STORY (EASY)</option><option value="organize" selected>ORGANIZE (MEDIUM)</option><option value="resist">RESIST (HARD)</option></select><button id="restart-toggle" class="tower-btn" type="button">RESTART</button><button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
     <div id="ui-layer">
         <div><span id="precedent-label">PRECEDENT:</span> <span id="precedent-val">100</span></div>
         <div>LIVES: <span id="lives-val">3</span></div>
@@ -646,5 +696,12 @@
     <p id="tower-hint">Coder (Logic) (50) | Boolean Bits | Slows</p>
     <script src="audio.js"></script>
     <script src="mode-loader.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
 </body>
 </html>

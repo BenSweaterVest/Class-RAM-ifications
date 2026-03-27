@@ -12,6 +12,8 @@ Last updated: March 26, 2026
 - [x] Synchronized core docs to the promoted March 25 art set.
 - [x] Polished runner HUD, legend-card system, checkpoint interaction flow, and theme/audio controls.
 - [x] Installed new cabinet/bot obstacle art and revised all legend card historical copy.
+- [x] Wired new bot (LOCK_BOT_v3) and cabinet (VintageSLOW_CABINET_v4) sprites; removed superseded ENEMY_03/04.
+- [x] Removed retired FOLLOWER_01-05 and COLLECTIBLE_01 from both mirrored asset folders; updated manifest, roster, and docs.
 - [x] Removed obsolete hidden runner help/touch-control shell and updated smoke/contracts accordingly.
 - [x] Implemented a first-pass mobile runner layer: swipe/tap controls, touch hint, mobile HUD polish, and narrow-screen legend rail behavior.
 - [x] Captured current product decisions for title, audio stance, mobile UX direction, and difficulty-adjustment targets.

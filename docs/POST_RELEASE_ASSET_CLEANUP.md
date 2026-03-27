@@ -1,53 +1,21 @@
-# Post-Release Asset Cleanup Plan
+# Post-Release Asset Cleanup
 
-Last updated: March 25, 2026
+Last updated: March 26, 2026
 
-## Purpose
+## Status: COMPLETE
 
-Prepare the first post-release cleanup pass that removes retired generic runner ally art while preserving asset parity and documentation clarity.
+The pre-release cleanup pass was executed on March 26, 2026. All retired generic follower/collectible PNGs and superseded obstacle sprites have been removed from both mirrored asset folders.
 
-## Assets Targeted For Removal
+## Removed
 
-These files are retained today only for archival continuity and are no longer wired into active runner mode:
+- `FOLLOWER_01_HTGFollowerType01_00001_.png` through `FOLLOWER_05_HTGFollowerType05_00001_.png` — generic ally sprites, replaced by eight named HTG members
+- `COLLECTIBLE_01_HTGMemberCollectible_00001_.png` — generic collectible, retired with the follower set
+- `ENEMY_03_FilingCabinet_00001_.png` — replaced by `VintageSLOW_CABINET_v4_SlowObstacle-FilingCabinet_00001_.png`
+- `ENEMY_04_PolygraphBot_00001_.png` — replaced by `LOCK_BOT_v3_LaneLockObstacle-SurveillanceBot_00001_.png`
+- `BARRIER_01_GayInvestigationUnitWall_00001_.png` — replaced by `BARRIER_v5_BarrierWall-SecurityDoor_00001_.png`
 
-- `FOLLOWER_01_HTGFollowerType01_00001_.png`
-- `FOLLOWER_02_HTGFollowerType02_00001_.png`
-- `FOLLOWER_03_HTGFollowerType03_00001_.png`
-- `FOLLOWER_04_HTGFollowerType04_00001_.png`
-- `FOLLOWER_05_HTGFollowerType05_00001_.png`
-- `COLLECTIBLE_01_HTGMemberCollectible_00001_.png`
+## Current state
 
-They currently exist in both:
-
-- `assets/processed/`
-- `class_ram_ifications assets/`
-
-## Preconditions
-
-- First public release is complete.
-- No intention remains to reuse the generic follower/collectible art for runner mode.
-- Owner has not reversed the current post-release cleanup decision.
-
-## Cleanup Steps
-
-1. Remove the six retired PNGs from `assets/processed/`.
-2. Remove the same six retired PNGs from `class_ram_ifications assets/`.
-3. Update `class_ram_ifications assets/manifest.json`.
-4. Update `class_ram_ifications_roster.json`.
-5. Update `docs/ASSET_IMAGE_CATALOG.md`.
-6. Update any release/readiness docs that still mention the retired pack as an open decision.
-7. Run:
-   - `node scripts/check_asset_sync.js`
-   - `node scripts/run_all_checks.js`
-
-## Validation Expectations
-
-- Asset parity remains 1:1 between the two mirrored folders.
-- No active runtime reference points at any removed generic follower/collectible file.
-- Runner mode still uses the eight named `HTG_0x` sprites for allies and chain members.
-
-## Risks
-
-- Removing files from only one mirrored folder will fail asset-sync checks.
-- Stale metadata/docs could leave the repo appearing inconsistent even if the runtime is fine.
-- If release priorities change and archival continuity becomes more important than cleanup, this task should be deferred rather than rushed.
+- Both `assets/processed/` and `class_ram_ifications assets/` contain exactly 38 PNGs, fully synchronized.
+- `manifest.json` and `class_ram_ifications_roster.json` updated to reflect current filenames.
+- `node scripts/run_all_checks.js` passes: asset sync, runner contract, smoke contract all green.

@@ -47,10 +47,11 @@
     }
 
     function isLikelyTouchDevice() {
-        return (
-            navigator.maxTouchPoints > 0 ||
-            window.matchMedia('(pointer: coarse)').matches
-        );
+        // pointer:coarse = primary input is touch/stylus (not trackpad or mouse).
+        // max-width:900px excludes touch-capable laptops and desktop monitors —
+        // those should use keyboard layout and keyboard control hints regardless
+        // of whether the screen technically supports touch.
+        return window.matchMedia('(pointer: coarse) and (max-width: 900px)').matches;
     }
 
     function applyInputMode(touchCapable) {

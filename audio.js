@@ -151,14 +151,43 @@
             setTimeout(() => beep(784, 0.12, 'square', 0.11), 180);
         },
         narrativeSomber() {
-            beep(262, 0.14, 'sawtooth', 0.09);
-            setTimeout(() => beep(220, 0.16, 'sawtooth', 0.08), 110);
+            beep(262, 0.22, 'sine', 0.11);
+            setTimeout(() => beep(220, 0.28, 'sine', 0.10), 160);
         },
         narrativeVictory() {
             beep(523, 0.08, 'square', 0.12);
             setTimeout(() => beep(659, 0.1, 'square', 0.12), 90);
             setTimeout(() => beep(784, 0.12, 'square', 0.12), 180);
             setTimeout(() => beep(1046, 0.2, 'triangle', 0.13), 280);
+        },
+        chainLoss() {
+            beep(280, 0.06, 'square', 0.07);
+        },
+        lifeLost() {
+            beep(220, 0.12, 'sawtooth', 0.13);
+            setTimeout(() => beep(175, 0.18, 'sawtooth', 0.10), 100);
+        },
+        barrierWarning() {
+            // Escalating pulses over ~1750ms — pacing gets faster, pitch rises.
+            // Each callback captures the current generation; if cancelBarrierWarning()
+            // has been called since (increments the counter), the beep is silently dropped.
+            const gen = ++barrierWarnGen;
+            const pulses = [
+                { delay: 0,    freq: 330, dur: 0.14 },
+                { delay: 480,  freq: 345, dur: 0.12 },
+                { delay: 900,  freq: 362, dur: 0.11 },
+                { delay: 1180, freq: 382, dur: 0.10 },
+                { delay: 1390, freq: 405, dur: 0.09 },
+                { delay: 1545, freq: 430, dur: 0.08 },
+                { delay: 1655, freq: 458, dur: 0.08 },
+                { delay: 1735, freq: 490, dur: 0.07 },
+            ];
+            pulses.forEach(({ delay, freq, dur }) => {
+                setTimeout(() => { if (barrierWarnGen === gen) beep(freq, dur, 'square', 0.07); }, delay);
+            });
+        },
+        cancelBarrierWarning() {
+            barrierWarnGen++;
         }
     };
 

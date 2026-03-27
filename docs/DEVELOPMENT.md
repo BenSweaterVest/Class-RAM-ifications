@@ -83,6 +83,12 @@ Promoted narrative popup cards:
 - CARD_04_CardReversal1990_00001_.png
 - CARD_05_CardExecutiveOrder1995_00001_.png
 
+Runner obstacle sprites:
+- ENEMY_02_CorporateSuit_00001_.png (suit)
+- VintageSLOW_CABINET_v4_SlowObstacle-FilingCabinet_00001_.png (cabinet)
+- LOCK_BOT_v3_LaneLockObstacle-SurveillanceBot_00001_.png (bot)
+- BARRIER_v5_BarrierWall-SecurityDoor_00001_.png (barrier wall)
+
 Runner HTG member roster:
 - HTG_01_HTGMemberAlex_00001_.png
 - HTG_02_HTGMemberCarmen_00001_.png

@@ -2,12 +2,14 @@
 
 `assets/` is the runtime asset folder.
 
-## Runtime Expectations
+## Subfolders
 
-Current expected contents:
+- `processed/` — gameplay sprites (runtime source of truth, 38 PNGs)
+- `favicon/` — browser and PWA icons (`favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`)
 
-- `processed/` for gameplay sprites and projectiles
-- optional BGM file such as `bgm.ogg` or `bgm.mp3`
+## Audio
+
+`DiscoMusic.ogg` / `DiscoMusic.mp3` live directly under `assets/` and are referenced by `mode-loader.js`.
 
 ## Canonical Image Documentation
 
@@ -15,19 +17,7 @@ For the full, up-to-date inventory of all committed PNG image assets, see:
 
 - [docs/ASSET_IMAGE_CATALOG.md](../docs/ASSET_IMAGE_CATALOG.md)
 
-That catalog includes:
+## Source / Mirror
 
-- complete runtime and source file map
-- current measured PNG dimensions
-- active vs retained asset status
-- asset role and mirror expectations
-
-## Source-Generation Files
-
-Source/reference metadata lives at repo root and under:
-
-- `class_ram_ifications assets/`
-- `class_ram_ifications assets/manifest.json`
-- `class_ram_ifications_roster.json`
-
-`assets/processed/` remains the runtime source of truth, but every committed PNG is expected to be mirrored into `class_ram_ifications assets/` for sync verification.
+`class_ram_ifications assets/` at repo root is the source mirror used for sync verification.
+Every committed PNG in `assets/processed/` must appear there too (checked by `scripts/check_asset_sync.js`).

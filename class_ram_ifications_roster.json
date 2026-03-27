@@ -1,6 +1,6 @@
 {
   "project": "Class RAM-ifications",
-  "last_updated": "2026-03-25",
+  "last_updated": "2026-03-26",
   "htg_members": [
     {
       "id": "HTG_01",
@@ -87,13 +87,5 @@
     { "id": "BG_02", "filename": "BG_02_v1_BackgroundDistrictCourt_00001_.png", "phase": "Federal District Court, San Francisco", "dimensions": "512x512" },
     { "id": "BG_03", "filename": "BG_03_BackgroundAppealsCourt_00001_.png", "phase": "9th Circuit Court of Appeals", "dimensions": "512x512" },
     { "id": "BG_04", "filename": "BG_04_v3_BackgroundWashingtonDC_00001_.png", "phase": "Washington DC, 1995", "dimensions": "512x512" }
-  ],
-  "retained_legacy_runner_art": [
-    "FOLLOWER_01_HTGFollowerType01_00001_.png",
-    "FOLLOWER_02_HTGFollowerType02_00001_.png",
-    "FOLLOWER_03_HTGFollowerType03_00001_.png",
-    "FOLLOWER_04_HTGFollowerType04_00001_.png",
-    "FOLLOWER_05_HTGFollowerType05_00001_.png",
-    "COLLECTIBLE_01_HTGMemberCollectible_00001_.png"
   ]
 }
