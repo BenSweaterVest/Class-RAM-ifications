@@ -38,6 +38,15 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 - [ ] Confirm the top-bar restart button works on touch layouts
 - [ ] On mobile-sized layout, confirm tapping a legend card opens a bottom sheet and pauses gameplay
 
+## Info Modals (HOW TO PLAY / ABOUT)
+
+- [ ] Click HOW TO PLAY — confirm modal opens with keyboard controls, touchscreen controls, and objective sections
+- [ ] Click ABOUT — confirm modal opens with Dr. Kris Norman quote, HTG links, and Inspired By grid with images
+- [ ] Click ✕ CLOSE — confirm modal closes
+- [ ] Click backdrop area outside panel — confirm modal closes
+- [ ] Press Escape while modal is open — confirm modal closes without triggering game pause
+- [ ] Confirm modals render correctly in both dark and light mode
+
 ## Narrative Checkpoints
 
 - [ ] Confirm intro narrative card (CARD_01) appears at run start and blocks gameplay until continue

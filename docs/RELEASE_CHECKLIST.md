@@ -1,6 +1,6 @@
 # First Release Checklist
 
-Last updated: March 27, 2026
+Last updated: March 28, 2026
 
 Use this checklist before calling the first public build ready.
 
@@ -10,14 +10,14 @@ Companion references:
 
 ## Pre-Deploy Gate
 
-- [ ] `node scripts/run_all_checks.js` passes (run immediately before deploy)
+- [x] `node scripts/run_all_checks.js` passes — **PASSED March 28, 2026** (modals are inline HTML/JS in index.html; not in checked scripts)
 
 ## Product Readiness
 
 - [x] The full 1984 to 1995 run is playable without blocking bugs
 - [x] Sprite alignment is good enough that gameplay reads clearly
 - [x] HUD text, hint text, and end screens are readable
-- [ ] Difficulty feels acceptable through at least one full run, including the intended slight easing of rounds 3 and 4 — pending owner acceptance
+- [x] Difficulty feels acceptable through at least one full run — accepted by owner after real-device testing (March 28, 2026)
 - [x] Phase thresholds are correct: 3, 4, 5, 6 (not 3/5/7/9)
 - [x] Win condition: popup 5 (phase4Victory) is the win moment; win screen overlay with fireworks, disco balls, and per-phase ally stats appears after
 
@@ -25,7 +25,7 @@ Companion references:
 
 - [x] `index.html` is playable with no blocking errors
 - [x] Lane switching and dash controls are responsive on desktop
-- [ ] Lane switching and swipe controls are comfortable on real mobile hardware
+- [x] Lane switching and swipe controls are comfortable on real mobile hardware — verified on real device (March 28, 2026)
 - [x] Mobile info cards use the intended bottom-sheet treatment and pause gameplay when open
 - [x] Solidarity threshold and barrier timing are understandable without external explanation
 - [x] Barrier-clear effects (flash, sparkles, invulnerability glow arc) are visible and feel correct
@@ -34,6 +34,7 @@ Companion references:
 - [x] Historical finale messaging and Executive Order transition are correct
 - [x] Escape key pauses and unpauses correctly; "PAUSED" shown in HUD
 - [x] Touch devices: tap on paused canvas does nothing (no accidental resume)
+- [x] HOW TO PLAY and ABOUT modal buttons implemented in mode-banner (keyboard + touch controls, historical context and attribution; Escape closes without triggering pause)
 
 ## Audio Readiness
 

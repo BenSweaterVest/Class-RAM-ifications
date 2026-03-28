@@ -40,3 +40,4 @@ All implementation work is complete. The only remaining tasks are owner actions.
 - [x] All docs synchronized with current implementation.
 - [x] Real-device testing complete. Balance accepted. Narrative copy locked.
 - [x] Verification bundle green: `node scripts/run_all_checks.js` passed March 28, 2026.
+- [x] HOW TO PLAY and ABOUT modal buttons added to mode-banner (far left): keyboard + touchscreen controls, objective, Dr. Kris Norman quote, historical links, Inspired By grid (Frogger + Robot Unicorn Attack).

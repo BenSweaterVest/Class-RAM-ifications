@@ -1,6 +1,6 @@
 # Development Guide
 
-Last updated: March 27, 2026
+Last updated: March 28, 2026
 
 ## Runtime Ownership
 
@@ -12,10 +12,10 @@ Last updated: March 27, 2026
 ## Current Runner Shell
 
 - Keyboard and touch controls both supported. Touch gesture handling (swipe/tap) is implemented in `runner_mode.js` (`handleTouchGestureStart/Move/End/Cancel`).
-- Top utility bar holds mute, theme, difficulty selector, and restart controls.
+- Top utility bar holds HOW TO PLAY and ABOUT buttons (far left) plus mute, theme, difficulty selector, and restart controls (right). HOW TO PLAY and ABOUT open modal overlays; Escape closes them without triggering game pause (capture-phase listener).
 - Bottom hint text and legend-card rail are the primary on-page teaching surfaces.
 - The earlier hidden touch-control/help shell was removed during closeout cleanup.
-- Real-device tuning for swipe/tap comfort and landscape orientation remains an open owner task.
+- Real-device testing complete; swipe/tap comfort and balance accepted by owner (March 28, 2026).
 
 ## Difficulty System
 

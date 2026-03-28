@@ -21,6 +21,7 @@ Last updated: March 28, 2026
 - Barrier-clear effects: white flash, rainbow sparkles, 3-second invulnerability glow arc
 - Mobile: swipe/tap controls, touch hint, pausing bottom-sheet info cards
 - PWA: manifest.json, sw.js (class-ram-v3), favicon set, OG/Twitter meta
+- HOW TO PLAY / ABOUT buttons in mode-banner (far left): modal overlays with keyboard + touch controls, objective, Dr. Kris Norman quote, HTG history links, Inspired By grid
 - Debug shortcuts (dev only): F2, Alt+0–6
 
 ## Verification (March 28, 2026)

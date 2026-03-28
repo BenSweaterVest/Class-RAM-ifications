@@ -16,7 +16,7 @@ The project is feature-complete, verified, and real-device tested. The only rema
 
 **Sprint 4 — Post-Release Cleanup:** Retired generic follower/collectible/enemy/barrier assets removed.
 
-**Sprint 5 — Win Screen and Closeout:** Win screen (fireworks, disco balls, per-phase stats, all-time total), narrative SFX looping, AudioContext fix, narrative SFX volumes boosted, legacy mode retired, repo pruned (duplicate source folder, generation metadata, GitHub Actions workflow, stale scripts/docs removed).
+**Sprint 5 — Win Screen and Closeout:** Win screen (fireworks, disco balls, per-phase stats, all-time total), narrative SFX looping, AudioContext fix, narrative SFX volumes boosted, legacy mode retired, repo pruned (duplicate source folder, generation metadata, GitHub Actions workflow, stale scripts/docs removed), HOW TO PLAY / ABOUT modal buttons added to mode-banner.
 
 ## Locked Decisions
 

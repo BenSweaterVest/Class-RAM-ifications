@@ -1,6 +1,6 @@
 # Mechanics Guide
 
-Last updated: March 27, 2026
+Last updated: March 28, 2026
 
 ## Objective
 
@@ -37,7 +37,13 @@ If no difficulty has been selected, the game defaults to `organize`.
 
 **Touch (genuine small touch devices):**
 - Swipe left/right: move between lanes
+- Swipe up/down: change lane
 - Tap: attempt Solidarity
+
+**Info overlays (available at any time):**
+- HOW TO PLAY button (mode-banner, far left): keyboard controls, touchscreen controls, and objective reference
+- ABOUT button (mode-banner): historical context and attribution
+- Both modals close with Escape, ✕ CLOSE, or backdrop click
 
 ## Pause
 

@@ -50,6 +50,13 @@ A historical arcade runner about *High Tech Gays v. Defense Industrial Security 
 
 8 named HTG members (pride-flag colors: Alex/Hot Pink → Evelyn/Violet), 4 phase backgrounds, 5 narrative cards, player/obstacle/UI sprites. All generated via FLUX.2 Klein + Python pipeline; committed in `assets/processed/`.
 
+## UI
+
+- **HOW TO PLAY** button (mode-banner, far left): modal with keyboard controls, touchscreen controls, and objective reference
+- **ABOUT** button (mode-banner): Dr. Kris Norman quote, links to HTG v. DISCO site and Wikipedia, Inspired By grid (Frogger, Robot Unicorn Attack — archive.org)
+- Modals close on backdrop click, ✕ CLOSE button, or Escape (without triggering game pause)
+- Both buttons and modals fully support dark and light mode
+
 ## Tech
 
 - Static SPA, no build step — Cloudflare Pages via direct GitHub integration

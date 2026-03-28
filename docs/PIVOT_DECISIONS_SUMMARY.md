@@ -1,6 +1,6 @@
 # Pivot Decisions Summary
 
-Last updated: March 27, 2026
+Last updated: March 28, 2026
 Scope: implementation decisions already reflected in repository code/docs.
 
 ## 1. Runtime Strategy
@@ -144,11 +144,11 @@ The following items were pending as of March 25–26, 2026 and are now resolved:
 - Public title: `Class RAM-ifications` — locked and in use.
 - Audio policy: BGM implemented, non-blocking for release — locked.
 - Mobile parity: swipe/tap gestures, bottom sheet for info cards, dark mode default — fully implemented.
-- Rounds 3 and 4 difficulty: initial easing pass complete — pending owner acceptance on feel only.
+- Rounds 3 and 4 difficulty: initial easing pass complete — accepted by owner after real-device testing (March 28, 2026).
 - Phase thresholds: confirmed as 3/4/5/6 (not 3/5/7/9) — corrected in all docs.
 - Pause key: Escape — implemented with full applyPauseCompensation() coverage.
 - BGM ducking during narrative: yes — ducks to 5% on popup open, restores to 24% on close.
-- PWA: yes — manifest.json + sw.js service worker (cache name class-ram-v2) + favicon set in assets/favicon/.
+- PWA: yes — manifest.json + sw.js service worker (cache name class-ram-v3) + favicon set in assets/favicon/.
 - Debug shortcut set: F2 for overlay, Alt+0 for force-lose, Alt+1–5 for force-narrative — implemented, not player-facing.
 - Win screen: popup 5 (phase4Victory) is the win moment; a separate win overlay with fireworks, disco balls, per-phase ally stats, and all-time machine total renders after it closes.
 

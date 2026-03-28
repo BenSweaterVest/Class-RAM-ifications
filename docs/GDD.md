@@ -1,7 +1,7 @@
 # Game Design Document
 
 Project: Class RAM-ifications
-Last updated: March 27, 2026
+Last updated: March 28, 2026
 Direction: Runner-first historical arcade experience
 
 ## Design Intent
@@ -57,6 +57,7 @@ Lose:
 - PWA: manifest.json + sw.js service worker (cache name class-ram-v3).
 - Attempt counter and totalAlliesGathered shown on You Lose screen.
 - Win screen: fireworks, bouncing disco balls, per-phase ally stats (labeled by year/level), all-time machine total. "Play Again?" restarts with same difficulty.
+- Info modals: HOW TO PLAY (keyboard + touchscreen controls, objective); ABOUT (Dr. Kris Norman quote, HTG history links, Inspired By: Frogger + Robot Unicorn Attack).
 
 ## UX/Tone
 

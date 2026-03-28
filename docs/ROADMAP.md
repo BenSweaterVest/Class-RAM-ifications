@@ -20,6 +20,7 @@ Last updated: March 28, 2026
 - All legacy/retired assets removed; repo pruned; source mirror folder removed.
 - Verification bundle green (March 28): syntax, runner contract, smoke contract.
 - Real-device testing complete. Balance accepted.
+- HOW TO PLAY / ABOUT modal buttons: keyboard + touchscreen controls, objective, historical quote, HTG links, Inspired By grid.
 
 ## Pending (Owner Action Only)
 
