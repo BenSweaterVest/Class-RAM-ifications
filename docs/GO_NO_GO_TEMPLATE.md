@@ -34,7 +34,6 @@ List each non-blocking issue with:
 
 ### Scripted Checks
 
-- [ ] `node scripts/check_asset_sync.js`
 - [ ] `node scripts/check_runner_contract.js`
 - [ ] `node scripts/check_smoke_contract.js`
 - [ ] `node scripts/run_all_checks.js`
@@ -44,7 +43,6 @@ List each non-blocking issue with:
 ### Manual Smoke
 
 - [ ] Local runner mode smoke complete
-- [ ] Local legacy mode smoke complete
 - [ ] Live smoke complete after deploy
 
 ## 5. Release Decision Gates

@@ -19,22 +19,21 @@ function main() {
   const indexHtml = read('index.html');
   const loader = read('mode-loader.js');
   const runner = read('runner_mode.js');
-  const legacy = read('game.js');
 
-  // Startup and mode shell checks.
+  // Core UI elements present in index.html
   expectContains(indexHtml, 'id="gameCanvas"', 'game canvas', failures);
-  expectContains(indexHtml, 'id="mode-banner"', 'mode banner', failures);
-  expectContains(indexHtml, 'id="tower-select"', 'legacy tower controls container', failures);
+  expectContains(indexHtml, 'id="runner-narrative"', 'narrative modal', failures);
   expectContains(indexHtml, 'id="runner-legend"', 'runner legend container', failures);
   expectContains(indexHtml, 'id="audio-mute-toggle"', 'runner mute button', failures);
   expectContains(indexHtml, 'id="theme-toggle"', 'runner theme button', failures);
+  expectContains(indexHtml, 'id="restart-toggle"', 'restart toggle', failures);
+  expectContains(indexHtml, 'id="difficulty-select"', 'difficulty selector', failures);
 
-  // Mode-router checks.
-  expectContains(loader, "const mode = rawMode === 'legacy' ? 'legacy' : 'runner';", 'runner-default mode selection', failures);
+  // Loader is runner-only
   expectContains(loader, "loadScript('runner_mode.js')", 'runner loader path', failures);
-  expectContains(loader, "loadScript('game.js')", 'legacy loader path', failures);
+  expectContains(loader, 'bindRunnerKeyboardFallback()', 'loader keyboard fallback', failures);
 
-  // Runner controls and recovery checks.
+  // Runner controls and recovery checks
   expectContains(runner, "if (key === 'ArrowUp')", 'runner ArrowUp handler', failures);
   expectContains(runner, "if (key === 'ArrowDown')", 'runner ArrowDown handler', failures);
   expectContains(runner, "if (key === 'd' || key === 'D')", 'runner dash key handler', failures);
@@ -42,13 +41,14 @@ function main() {
   expectContains(runner, 'function attemptSolidarityActivation', 'runner solidarity attempt handler', failures);
   expectContains(runner, 'window.runnerControls = {', 'runner global control API', failures);
 
-  // Legacy controls and fallback checks.
-  expectContains(legacy, "if (e.key === '1')", 'legacy key 1 select', failures);
-  expectContains(legacy, "if (e.key === '2')", 'legacy key 2 select', failures);
-  expectContains(legacy, "if (e.key === '3')", 'legacy key 3 select', failures);
-  expectContains(legacy, "if (e.key === '4')", 'legacy key 4 select', failures);
-  expectContains(legacy, "else if (e.key === 'm' || e.key === 'M')", 'legacy mute key handler', failures);
-  expectContains(legacy, "else if (e.key === 'r' || e.key === 'R')", 'legacy restart key handler', failures);
+  // Difficulty system
+  expectContains(runner, 'const ROUND_PROFILES', 'per-round difficulty profiles', failures);
+  expectContains(runner, 'const DIFFICULTY_MODES', 'difficulty mode scalars', failures);
+  expectContains(runner, 'function getRoundProfile', 'round profile resolver', failures);
+
+  // Win screen
+  expectContains(indexHtml, 'id="runner-win-screen"', 'win screen overlay', failures);
+  expectContains(runner, 'function showWinScreen', 'win screen function', failures);
 
   if (!failures.length) {
     console.log('PASS: smoke contract checks succeeded.');

@@ -1,21 +1,12 @@
 # Image Asset Catalog
 
-Last verified: March 27, 2026
-Scope: all committed PNG image assets mirrored between `assets/processed/` and `class_ram_ifications assets/`.
+Last verified: March 28, 2026
+Scope: all committed PNG image assets in `assets/processed/`.
 
 ## Current Source Of Truth
 
-- Runtime loader reads PNGs from `assets/processed/`.
-- Source mirror stays in `class_ram_ifications assets/`.
-- `scripts/check_asset_sync.js` expects both folders to contain the same PNG filenames with matching hashes.
-- Lightweight metadata now lives in:
-  - `class_ram_ifications assets/manifest.json`
-  - `class_ram_ifications_roster.json`
-
-Current state:
-
-- Mirrored PNG count: 38
-- Mirror status: 1:1 across both folders (verified by check_asset_sync.js)
+- Runtime loader reads PNGs from `assets/processed/` (32 PNGs).
+- Source mirror folder and asset generation metadata removed post-release (project is feature-complete).
 
 ## Active Runner Art
 
@@ -58,26 +49,23 @@ Current state:
 - `CARD_04_CardReversal1990_00001_.png`
 - `CARD_05_CardExecutiveOrder1995_00001_.png`
 
-## Legacy / Shared Pack
+## Shared Sprites (Runner-Used)
 
-- `TOWER_01_CoderTower_00001_.png`
-- `TOWER_02_AttorneyTower_00001_.png`
-- `TOWER_03_ActivistTower_00001_.png`
-- `TOWER_04_EncryptionTower_00001_.png`
 - `ENEMY_01_DISCOAuditor_00001_.png`
 - `FILE_01_CaseFile_00001_.png`
-- `PROJ_01_BooleanBitProjectile_00001_.png`
-- `PROJ_02_PrecedentProjectile_00001_.png`
 
 ## Retired (Removed)
 
-The following sprites were removed from both mirrored asset folders during the March 26, 2026 cleanup pass:
+The following sprites were removed from both mirrored asset folders:
 
-- `FOLLOWER_01` through `FOLLOWER_05` — generic ally sprites, replaced by the eight named HTG members
-- `COLLECTIBLE_01_HTGMemberCollectible_00001_.png` — generic collectible, retired with the follower set
-- `ENEMY_03_FilingCabinet_00001_.png` — replaced by `VintageSLOW_CABINET_v4`
-- `ENEMY_04_PolygraphBot_00001_.png` — replaced by `LOCK_BOT_v3`
-- `BARRIER_01_GayInvestigationUnitWall_00001_.png` — replaced by `BARRIER_v5`
+- `FOLLOWER_01` through `FOLLOWER_05` — generic ally sprites, replaced by the eight named HTG members (March 26, 2026)
+- `COLLECTIBLE_01_HTGMemberCollectible_00001_.png` — generic collectible, retired with the follower set (March 26, 2026)
+- `ENEMY_03_FilingCabinet_00001_.png` — replaced by `VintageSLOW_CABINET_v4` (March 26, 2026)
+- `ENEMY_04_PolygraphBot_00001_.png` — replaced by `LOCK_BOT_v3` (March 26, 2026)
+- `BARRIER_01_GayInvestigationUnitWall_00001_.png` — replaced by `BARRIER_v5` (March 26, 2026)
+- `TOWER_01` through `TOWER_04` — tower-defense sprites, removed with legacy mode (March 27, 2026)
+- `PROJ_01_BooleanBitProjectile_00001_.png` — tower-defense projectile, removed with legacy mode (March 27, 2026)
+- `PROJ_02_PrecedentProjectile_00001_.png` — tower-defense projectile, removed with legacy mode (March 27, 2026)
 
 ## Measured Dimensions
 
@@ -90,13 +78,10 @@ The following sprites were removed from both mirrored asset folders during the M
 - Runner mode maps the eight named HTG members directly for both pickups and follower-chain rendering.
 - Narrative popup text is text-driven, but card art is rendered behind the modal content.
 - If a promoted phase background fails to load, runner mode falls back to `ENV_02_RunnerModeBackground_00001_.png`.
-- Legacy mode remains isolated and continues to use the older tower-defense sprite set.
+- Legacy tower-defense mode has been removed; all tower/projectile sprites are retired.
 
 ## Change Procedure
 
-1. Add or replace the PNG in `class_ram_ifications assets/`.
-2. Mirror the same PNG into `assets/processed/`.
-3. Update `class_ram_ifications assets/manifest.json` if the active/retired collection list changed.
-4. Update `class_ram_ifications_roster.json` if the HTG roster, card set, or background set changed.
-5. Update this catalog when active usage or archive status changes.
-6. Run `node scripts/run_all_checks.js`.
+1. Add or replace the PNG in `assets/processed/`.
+2. Update this catalog when active usage or archive status changes.
+3. Run `node scripts/run_all_checks.js`.

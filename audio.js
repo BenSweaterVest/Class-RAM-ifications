@@ -101,7 +101,8 @@
 
     window.sfx = {
         init() {
-            getContext();
+            const ac = getContext();
+            if (ac && ac.state === 'suspended') ac.resume();
         },
         isMuted() {
             return muted;
@@ -140,26 +141,27 @@
             beep(700, 0.06, 'square', 0.12);
         },
         narrativeNeutral() {
-            beep(700, 0.06, 'square', 0.1);
+            beep(700, 0.14, 'square', 0.20);
+            setTimeout(() => beep(600, 0.16, 'square', 0.16), 140);
         },
         narrativeHopeful() {
-            beep(494, 0.08, 'triangle', 0.1);
-            setTimeout(() => beep(554, 0.1, 'triangle', 0.1), 90);
+            beep(494, 0.12, 'triangle', 0.19);
+            setTimeout(() => beep(554, 0.15, 'triangle', 0.19), 110);
         },
         narrativeHappy() {
-            beep(523, 0.08, 'square', 0.11);
-            setTimeout(() => beep(659, 0.1, 'square', 0.11), 90);
-            setTimeout(() => beep(784, 0.12, 'square', 0.11), 180);
+            beep(523, 0.10, 'square', 0.20);
+            setTimeout(() => beep(659, 0.12, 'square', 0.20), 100);
+            setTimeout(() => beep(784, 0.16, 'square', 0.20), 200);
         },
         narrativeSomber() {
-            beep(262, 0.22, 'sine', 0.11);
-            setTimeout(() => beep(220, 0.28, 'sine', 0.10), 160);
+            beep(262, 0.28, 'sine', 0.20);
+            setTimeout(() => beep(220, 0.34, 'sine', 0.18), 200);
         },
         narrativeVictory() {
-            beep(523, 0.08, 'square', 0.12);
-            setTimeout(() => beep(659, 0.1, 'square', 0.12), 90);
-            setTimeout(() => beep(784, 0.12, 'square', 0.12), 180);
-            setTimeout(() => beep(1046, 0.2, 'triangle', 0.13), 280);
+            beep(523, 0.10, 'square', 0.20);
+            setTimeout(() => beep(659, 0.12, 'square', 0.20), 100);
+            setTimeout(() => beep(784, 0.14, 'square', 0.20), 200);
+            setTimeout(() => beep(1046, 0.26, 'triangle', 0.22), 310);
         },
         chainLoss() {
             beep(280, 0.06, 'square', 0.07);

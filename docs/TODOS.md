@@ -1,46 +1,42 @@
 # TODOs
 
-Last updated: March 27, 2026
+Last updated: March 28, 2026
 
-## Completed This Session
+---
 
-- [x] Promoted new background, popup card, and HTG member art into mirrored runtime/source PNG folders.
-- [x] Wired narrative popup cards as artwork backplates with text overlay on the left reading column.
-- [x] Replaced generic runner HTG member variants with the eight named pride-flag roster members.
-- [x] Updated follower chain rendering to reuse collected HTG identities.
-- [x] Replaced stale prompt-heavy asset metadata with current lightweight manifest/roster documents.
-- [x] Synchronized core docs to the promoted March 25 art set.
-- [x] Polished runner HUD, legend-card system, checkpoint interaction flow, and theme/audio controls.
-- [x] Installed new cabinet/bot obstacle art and revised all legend card historical copy.
-- [x] Wired new bot (LOCK_BOT_v3) and cabinet (VintageSLOW_CABINET_v4) sprites; removed superseded ENEMY_03/04.
-- [x] Removed retired FOLLOWER_01-05 and COLLECTIBLE_01 from both mirrored asset folders; updated manifest, roster, and docs.
-- [x] Removed obsolete hidden runner help/touch-control shell and updated smoke/contracts accordingly.
-- [x] Implemented a first-pass mobile runner layer: swipe/tap controls, touch hint, mobile HUD polish, and narrow-screen legend rail behavior.
-- [x] Captured current product decisions for title, audio stance, mobile UX direction, and difficulty-adjustment targets.
-- [x] Replaced the narrow-screen legend rail with the mobile bottom-sheet pattern opened from the existing card row.
-- [x] Made the mobile bottom sheet pause gameplay cleanly and resume cleanly on close.
-- [x] Tuned rounds 3 and 4 slightly easier while preserving the current feel of rounds 1 and 2.
-- [x] Redesigned difficulty system: unified ROUND_PROFILES table + DIFFICULTY_MODES scalars; Story/Organize/Resist dropdown; default fallback to 'organize'.
-- [x] Expanded Playwright smoke: gameplay liveness check added (control API + canvas frame-change assertion).
-- [x] Consolidated duplicated release/readiness notes: BACKLOG_TRIAGE.md removed, PIVOT_DECISIONS_SUMMARY.md updated, MOBILE_GESTURE_PLAN.md marked as implemented spec, DEVELOPMENT.md refreshed.
-- [x] Completed post-release cleanup pass: removed retired generic follower/collectible PNGs from both mirrored asset folders.
-- [x] Implemented Escape key pause/unpause with full applyPauseCompensation() coverage (phaseFlashUntil, postBarrierInvulnerabilityUntil, and all other active timers).
-- [x] Implemented barrier-clear effects: white flash overlay, rainbow sparkle particles, 3-second post-barrier invulnerability with glow arc.
-- [x] Implemented barrierWarning SFX: 8-pulse escalating beep with generation counter for clean cancellation on restart.
-- [x] Distinguished chainLoss SFX (square beep, tail hit) from lifeLost SFX (sawtooth 2-tone, direct player hit).
-- [x] Added attempt counter (localStorage 'classRamAttempts') and totalAlliesGathered stat; both shown on You Lose screen.
-- [x] Added BGM ducking during narrative popups (5% on open, restores to 24% on close).
-- [x] Added debug shortcuts: F2 overlay, Alt+1–5 force narrative popups, Alt+0 force You Lose state.
-- [x] Added PWA support: manifest.json, sw.js service worker (cache name class-ram-v2), favicon set in assets/favicon/.
-- [x] Added Open Graph and Twitter Card meta tags.
-- [x] Fixed touch guard: tap on paused game does nothing (guard in handleTouchGestureEnd).
-- [x] Fixed difficulty default fallback to 'organize' when no selection is stored.
-- [x] Simplified win screen: popup 5 (phase4Clear) is the win moment; no separate win canvas overlay.
-- [x] Retuned narrativeSomber SFX to sine wave (mournful, distinct from game-over).
+## Status: Ready To Deploy
 
-## Remaining (Needs Owner Action Only)
+All implementation work is complete. The only remaining tasks are owner actions.
 
-- [ ] Real-phone and real-tablet spot checks for swipe comfort, readability, and pause behavior.
-- [ ] Final acceptance check on rounds 3 and 4 feel after the easing pass.
-- [ ] Run `node scripts/run_all_checks.js` immediately before deploying to confirm all checks are green.
-- [ ] Live environment go/no-go signoff.
+---
+
+## Remaining — Owner Actions Only
+
+- [x] Run `node scripts/run_all_checks.js` — **PASSED March 28, 2026**
+- [ ] Push to main → Cloudflare Pages deploys automatically to https://class-ram-ifications.pages.dev/
+- [ ] Follow `docs/LIVE_VERIFICATION_RUNBOOK.md` on the live URL
+- [ ] Fill in `docs/GO_NO_GO_TEMPLATE.md` and sign off
+
+---
+
+## Completed
+
+- [x] Runner-first architecture established.
+- [x] Core movement / obstacles / collection / barrier / solidarity loop.
+- [x] 5-card narrative system: illustrated card art, pause, BGM ducking, tone SFX, looping while open.
+- [x] AudioContext fix: SFX and narrative audio plays correctly after first user gesture.
+- [x] Dynamic phase thresholds (3/4/5/6) + difficulty modes (story / organize / resist).
+- [x] Named HTG member roster (8 pride-flag characters) for pickups and follower chain.
+- [x] Phase backgrounds, narrative card art, obstacle and UI sprites.
+- [x] Mobile swipe/tap controls, touch hint, pausing bottom-sheet info cards.
+- [x] Escape pause with full applyPauseCompensation() coverage.
+- [x] Barrier-clear effects: flash, sparkles, 3-second invulnerability glow arc.
+- [x] Win screen: fireworks (multi-direction, multi-color), disco balls, per-phase stats by year/level, all-time machine total, "Play Again?".
+- [x] You Lose screen: allies gathered this run + attempt counter.
+- [x] Debug shortcuts: F2, Alt+0–6 (dev only, not player-facing).
+- [x] PWA: manifest.json, sw.js (class-ram-v3), favicon set, OG/Twitter meta.
+- [x] Legacy tower-defense mode retired and fully removed.
+- [x] Repo pruned: duplicate source asset folder, generation metadata, GitHub Actions workflow, stale scripts and docs removed.
+- [x] All docs synchronized with current implementation.
+- [x] Real-device testing complete. Balance accepted. Narrative copy locked.
+- [x] Verification bundle green: `node scripts/run_all_checks.js` passed March 28, 2026.

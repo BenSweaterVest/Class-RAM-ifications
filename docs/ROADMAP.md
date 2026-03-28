@@ -1,39 +1,39 @@
 # Roadmap
 
-Last updated: March 27, 2026
+Last updated: March 28, 2026
 
 ## Completed
 
-- Runner-first architecture established.
-- Core movement/obstacles/collection loop implemented.
-- Barrier + Solidarity progression implemented.
-- 5-card historical narrative flow implemented.
-- Dynamic phase thresholds (3/4/5/6) implemented.
-- Difficulty modes (story / organize / resist) with per-stat scalars implemented.
-- Tone-specific popup visuals and SFX implemented.
-- Promoted phase backgrounds, checkpoint cards, and named HTG roster art installed.
-- Runner HUD, legend cards, theme toggle, and checkpoint UX polished.
-- Mobile swipe/tap controls, bottom-sheet info layout, and narrow-screen legend behavior implemented.
-- Escape key pause/unpause with full applyPauseCompensation() coverage.
+- Runner-first architecture established; legacy tower-defense mode retired and removed.
+- Core movement / obstacles / collection / barrier / solidarity loop.
+- 5-card historical narrative flow (intro + 4 phase clears), illustrated card art, tone SFX.
+- Dynamic phase thresholds (3/4/5/6) + difficulty modes (story / organize / resist).
+- Narrative SFX looping while popup is open; AudioContext resume fix.
+- Promoted phase backgrounds, checkpoint cards, and named HTG roster (8 members).
+- Runner HUD, legend cards, theme toggle, compact UI, and checkpoint UX.
+- Mobile swipe/tap controls, touch hint, bottom-sheet info cards.
+- Escape pause with full applyPauseCompensation() coverage.
 - Barrier-clear effects: white flash, rainbow sparkles, 3-second invulnerability glow arc.
-- PWA support: manifest.json, sw.js (cache name class-ram-v2), favicon set, OG/Twitter meta tags.
+- Win screen: fireworks (multi-direction, multi-color), disco balls, per-phase stats, all-time total.
+- PWA: manifest.json, sw.js (class-ram-v3), favicon set, OG/Twitter meta tags.
 - Attempt counter and totalAlliesGathered shown on You Lose screen.
-- Post-release asset cleanup: retired FOLLOWER_01-05, COLLECTIBLE_01, old ENEMY_03/04, BARRIER_01 removed.
-- Verification scripts and focused smoke in place (gameplay liveness check included).
+- All legacy/retired assets removed; repo pruned; source mirror folder removed.
+- Verification bundle green (March 28): syntax, runner contract, smoke contract.
+- Real-device testing complete. Balance accepted.
 
-## Remaining (Owner Action Only)
+## Pending (Owner Action Only)
 
-- Real-phone and real-tablet spot checks for swipe comfort, readability, and pause behavior.
-- Final acceptance check on rounds 3 and 4 feel after the easing pass.
-- Run `node scripts/run_all_checks.js` immediately before deploying.
-- Live environment go/no-go signoff.
+- Deploy to https://class-ram-ifications.pages.dev/
+- Live verification per `docs/LIVE_VERIFICATION_RUNBOOK.md`
+- Go/no-go signoff per `docs/GO_NO_GO_TEMPLATE.md`
 
-## Near-Term Product Direction
+## Locked Product Decisions
 
-- Public title: `Class RAM-ifications`.
-- Dark mode remains the first-visit default.
-- Touch devices use swipe/tap controls plus a lightweight hint, not persistent gameplay buttons.
-- Mobile info experience uses a pausing bottom sheet on narrow touch layouts.
-- BGM remains implemented but non-blocking for release.
-
-Companion planning detail: `docs/NEXT_SPRINTS_PLAN.md`
+- Public title: `Class RAM-ifications`
+- Default first-visit theme: dark mode
+- Mobile control style: swipe/tap, not persistent gameplay buttons
+- Mobile info UX: pausing bottom sheet from legend card row
+- Audio stance: BGM implemented, non-blocking for release if startup fails
+- Difficulty default: `organize`
+- Narrative copy: locked
+- No content expansion, leaderboard, or sharing features planned

@@ -17,9 +17,7 @@ function fail(msg) {
       const runnerNarrative = document.getElementById('runner-narrative');
       return {
         bodyMode: document.body.dataset.mode,
-        towerSelectDisplay: getComputedStyle(document.getElementById('tower-select')).display,
         restartDisplay: getComputedStyle(document.getElementById('restart-toggle')).display,
-        precedentLabel: (document.getElementById('precedent-label')?.textContent || '').trim(),
         compactExists: Boolean(document.getElementById('compact-ui-toggle')),
         compactText: (document.getElementById('compact-ui-toggle')?.textContent || '').trim(),
         themeText: (document.getElementById('theme-toggle')?.textContent || '').trim(),
@@ -33,14 +31,8 @@ function fail(msg) {
     if (runnerState.bodyMode !== 'runner') {
       fail(`Expected runner mode body dataset, got ${runnerState.bodyMode}.`);
     }
-    if (runnerState.towerSelectDisplay !== 'none') {
-      fail(`Expected tower select hidden in runner mode, got ${runnerState.towerSelectDisplay}.`);
-    }
     if (runnerState.restartDisplay === 'none') {
       fail('Expected restart button visible in runner mode.');
-    }
-    if (runnerState.precedentLabel !== '') {
-      fail(`Expected empty precedent label in runner mode, got "${runnerState.precedentLabel}".`);
     }
     if (!runnerState.compactExists || !runnerState.compactText.includes('COMPACT UI')) {
       fail('Expected compact UI toggle to exist in runner mode.');
@@ -58,52 +50,8 @@ function fail(msg) {
       fail('Expected runner legend and runnerControls to initialize in runner mode.');
     }
 
-    const legacyPage = await browser.newPage({ viewport: { width: 1200, height: 800 } });
-    await legacyPage.goto(`${baseUrl}?mode=legacy`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await legacyPage.waitForTimeout(700);
-
-    const legacyState = await legacyPage.evaluate(() => {
-      return {
-        bodyMode: document.body.dataset.mode,
-        towerSelectDisplay: getComputedStyle(document.getElementById('tower-select')).display,
-        restartDisplay: getComputedStyle(document.getElementById('restart-toggle')).display,
-        precedentLabel: (document.getElementById('precedent-label')?.textContent || '').trim(),
-        narrativeDisplay: getComputedStyle(document.getElementById('runner-narrative')).display,
-        hintText: (document.getElementById('tower-hint')?.textContent || '').replace(/\s+/g, ' ').trim(),
-        runnerControlsReady: Boolean(window.runnerControls),
-        compactExists: Boolean(document.getElementById('compact-ui-toggle')),
-        compactText: (document.getElementById('compact-ui-toggle')?.textContent || '').trim()
-      };
-    });
-
-    if (legacyState.bodyMode !== 'legacy') {
-      fail(`Expected legacy mode body dataset, got ${legacyState.bodyMode}.`);
-    }
-    if (legacyState.towerSelectDisplay === 'none') {
-      fail('Expected tower select visible in legacy mode.');
-    }
-    if (legacyState.restartDisplay !== 'none') {
-      fail(`Expected restart button hidden in legacy mode, got ${legacyState.restartDisplay}.`);
-    }
-    if (legacyState.precedentLabel !== 'PRECEDENT:') {
-      fail(`Expected PRECEDENT: label in legacy mode, got "${legacyState.precedentLabel}".`);
-    }
-    if (legacyState.narrativeDisplay !== 'none') {
-      fail(`Expected runner narrative hidden in legacy mode, got ${legacyState.narrativeDisplay}.`);
-    }
-    if (!legacyState.hintText.includes('Boolean Bits') || !legacyState.hintText.includes('Slows')) {
-      fail('Expected legacy hint text to remain tower-defense oriented.');
-    }
-    if (legacyState.runnerControlsReady) {
-      fail('Did not expect runnerControls API in legacy mode.');
-    }
-    if (!legacyState.compactExists || !legacyState.compactText.includes('COMPACT UI')) {
-      fail('Expected compact UI toggle to exist in legacy mode.');
-    }
-
     console.log('PASS: mode shell smoke checks succeeded.');
-    console.log('- Runner default shell state: PASS');
-    console.log('- Legacy shell routing/state: PASS');
+    console.log('- Runner shell state: PASS');
   } finally {
     await browser.close();
   }

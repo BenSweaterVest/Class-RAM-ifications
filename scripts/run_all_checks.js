@@ -2,11 +2,6 @@ const { spawnSync } = require('child_process');
 
 const checks = [
   {
-    label: 'Syntax: game.js',
-    cmd: 'node',
-    args: ['--check', 'game.js']
-  },
-  {
     label: 'Syntax: runner_mode.js',
     cmd: 'node',
     args: ['--check', 'runner_mode.js']
@@ -20,11 +15,6 @@ const checks = [
     label: 'Syntax: audio.js',
     cmd: 'node',
     args: ['--check', 'audio.js']
-  },
-  {
-    label: 'Check: asset sync',
-    cmd: 'node',
-    args: ['scripts/check_asset_sync.js']
   },
   {
     label: 'Check: runner contract',

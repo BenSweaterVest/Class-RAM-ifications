@@ -72,7 +72,6 @@ function fail(msg) {
       }
 
       const legendText = (document.getElementById('runner-legend')?.textContent || '').replace(/\s+/g, ' ');
-      const hintText = (document.getElementById('tower-hint')?.textContent || '').replace(/\s+/g, ' ');
 
       if (!legendText.includes('Timothy Dooling (Contender)') || !legendText.includes('HTG Members (Ally Chain)') || !legendText.includes('Suit (Damage)')) {
         return { ok: false, reason: 'runner legend sprite photo labels missing' };
@@ -121,15 +120,6 @@ function fail(msg) {
         return { ok: false, reason: `expected 8 HTG mini cards, found ${htgMiniCards.length}` };
       }
       htgCard.click();
-      const hasKeyboardHint = hintText.includes('Left/A move left') && hintText.includes('Right/D move right') && hintText.includes('Up/Down lanes');
-      const hasTouchHint = hintText.includes('Swipe up/down to change lanes') && hintText.includes('swipe left/right to shift position');
-      if (!hasKeyboardHint && !hasTouchHint) {
-        return { ok: false, reason: 'runner mode hint text mismatch' };
-      }
-      const hasSolidarityHint = hintText.includes('Space Solidarity (burst through the barrier)') || hintText.includes('tap to use Solidarity (burst through the barrier)');
-      if (!hasSolidarityHint || !hintText.includes('Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.')) {
-        return { ok: false, reason: 'runner mode hint action text mismatch' };
-      }
 
       return {
         ok: true,
@@ -272,14 +262,12 @@ function fail(msg) {
     await mobilePage.waitForTimeout(500);
 
     const mobileCheck = await mobilePage.evaluate(() => {
-      const hintText = (document.getElementById('tower-hint')?.textContent || '').replace(/\s+/g, ' ');
       const restartDisplay = getComputedStyle(document.getElementById('restart-toggle')).display;
       const touchAction = getComputedStyle(document.getElementById('game-container')).touchAction;
       const touchHintOpacity = getComputedStyle(document.getElementById('runner-touch-hint')).opacity;
       const bodyClassName = document.body.className;
 
       return {
-        hintText,
         restartDisplay,
         touchAction,
         touchHintOpacity,
@@ -287,9 +275,6 @@ function fail(msg) {
       };
     });
 
-    if (!mobileCheck.hintText.includes('Swipe up/down to change lanes') || !mobileCheck.hintText.includes('tap to use Solidarity')) {
-      fail('Mobile hint text did not switch to swipe/tap instructions.');
-    }
     if (mobileCheck.restartDisplay === 'none') {
       fail('Restart button should be visible in runner mode for mobile.');
     }

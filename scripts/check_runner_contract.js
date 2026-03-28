@@ -33,7 +33,6 @@ function main() {
   expectContains(indexHtml, 'id="runner-touch-hint"', 'touch hint overlay', failures);
 
   // Loader
-  expectContains(loader, "const mode = rawMode === 'legacy' ? 'legacy' : 'runner';", 'runner-default mode routing', failures);
   expectContains(loader, 'bindRunnerKeyboardFallback()', 'loader keyboard fallback', failures);
 
   // Runner core functions

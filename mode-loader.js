@@ -1,16 +1,10 @@
 (function () {
-    const towerSelect = document.getElementById('tower-select');
     const compactUiToggle = document.getElementById('compact-ui-toggle');
     const audioMuteToggle = document.getElementById('audio-mute-toggle');
     const themeToggle = document.getElementById('theme-toggle');
     const restartToggle = document.getElementById('restart-toggle');
-    const precedentLabel = document.getElementById('precedent-label');
     const runnerNarrative = document.getElementById('runner-narrative');
-    const hint = document.getElementById('tower-hint');
 
-    const params = new URLSearchParams(window.location.search);
-    const rawMode = params.get('mode');
-    const mode = rawMode === 'legacy' ? 'legacy' : 'runner';
     const touchCapable = isLikelyTouchDevice();
     applyInputMode(touchCapable);
     setupMuteToggle();
@@ -18,33 +12,18 @@
     setupRestartToggle();
     setupCompactUiMode(touchCapable);
 
-    document.body.dataset.mode = mode;
-    if (mode === 'runner') {
-        if (towerSelect) towerSelect.style.display = 'none';
-        if (runnerNarrative) runnerNarrative.style.display = 'none';
-        if (precedentLabel) precedentLabel.textContent = '';
-        if (hint) {
-            hint.innerHTML = touchCapable
-                ? 'Touch controls: Swipe up/down to change lanes, swipe left/right to shift position, tap to use Solidarity (burst through the barrier).<br>Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.'
-                : 'Runner controls: Up/Down lanes, Left/A move left, Right/D move right, Space Solidarity (burst through the barrier).<br>Collect HTG allies; avoid suits/cabinets/bots/get through the barriers.';
-        }
-        if (restartToggle) restartToggle.style.display = 'inline-block';
-        if (window.bgm) {
-            window.bgm.setTrack([
-                'assets/DiscoMusic.ogg',
-                'assets/DiscoMusic.mp3'
-            ]);
-            window.bgm.armAutoplay();
-        }
-        bindRunnerKeyboardFallback();
-        loadScript('runner_mode.js');
-    } else {
-        if (window.bgm) window.bgm.stop();
-        if (runnerNarrative) runnerNarrative.style.display = 'none';
-        if (precedentLabel) precedentLabel.textContent = 'PRECEDENT:';
-        if (restartToggle) restartToggle.style.display = 'none';
-        loadScript('game.js');
+    document.body.dataset.mode = 'runner';
+    if (runnerNarrative) runnerNarrative.style.display = 'none';
+    if (restartToggle) restartToggle.style.display = 'inline-block';
+    if (window.bgm) {
+        window.bgm.setTrack([
+            'assets/DiscoMusic.ogg',
+            'assets/DiscoMusic.mp3'
+        ]);
+        window.bgm.armAutoplay();
     }
+    bindRunnerKeyboardFallback();
+    loadScript('runner_mode.js');
 
     function isLikelyTouchDevice() {
         // pointer:coarse = primary input is touch/stylus (not trackpad or mouse).

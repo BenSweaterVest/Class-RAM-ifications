@@ -1,13 +1,12 @@
 // Service Worker — Class RAM-ifications
 // Bump CACHE_NAME whenever static assets change to force a refresh on existing installs.
-const CACHE_NAME = 'class-ram-v2';
+const CACHE_NAME = 'class-ram-v3';
 
 const STATIC_ASSETS = [
     './',
     './index.html',
     './mode-loader.js',
     './runner_mode.js',
-    './game.js',
     './audio.js',
     './manifest.json',
     // Audio
@@ -49,12 +48,6 @@ const STATIC_ASSETS = [
     './assets/processed/HTG_08_HTGMemberEvelyn_00001_.png',
     './assets/processed/LOCK_BOT_v3_LaneLockObstacle-SurveillanceBot_00001_.png',
     './assets/processed/PLAYER_01_TimothyDoolingPlayerCharacter_00001_.png',
-    './assets/processed/PROJ_01_BooleanBitProjectile_00001_.png',
-    './assets/processed/PROJ_02_PrecedentProjectile_00001_.png',
-    './assets/processed/TOWER_01_CoderTower_00001_.png',
-    './assets/processed/TOWER_02_AttorneyTower_00001_.png',
-    './assets/processed/TOWER_03_ActivistTower_00001_.png',
-    './assets/processed/TOWER_04_EncryptionTower_00001_.png',
     './assets/processed/UI_01_SolidarityButtonInactive_00001_.png',
     './assets/processed/UI_02_SolidarityButtonActive_00001_.png',
     './assets/processed/UI_03_SolidarityButtonUrgent_00001_.png',

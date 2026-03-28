@@ -8,8 +8,7 @@ A runner game about building collective strength under escalating institutional 
 
 ## Play
 
-- Runner mode (default): index.html
-- Legacy mode: index.html?mode=legacy
+Open `index.html` (or serve locally):
 
 Run locally:
 

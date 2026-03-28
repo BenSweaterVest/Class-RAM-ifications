@@ -30,7 +30,7 @@ If no difficulty has been selected, the game defaults to `organize`.
 **Keyboard:**
 - Left / A: move left
 - Right / D: move right
-- Up / W or Down / S: lane change
+- Up / Down: lane change
 - Space: attempt Solidarity
 - R / Enter: restart (on lose or win screen)
 - Escape: pause / unpause
@@ -88,13 +88,18 @@ When a new barrier wall spawns, an 8-pulse escalating beep plays (barrierWarning
 2. `phase1Clear` — Phase 1 cleared (hopeful tone)
 3. `phase2Clear` — Phase 2 cleared (happy tone)
 4. `phase3Clear` — Phase 3 cleared (somber tone)
-5. `phase4Clear` — Phase 4 cleared / EO 12968 victory (victory tone) — this is the win moment
+5. `phase4Victory` — Phase 4 cleared / EO 12968 victory (victory tone) — this is the win moment
 
 BGM ducks to 5% volume while a narrative popup is open and restores to 24% when the popup is closed. Each checkpoint has a tone-specific SFX cue.
 
 ## Win Condition
 
-Clearing the 4th barrier triggers popup 5 (phase4Clear). After the player advances past that popup, the game resolves to the win state. There is no separate win canvas overlay — the final narrative card is the win moment.
+Clearing the 4th barrier triggers popup 5 (phase4Victory). After the player advances past that popup, the game resolves to the win state. A win screen overlay appears showing:
+- Fireworks launching from multiple directions (some multi-color)
+- Bouncing disco balls
+- Per-phase ally counts labeled by year and level (e.g., "1984 (Level 1)")
+- All-time allies gathered across all machines (localStorage)
+- "Play Again?" button — restarts at the same difficulty
 
 ## Lose Condition
 
@@ -118,6 +123,7 @@ These are for development use only and are not shown to players:
 - F2: toggle debug overlay (lists all shortcuts)
 - Alt+1 through Alt+5: force-open narrative popups 1–5
 - Alt+0: force You Lose state
+- Alt+6: force You Win state (fake per-phase ally counts)
 
 ## Notes For Playtesting
 

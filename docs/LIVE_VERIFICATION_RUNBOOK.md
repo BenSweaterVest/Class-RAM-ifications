@@ -7,14 +7,13 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 - Open deployed URL in desktop browser.
 - Confirm page loads with no blocking startup errors.
 
-## 2. Runner Default Validation
+## 2. Runner Startup Validation
 
-- Open `index.html` path.
-- Confirm tower controls are hidden.
+- Open `index.html`.
 - Confirm runner legend row appears below the game.
 - Confirm intro history checkpoint appears immediately and blocks gameplay.
 - Validate controls:
-  - `ArrowUp` / `W` and `ArrowDown` / `S` lane change
+  - `ArrowUp` and `ArrowDown` lane change
   - `ArrowLeft` / `A` move left
   - `ArrowRight` / `D` move right
   - `Space` Solidarity (near active barrier, chain meets phase threshold)
@@ -29,45 +28,31 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 - Confirm BGM ducks during popup open and restores on close.
 - Confirm Escape key pauses and unpauses; HUD shows "PAUSED".
 
-## 3. Legacy Regression Validation
+## 3. Gameplay Flow Validation
 
-- Open `index.html?mode=legacy`.
-- Confirm tower controls are visible.
-- Confirm runner narrative overlay is hidden.
-- Confirm tower-defense hint text is present.
-- Validate legacy controls:
-  - `1`-`4` select towers
-  - click canvas to place tower
-  - `M` mute
-  - `R` restart
+- Confirm obstacle waves, member collection, chain growth.
+- Confirm obstacle-specific effects (suit chain shred, cabinet slowdown, bot lane lock).
+- Confirm barrier warning SFX and active collision behavior.
+- Confirm solidarity pass-through and precedent increment.
+- Confirm win screen appears after phase4Victory is dismissed: fireworks, disco balls, per-phase ally stats, all-time machine total.
+- Confirm "Play Again?" restarts with same difficulty.
 
-## 4. Gameplay Flow Validation
+## 4. Visual/Asset Validation
 
-- Runner:
-  - confirm obstacle waves, member collection, chain growth
-  - confirm obstacle-specific effects (suit chain shred, cabinet slowdown, bot lane lock)
-  - confirm barrier warning and active collision behavior
-  - confirm solidarity pass-through and precedent increment
-- Legacy:
-  - confirm case/auditor flow and stage transitions
-
-## 5. Visual/Asset Validation
-
-- Confirm sprites load in both modes.
-- Confirm no missing-asset hard failures.
-- If possible, inspect console for repeated sprite load errors.
+- Confirm sprites load correctly; no missing-asset hard failures.
+- Inspect console for repeated sprite load errors.
 - On a phone-sized viewport, confirm tapping a runner info card opens a bottom sheet and pauses gameplay.
 - Confirm manifest.json is served correctly (PWA installability prompt in Chrome/Edge).
-- Confirm sw.js registers without console errors (cache name: class-ram-v2).
+- Confirm sw.js registers without console errors (cache name: class-ram-v3).
 
-## 6. Audio Validation
+## 5. Audio Validation
 
 - Confirm SFX initialize on first user interaction.
-- Confirm mute toggle behavior works.
+- Confirm mute toggle behavior works for both SFX and BGM.
 - If BGM starts, confirm autoplay policy-safe start and mute behavior.
-- If BGM does not start, confirm that is treated as non-blocking and the build is still fully usable.
+- If BGM does not start, confirm that is treated as non-blocking.
 
-## 7. Evidence Capture
+## 6. Evidence Capture
 
 Record in go/no-go report:
 

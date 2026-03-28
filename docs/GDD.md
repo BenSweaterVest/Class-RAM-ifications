@@ -38,7 +38,7 @@ Narrative checkpoints (5 total):
 ## Win / Lose
 
 Win:
-- Clear 4 barriers (4 precedents) and complete final narrative card (popup 5, phase4Clear / EO 12968). No separate win canvas overlay.
+- Clear 4 barriers (4 precedents) and advance past final narrative card (popup 5, phase4Victory / EO 12968). Win screen overlay with fireworks, disco balls, and per-phase stats appears after.
 
 Lose:
 - Hit live barrier without active shield.
@@ -54,8 +54,9 @@ Lose:
 - Narrative: modal checkpoints with pause-time compensation; BGM ducks to 5% on open.
 - Difficulty modes: story / organize (default) / resist — scalars on wall interval, threshold, obstacle speed, spawn density.
 - Pause: Escape key toggles; all active timers compensated on resume.
-- PWA: manifest.json + sw.js service worker (cache name class-ram-v2).
+- PWA: manifest.json + sw.js service worker (cache name class-ram-v3).
 - Attempt counter and totalAlliesGathered shown on You Lose screen.
+- Win screen: fireworks, bouncing disco balls, per-phase ally stats (labeled by year/level), all-time machine total. "Play Again?" restarts with same difficulty.
 
 ## UX/Tone
 
@@ -70,6 +71,5 @@ Each checkpoint also has a dedicated SFX cue.
 
 ## Constraints
 
-- Legacy mode remains available for regression continuity.
 - Missing phase backgrounds must not break runtime (fallback required).
 - Documentation must stay aligned to implemented thresholds and narrative copy.

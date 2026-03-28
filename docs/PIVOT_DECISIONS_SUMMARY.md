@@ -7,17 +7,16 @@ Scope: implementation decisions already reflected in repository code/docs.
 
 Decision:
 
-- Keep dual runtime modes during migration.
+- Runner mode is the sole game experience.
 
 Implementation:
 
-- Runner mode is default at `index.html`.
-- Legacy mode is preserved at `index.html?mode=legacy`.
-- Mode routing is handled in `mode-loader.js`.
+- Runner mode loads at `index.html`.
+- `mode-loader.js` handles startup setup (runner-only; legacy mode removed).
 
 Rationale:
 
-- Preserves a stable playable baseline while runner mechanics iterate.
+- Legacy tower-defense mode was retired after runner mechanics reached feature completeness.
 
 ## 2. Pivot Direction
 
@@ -27,7 +26,7 @@ Decision:
 
 Implementation:
 
-- Runner design is primary in `docs/GDD.md` and `docs/PIVOT_SPEC_CLEARANCE_PATH.md`.
+- Runner design is primary in `docs/GDD.md`.
 - Sprint planning is aligned in `docs/TODOS.md`.
 
 Rationale:
@@ -63,7 +62,7 @@ Implementation:
 
 - Courtroom phase activates late-run in `runner_mode.js`.
 - Outcome resolves to EO 12968 messaging when precedent target is met (PRECEDENT_TARGET = 4).
-- Win moment is popup 5 (phase4Clear) — no separate win canvas overlay.
+- Win moment is popup 5 (phase4Victory) — no separate win canvas overlay.
 
 Rationale:
 
@@ -94,22 +93,17 @@ Rationale:
 
 Decision:
 
-- Keep `assets/processed/` as runtime asset source while retaining source-generation assets and metadata.
+- `assets/processed/` is the sole runtime asset source. Source-generation mirror and metadata files removed post-release.
 
 Implementation:
 
-- Runtime sprites loaded from `assets/processed/`.
-- Source artifacts retained under `class_ram_ifications assets/` + manifest/roster files.
-- Retired FOLLOWER_01-05 and COLLECTIBLE_01 removed from both folders post-release.
-- Cataloged comprehensively in `docs/ASSET_IMAGE_CATALOG.md`.
-
-Current note:
-
-- Long-term role of `class_ram_ifications assets/` (maintained mirror vs. source archive) remains a post-release decision.
+- Runtime sprites loaded from `assets/processed/` (32 PNGs).
+- Retired assets removed: FOLLOWER_01-05, COLLECTIBLE_01, TOWER_01-04, PROJ_01-02.
+- Cataloged in `docs/ASSET_IMAGE_CATALOG.md`.
 
 Rationale:
 
-- Allows deterministic regeneration while preserving runtime simplicity.
+- Project is feature-complete; no further asset generation planned. Duplicate source folder removed to eliminate repo bloat.
 
 ## 7. Runner Visual Integration
 
@@ -121,7 +115,7 @@ Implementation:
 
 - Sprite preloading and draw paths added in `runner_mode.js`.
 - Fallback geometry retained for resilience if a sprite fails to load.
-- Runtime chroma-key processing with safe fallback behavior is active in both `game.js` and `runner_mode.js`.
+- Runtime chroma-key processing with safe fallback behavior is active in `runner_mode.js`.
 
 Rationale:
 
@@ -137,7 +131,7 @@ Implementation:
 
 - Syntax checks run on key scripts before each deploy.
 - `node scripts/run_all_checks.js` is the pre-deploy gate.
-- `docs/SMOKE_TEST.md`, `docs/DEPLOY_CHECKLIST.md`, and `docs/RELEASE_CHECKLIST.md` updated for runner needs.
+- `docs/SMOKE_TEST.md` and `docs/RELEASE_CHECKLIST.md` updated for runner needs.
 
 Rationale:
 
@@ -156,9 +150,8 @@ The following items were pending as of March 25–26, 2026 and are now resolved:
 - BGM ducking during narrative: yes — ducks to 5% on popup open, restores to 24% on close.
 - PWA: yes — manifest.json + sw.js service worker (cache name class-ram-v2) + favicon set in assets/favicon/.
 - Debug shortcut set: F2 for overlay, Alt+0 for force-lose, Alt+1–5 for force-narrative — implemented, not player-facing.
-- Win screen: popup 5 (phase4Clear) is the win moment — no separate win canvas overlay.
+- Win screen: popup 5 (phase4Victory) is the win moment; a separate win overlay with fireworks, disco balls, per-phase ally stats, and all-time machine total renders after it closes.
 
 Still open:
 
-- `class_ram_ifications assets/` long-term role (maintained mirror vs. source archive) — deferred to post-release.
 - Manual live deploy sign-off once hosted build is verified.

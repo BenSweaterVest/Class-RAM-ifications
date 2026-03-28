@@ -6,7 +6,6 @@ Use this checklist before calling the first public build ready.
 
 Companion references:
 
-- [docs/RELEASE_CANDIDATE_STATUS.md](RELEASE_CANDIDATE_STATUS.md)
 - [docs/GO_NO_GO_TEMPLATE.md](GO_NO_GO_TEMPLATE.md)
 
 ## Pre-Deploy Gate
@@ -20,12 +19,11 @@ Companion references:
 - [x] HUD text, hint text, and end screens are readable
 - [ ] Difficulty feels acceptable through at least one full run, including the intended slight easing of rounds 3 and 4 — pending owner acceptance
 - [x] Phase thresholds are correct: 3, 4, 5, 6 (not 3/5/7/9)
-- [x] Win condition: popup 5 (phase4Clear) is the win moment; no separate win canvas overlay
+- [x] Win condition: popup 5 (phase4Victory) is the win moment; win screen overlay with fireworks, disco balls, and per-phase ally stats appears after
 
 ## Runner Pivot Readiness
 
-- [x] `index.html` (runner default) is playable with no blocking errors
-- [x] `index.html?mode=legacy` remains playable as regression reference
+- [x] `index.html` is playable with no blocking errors
 - [x] Lane switching and dash controls are responsive on desktop
 - [ ] Lane switching and swipe controls are comfortable on real mobile hardware
 - [x] Mobile info cards use the intended bottom-sheet treatment and pause gameplay when open
@@ -59,13 +57,13 @@ Companion references:
 
 ## Debug Shortcuts
 
-- [x] Debug shortcuts (F2, Alt+0–5) are functional for development use
+- [x] Debug shortcuts (F2, Alt+0–6) are functional for development use
 - [x] Debug shortcuts are not accessible or visible from any player-facing UI surface
 
 ## PWA Readiness
 
 - [x] manifest.json present at root with correct name, short_name, display, and orientation
-- [x] sw.js service worker present; cache name class-ram-v2; strategies correct
+- [x] sw.js service worker present; cache name class-ram-v3; strategies correct
 - [x] Favicon set complete in assets/favicon/ (ico, 32x32, 16x16, apple-touch-icon)
 - [x] Favicon links in index.html head are correct
 - [x] Open Graph and Twitter Card meta tags present in index.html
@@ -74,15 +72,15 @@ Companion references:
 
 ## Repo And Asset Readiness
 
-- [x] Runtime sprites are present in `assets/processed/`
-- [x] Retired FOLLOWER_01-05 and COLLECTIBLE_01 removed from both asset folders
+- [x] Runtime sprites are present in `assets/processed/` (32 PNGs)
+- [x] All retired/legacy assets removed (FOLLOWER_01-05, COLLECTIBLE_01, TOWER_01-04, PROJ_01-02)
+- [x] Source mirror folder and generation metadata removed (project is feature-complete)
 - [x] assets/New/ staging folder removed
 - [x] assets/favicon/site.webmanifest orphan removed
-- [ ] A decision has been made about the long-term role of `class_ram_ifications assets/`
 - [x] The intended release files are committed intentionally
 
 ## Deployment Readiness
 
-- [ ] [docs/DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md) has been completed
+- [ ] All deployment readiness items in this checklist have been completed
 - [ ] The live URL has been checked after deployment
 - [ ] Any release-blocking issues discovered on live have been fixed or consciously deferred

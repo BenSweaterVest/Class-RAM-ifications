@@ -13,6 +13,9 @@ const runnerNarrativeBody = document.getElementById('runner-narrative-body');
 const runnerNarrativeNextButton = document.getElementById('runner-narrative-next');
 const runnerLegend = document.getElementById('runner-legend');
 const runnerTouchHint = document.getElementById('runner-touch-hint');
+const runnerWinScreen = document.getElementById('runner-win-screen');
+const runnerWinStats = document.getElementById('runner-win-stats');
+const runnerWinRestart = document.getElementById('runner-win-restart');
 const runnerLegendSheet = document.getElementById('runner-legend-sheet');
 const runnerLegendSheetBackdrop = document.getElementById('runner-legend-sheet-backdrop');
 const runnerLegendSheetTitle = document.getElementById('runner-legend-sheet-title');
@@ -85,6 +88,11 @@ let narrativePaused = false;
 let legendPaused = false;
 let narrativeQueue = [];
 let narrativePauseStartedAt = 0;
+let narrativeSfxLoopTimer = null;
+let phaseAllyCounts = [0, 0, 0, 0];
+let fireworkParticles = [];
+let discoBalls = [];
+let nextFireworkAt = 0;
 let legendPauseStartedAt = 0;
 const shownNarrativeKeys = new Set();
 let debugOverlayEnabled = false;
@@ -112,7 +120,6 @@ const player = {
     lane: 2,
     targetLane: 2,
     y: LANES[2],
-    speed: 0,
     slowUntil: 0,
     laneCooldownUntil: 0,
     horizontalCooldownUntil: 0,
@@ -323,6 +330,7 @@ function addCollectedMember(memberVariant) {
     collectedMembers.unshift(memberVariant);
     chainCount = collectedMembers.length;
     totalAlliesGathered += 1;
+    phaseAllyCounts[Math.min(precedentEstablished, 3)]++;
 }
 
 function trimCollectedMembers(count = 1) {
@@ -365,6 +373,12 @@ function resetGame() {
     particles = [];
     pendingSpawns = [];
     if (window.sfx) window.sfx.cancelBarrierWarning();
+    stopNarrativeSfxLoop();
+    phaseAllyCounts = [0, 0, 0, 0];
+    fireworkParticles = [];
+    discoBalls = [];
+    nextFireworkAt = 0;
+    if (runnerWinScreen) runnerWinScreen.style.display = 'none';
     clearCollectedMembers();
     narrativePaused = false;
     legendPaused = false;
@@ -389,6 +403,7 @@ function resetGame() {
     player.laneCooldownUntil = 0;
     player.horizontalCooldownUntil = 0;
     player.slowUntil = 0;
+    player.hitFlashUntil = 0;
     player.trail = [];
 
     laneLockFeedbackText = '';
@@ -471,6 +486,242 @@ function debugForceNarrative(key) {
     showNextNarrative();
 }
 
+function showWinScreen() {
+    const prevTotal = parseInt(localStorage.getItem('classRamTotalAllies') || '0');
+    const newTotal = prevTotal + totalAlliesGathered;
+    localStorage.setItem('classRamTotalAllies', String(newTotal));
+
+    if (runnerWinStats) {
+        runnerWinStats.textContent = '';
+        const phaseLabels = ['1984 (Level 1)', '1987 (Level 2)', '1990 (Level 3)', '1995 (Level 4)'];
+        phaseLabels.forEach((label, i) => {
+            const n = phaseAllyCounts[i] || 0;
+            const row = document.createElement('div');
+            row.textContent = `${label}: ${n} ${n === 1 ? 'ally' : 'allies'}`;
+            runnerWinStats.appendChild(row);
+        });
+        const gap = document.createElement('div');
+        gap.textContent = '\u00a0';
+        runnerWinStats.appendChild(gap);
+        const runRow = document.createElement('div');
+        runRow.textContent = `This run: ${totalAlliesGathered} ${totalAlliesGathered === 1 ? 'ally' : 'allies'} total`;
+        runnerWinStats.appendChild(runRow);
+        const allTimeRow = document.createElement('div');
+        allTimeRow.textContent = `All-time on this machine: ${newTotal}`;
+        runnerWinStats.appendChild(allTimeRow);
+    }
+    if (runnerWinScreen) runnerWinScreen.style.display = 'flex';
+}
+
+const FIREWORK_COLORS = ['#ff2222', '#ff8800', '#ffee00', '#00ff55', '#00bbff', '#cc44ff', '#ff1493', '#ffffff', '#00ffee'];
+
+function _makeRocket(now, x, y, vx, vy, peakY, multiColor) {
+    return {
+        kind: 'rocket',
+        x, y, vx, vy,
+        color: FIREWORK_COLORS[Math.floor(Math.random() * FIREWORK_COLORS.length)],
+        peakY: peakY !== undefined ? peakY : canvas.height * (0.06 + Math.random() * 0.44),
+        multiColor: multiColor !== undefined ? multiColor : Math.random() < 0.4,
+        life: now + 6000,
+        born: now
+    };
+}
+
+function initDiscoBalls() {
+    discoBalls = Array.from({ length: 5 }, (_, i) => ({
+        x: 80 + Math.random() * (canvas.width - 160),
+        y: 40 + Math.random() * (canvas.height * 0.55),
+        vx: (i % 2 === 0 ? 1 : -1) * (1.2 + Math.random() * 1.5),
+        vy: (i % 3 === 0 ? 1 : -1) * (1.0 + Math.random() * 1.2),
+        r: 18 + Math.floor(Math.random() * 10),
+        hue: i * 72
+    }));
+
+    // Pre-place 8 rockets from varied positions so first explosions happen instantly
+    const now = performance.now();
+    const preloads = [
+        // bottom — 4 at staggered heights along their trajectory
+        () => { const pY = canvas.height * 0.08; return _makeRocket(now, canvas.width * 0.2, canvas.height - (canvas.height - pY) * 0.8, -0.5, -5, pY, false); },
+        () => { const pY = canvas.height * 0.18; return _makeRocket(now, canvas.width * 0.5, canvas.height - (canvas.height - pY) * 0.6, 0.3, -7, pY, true); },
+        () => { const pY = canvas.height * 0.12; return _makeRocket(now, canvas.width * 0.75, canvas.height - (canvas.height - pY) * 0.4, 0.8, -10, pY, false); },
+        () => { const pY = canvas.height * 0.25; return _makeRocket(now, canvas.width * 0.38, canvas.height + 8, -1, -13, pY, true); },
+        // left side — shooting right
+        () => _makeRocket(now, -8, canvas.height * 0.35, 10 + Math.random() * 4, -(3 + Math.random() * 3), canvas.height * 0.2, Math.random() < 0.5),
+        // right side — shooting left
+        () => _makeRocket(now, canvas.width + 8, canvas.height * 0.5, -(10 + Math.random() * 4), -(3 + Math.random() * 3), canvas.height * 0.25, Math.random() < 0.5),
+        // bottom-left corner diagonal
+        () => _makeRocket(now, 10, canvas.height + 8, 6 + Math.random() * 3, -(10 + Math.random() * 4), canvas.height * 0.15, true),
+        // bottom-right corner diagonal
+        () => _makeRocket(now, canvas.width - 10, canvas.height + 8, -(6 + Math.random() * 3), -(10 + Math.random() * 4), canvas.height * 0.15, false),
+    ];
+    for (const fn of preloads) fireworkParticles.push(fn());
+    nextFireworkAt = now + 150;
+}
+
+function spawnFirework(now) {
+    const roll = Math.random();
+    let rocket;
+    if (roll < 0.45) {
+        // Bottom — straight up
+        rocket = _makeRocket(now,
+            80 + Math.random() * (canvas.width - 160),
+            canvas.height + 8,
+            (Math.random() - 0.5) * 2.5,
+            -(12 + Math.random() * 7));
+    } else if (roll < 0.6) {
+        // Left side — shoots right and up
+        rocket = _makeRocket(now,
+            -8,
+            canvas.height * (0.25 + Math.random() * 0.5),
+            11 + Math.random() * 5,
+            -(4 + Math.random() * 5));
+    } else if (roll < 0.75) {
+        // Right side — shoots left and up
+        rocket = _makeRocket(now,
+            canvas.width + 8,
+            canvas.height * (0.25 + Math.random() * 0.5),
+            -(11 + Math.random() * 5),
+            -(4 + Math.random() * 5));
+    } else if (roll < 0.88) {
+        // Bottom-left corner diagonal
+        rocket = _makeRocket(now,
+            5 + Math.random() * 60,
+            canvas.height + 8,
+            5 + Math.random() * 5,
+            -(11 + Math.random() * 5));
+    } else {
+        // Bottom-right corner diagonal
+        rocket = _makeRocket(now,
+            canvas.width - 5 - Math.random() * 60,
+            canvas.height + 8,
+            -(5 + Math.random() * 5),
+            -(11 + Math.random() * 5));
+    }
+    fireworkParticles.push(rocket);
+}
+
+function explodeFirework(rocket, now) {
+    const count = 90 + Math.floor(Math.random() * 50);
+    const maxLife = 1000 + Math.random() * 700;
+    for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+        const speed = 3 + Math.random() * 7;
+        const color = rocket.multiColor
+            ? FIREWORK_COLORS[Math.floor(Math.random() * FIREWORK_COLORS.length)]
+            : rocket.color;
+        fireworkParticles.push({
+            kind: 'spark',
+            x: rocket.x,
+            y: rocket.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 2.5,
+            color,
+            born: now,
+            maxLife,
+            life: now + maxLife
+        });
+    }
+}
+
+function updateWinEffects(now) {
+    if (now >= nextFireworkAt) {
+        spawnFirework(now);
+        nextFireworkAt = now + 150 + Math.random() * 320;
+    }
+
+    const toExplode = [];
+    fireworkParticles = fireworkParticles.filter(p => {
+        if (p.life <= now) return false;
+        if (p.kind === 'rocket') {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.15;
+            if (p.vy >= 0 || p.y <= p.peakY || p.x < -30 || p.x > canvas.width + 30) {
+                toExplode.push(p);
+                return false;
+            }
+        } else {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.13;
+            p.vx *= 0.97;
+        }
+        return true;
+    });
+    for (const rocket of toExplode) explodeFirework(rocket, now);
+
+    for (const b of discoBalls) {
+        b.x += b.vx;
+        b.y += b.vy;
+        b.hue = (b.hue + 1.8) % 360;
+        if (b.x - b.r < 0 || b.x + b.r > canvas.width) b.vx = -b.vx;
+        if (b.y - b.r < 0 || b.y + b.r > canvas.height) b.vy = -b.vy;
+    }
+}
+
+function drawWinEffects() {
+    const now = performance.now();
+
+    for (const b of discoBalls) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.clip();
+        const facet = 5;
+        const left = Math.floor(b.x - b.r);
+        const top = Math.floor(b.y - b.r);
+        for (let fy = top; fy <= b.y + b.r; fy += facet) {
+            for (let fx = left; fx <= b.x + b.r; fx += facet) {
+                ctx.fillStyle = `hsl(${(b.hue + (fx - left) * 14 + (fy - top) * 9) % 360},100%,62%)`;
+                ctx.fillRect(fx, fy, facet, facet);
+            }
+        }
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.fillRect(Math.round(b.x - b.r * 0.35), Math.round(b.y - b.r * 0.38), 3, 3);
+        ctx.restore();
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    for (const p of fireworkParticles) {
+        if (p.kind === 'rocket') {
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x - 4, p.y - 10, 8, 18);
+            ctx.fillStyle = 'rgba(255, 200, 60, 0.7)';
+            ctx.fillRect(p.x - 3, p.y + 7, 6, 9);
+        } else {
+            const age = (now - p.born) / p.maxLife;
+            ctx.globalAlpha = Math.max(0, 1 - age);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x - 4, p.y - 4, 8, 8);
+            ctx.globalAlpha = 1;
+        }
+    }
+}
+
+function startNarrativeSfxLoop(sfxName) {
+    stopNarrativeSfxLoop();
+    playSfx(sfxName);
+    const schedule = () => {
+        narrativeSfxLoopTimer = setTimeout(() => {
+            if (!narrativePaused) return;
+            playSfx(sfxName);
+            schedule();
+        }, 2800);
+    };
+    schedule();
+}
+
+function stopNarrativeSfxLoop() {
+    if (narrativeSfxLoopTimer !== null) {
+        clearTimeout(narrativeSfxLoopTimer);
+        narrativeSfxLoopTimer = null;
+    }
+}
+
 function showNextNarrative() {
     if (!runnerNarrativePanel || !narrativeQueue.length) {
         narrativePaused = false;
@@ -515,11 +766,12 @@ function showNextNarrative() {
     if (runnerNarrativeBody) runnerNarrativeBody.textContent = copy.body;
     runnerNarrativePanel.style.display = 'block';
     if (runnerNarrativeNextButton) runnerNarrativeNextButton.focus();
-    playSfx(`narrative${tone.charAt(0).toUpperCase()}${tone.slice(1)}`);
+    startNarrativeSfxLoop(`narrative${tone.charAt(0).toUpperCase()}${tone.slice(1)}`);
     updateUI();
 }
 
 function advanceNarrative() {
+    stopNarrativeSfxLoop();
     const now = performance.now();
     if (narrativePauseStartedAt > 0) {
         applyPauseCompensation(Math.max(0, now - narrativePauseStartedAt));
@@ -540,6 +792,8 @@ function advanceNarrative() {
         gameActive = false;
         gameWon = true;
         gameEndedAt = performance.now();
+        initDiscoBalls();
+        showWinScreen();
     }
 
     updateUI();
@@ -1508,16 +1762,12 @@ function draw() {
         ctx.restore();
     }
 
-    if (!gameActive) {
+    if (gameWon && !gameActive) drawWinEffects();
+
+    if (!gameActive && !gameWon) {
         ctx.save();
         ctx.textAlign = 'center';
-        if (gameWon) {
-            ctx.fillStyle = '#00ff00';
-            ctx.font = '11px Courier New';
-            const isTouchUi = document.body && document.body.classList.contains('touch-ui');
-            ctx.fillText(isTouchUi ? 'Tap to restart' : 'Press R or Enter to restart', canvas.width / 2, canvas.height - 10);
-        } else {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
             ctx.fillRect(canvas.width / 2 - 230, canvas.height / 2 - 46, 460, 126);
             ctx.fillStyle = '#00ff00';
             ctx.font = '20px Courier New';
@@ -1530,7 +1780,6 @@ function draw() {
             ctx.font = '11px Courier New';
             ctx.fillStyle = '#aaffaa';
             ctx.fillText(`Allies gathered: ${totalAlliesGathered}  ·  Attempt: ${currentAttemptNumber}`, canvas.width / 2, canvas.height / 2 + 62);
-        }
         ctx.restore();
     }
 
@@ -1542,9 +1791,9 @@ function draw() {
 function drawDebugOverlay() {
     const now = performance.now();
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-    ctx.fillRect(canvas.width - 250, 6, 244, 230);
+    ctx.fillRect(canvas.width - 250, 6, 244, 244);
     ctx.strokeStyle = '#55ff55';
-    ctx.strokeRect(canvas.width - 250, 6, 244, 230);
+    ctx.strokeRect(canvas.width - 250, 6, 244, 244);
 
     ctx.fillStyle = '#a7ffa7';
     ctx.font = '11px Courier New';
@@ -1564,12 +1813,14 @@ function drawDebugOverlay() {
     ctx.fillStyle = '#a7ffa7';
     ctx.fillText('Alt+1..5  narrative cards', canvas.width - 236, 174);
     ctx.fillText('Alt+0     you-lose screen', canvas.width - 236, 188);
-    ctx.fillText('Escape    pause / unpause', canvas.width - 236, 202);
-    ctx.fillText('F2        toggle this overlay', canvas.width - 236, 216);
+    ctx.fillText('Alt+6     you-win screen', canvas.width - 236, 202);
+    ctx.fillText('Escape    pause / unpause', canvas.width - 236, 216);
+    ctx.fillText('F2        toggle this overlay', canvas.width - 236, 230);
 }
 
 function loop(now) {
     update(now);
+    if (gameWon && !gameActive) updateWinEffects(now);
     draw();
     requestAnimationFrame(loop);
 }
@@ -1671,6 +1922,19 @@ function handleRunnerKeydown(e) {
             updateUI();
             return;
         }
+        if (key === '6') {
+            e.preventDefault();
+            stopNarrativeSfxLoop();
+            gameActive = false;
+            gameWon = true;
+            gameEndedAt = performance.now();
+            phaseAllyCounts = [4, 5, 3, 7];
+            totalAlliesGathered = 19;
+            initDiscoBalls();
+            showWinScreen();
+            updateUI();
+            return;
+        }
     }
 
     if (!gameActive) {
@@ -1734,8 +1998,6 @@ function handleRunnerKeydown(e) {
 }
 
 window.addEventListener('keydown', handleRunnerKeydown);
-document.addEventListener('keydown', handleRunnerKeydown);
-document.onkeydown = handleRunnerKeydown;
 
 if (runnerNarrativeNextButton) {
     runnerNarrativeNextButton.addEventListener('pointerdown', handleNarrativeContinue);
@@ -1882,6 +2144,10 @@ if (gameContainer) {
             e.preventDefault();
         }
     }, { passive: false });
+}
+
+if (runnerWinRestart) {
+    runnerWinRestart.addEventListener('click', () => { resetGame(); });
 }
 
 if (document.body) {

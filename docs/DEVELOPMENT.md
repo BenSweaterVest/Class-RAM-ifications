@@ -5,10 +5,9 @@ Last updated: March 27, 2026
 ## Runtime Ownership
 
 - runner_mode.js: primary game logic, narrative, phase thresholds, collision/update/draw, pause, SFX triggers
-- mode-loader.js: mode routing and setup
+- mode-loader.js: startup setup (runner-only)
 - audio.js: procedural SFX + BGM hooks
 - index.html: UI shell, narrative theme styles, PWA meta, OG/Twitter meta
-- game.js: legacy reference mode
 
 ## Current Runner Shell
 
@@ -16,7 +15,7 @@ Last updated: March 27, 2026
 - Top utility bar holds mute, theme, difficulty selector, and restart controls.
 - Bottom hint text and legend-card rail are the primary on-page teaching surfaces.
 - The earlier hidden touch-control/help shell was removed during closeout cleanup.
-- `docs/MOBILE_GESTURE_PLAN.md` is the historical spec for gesture implementation; real-device tuning remains an open owner task.
+- Real-device tuning for swipe/tap comfort and landscape orientation remains an open owner task.
 
 ## Difficulty System
 
@@ -35,7 +34,7 @@ Obstacle pressure ramps 40% within each round (`WITHIN_ROUND_RAMP = 0.4`) then r
 ## Implemented Runner Contracts
 
 - 5 narrative keys in NARRATIVE_COPY
-- 5-step sequence in NARRATIVE_SEQUENCE (intro, phase1Clear, phase2Clear, phase3Clear, phase4Clear)
+- 5-step sequence in NARRATIVE_SEQUENCE (intro, phase1Clear, phase2Clear, phase3Clear, phase4Victory)
 - Per-round base chain thresholds: [3, 4, 5, 6] via ROUND_PROFILES — scaled by difficulty mode
 - Precedent target PRECEDENT_TARGET = 4
 - Phase-based year mapping and background key mapping
@@ -89,7 +88,7 @@ All sounds are procedurally generated in `audio.js`.
 - Sound: sine wave, mournful tone — intentionally distinct from the game-over sound.
 
 ### auditorHit
-- Trigger: auditor hits a tower (legacy mode context). Present in audio.js.
+- Trigger: auditor enemy hits the player. Present in audio.js.
 
 ## Attempt Counter And Allies Stat
 
@@ -104,6 +103,7 @@ All debug shortcuts are handled in `runner_mode.js` keyboard handler. They are n
 - F2: toggles a debug overlay that lists all available shortcuts.
 - Alt+1 through Alt+5: force-opens narrative popups 1–5 respectively.
 - Alt+0: forces the You Lose state immediately.
+- Alt+6: forces the You Win state immediately (with fake per-phase ally counts).
 
 ## PWA Support
 
@@ -113,7 +113,7 @@ All debug shortcuts are handled in `runner_mode.js` keyboard handler. They are n
   - display: standalone
   - orientation: landscape
 - `sw.js` service worker at repo root:
-  - Cache name: `class-ram-v2`
+  - Cache name: `class-ram-v3`
   - Strategy: cache-first for assets, network-first for navigation requests.
 - Favicon set in `assets/favicon/`: favicon.ico, favicon-32x32.png, favicon-16x16.png, apple-touch-icon.png.
 - Linked from `<head>` in `index.html`.
@@ -188,6 +188,4 @@ Runner HTG member roster:
 
 - Keep docs and smoke assertions synchronized with narrative copy changes.
 - Prefer additive fallbacks over hard asset assumptions.
-- Keep `assets/processed/` and `class_ram_ifications assets/` PNGs mirrored so `check_asset_sync` stays green.
-- Keep legacy mode untouched unless explicitly requested.
 - Debug shortcuts must not appear in any player-facing UI surface.
