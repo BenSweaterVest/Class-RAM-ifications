@@ -57,9 +57,15 @@ A historical arcade runner about *High Tech Gays v. Defense Industrial Security 
 - Modals close on backdrop click, ✕ CLOSE button, or Escape (without triggering game pause)
 - Both buttons and modals fully support dark and light mode
 
+## Bug Fixes (Post-Testing)
+
+- **Safari macOS touch-ui:** MacBook users in Safari were incorrectly receiving the mobile swipe experience. Safari was misreporting `pointer: coarse`; fixed by adding `hover: none` as a third detection guard — macOS always reports `hover: hover`.
+- **Safari iOS suit sprites:** Suit obstacles rendered in full color on iOS Safari < 18 because `ctx.filter` (Canvas 2D) is silently unsupported on those versions. Fixed by baking grayscale+contrast into the sprite's pixel data at load time via `ImageData`, making it work everywhere.
+- **Service worker:** Bumped to `class-ram-v4` to ensure all existing visitors get fresh copies of updated scripts.
+
 ## Tech
 
 - Static SPA, no build step — Cloudflare Pages via direct GitHub integration
-- PWA: manifest.json, sw.js (cache name `class-ram-v3`), favicon set, OG/Twitter meta tags
+- PWA: manifest.json, sw.js (cache name `class-ram-v4`), favicon set, OG/Twitter meta tags
 - Procedural SFX via Web Audio API; BGM via HTMLAudioElement
 - Debug shortcuts (dev only, not player-facing): F2 overlay, Alt+0–6

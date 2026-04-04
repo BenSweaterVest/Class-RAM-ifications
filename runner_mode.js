@@ -252,7 +252,7 @@ function loadRunnerSprite(key, src) {
     const img = new Image();
     runnerSpriteState[key] = 'loading';
     img.onload = () => {
-        runnerSpriteAssets[key] = applyRunnerChromaKey(img);
+        runnerSpriteAssets[key] = applyRunnerChromaKey(img, key === 'suit');
         runnerSpriteState[key] = 'loaded';
     };
     img.onerror = () => {
@@ -269,7 +269,7 @@ function getRunnerSprite(key) {
     return runnerSpriteState[key] === 'loaded' ? runnerSpriteAssets[key] : null;
 }
 
-function applyRunnerChromaKey(source) {
+function applyRunnerChromaKey(source, applyGrayscale) {
     try {
         const off = document.createElement('canvas');
         off.width = source.naturalWidth || source.width;
@@ -289,6 +289,12 @@ function applyRunnerChromaKey(source) {
             const green = g >= 245 && r <= 20 && b <= 20;
             if (magenta || green) {
                 data[i + 3] = 0;
+            } else if (applyGrayscale && data[i + 3] > 0) {
+                // Bake grayscale+contrast into the sprite at load time so it works
+                // on Safari iOS < 18, which does not support ctx.filter.
+                const lum = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+                const c = Math.min(255, Math.max(0, Math.round((lum - 128) * 1.1 + 128)));
+                data[i] = data[i + 1] = data[i + 2] = c;
             }
         }
 
@@ -1624,13 +1630,12 @@ function draw() {
                 ctx.fillRect(o.x - 6, o.y - o.h / 2 - 4, o.w + 12, o.h + 8);
             }
         }
-        const drawOptions = o.type === 'suit' ? { filter: 'grayscale(1) saturate(0.15) contrast(1.1)' } : null;
         drawRunnerSprite(spriteKey, o.x + o.w / 2, o.y, () => {
             if (o.type === 'suit') ctx.fillStyle = '#6a6a6a';
             if (o.type === 'cabinet') ctx.fillStyle = '#8899aa';
             if (o.type === 'bot') ctx.fillStyle = '#33aaff';
             ctx.fillRect(o.x, o.y - o.h / 2, o.w, o.h);
-        }, { w: o.renderW, h: o.renderH }, drawOptions);
+        }, { w: o.renderW, h: o.renderH });
     });
 
     if (wall) {

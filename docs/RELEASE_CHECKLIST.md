@@ -64,7 +64,7 @@ Companion references:
 ## PWA Readiness
 
 - [x] manifest.json present at root with correct name, short_name, display, and orientation
-- [x] sw.js service worker present; cache name class-ram-v3; strategies correct
+- [x] sw.js service worker present; cache name class-ram-v4; strategies correct
 - [x] Favicon set complete in assets/favicon/ (ico, 32x32, 16x16, apple-touch-icon)
 - [x] Favicon links in index.html head are correct
 - [x] Open Graph and Twitter Card meta tags present in index.html

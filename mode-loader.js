@@ -27,10 +27,11 @@
 
     function isLikelyTouchDevice() {
         // pointer:coarse = primary input is touch/stylus (not trackpad or mouse).
+        // hover:none = primary input cannot hover (rules out macOS — trackpad/mouse
+        //   always supports hover even if Safari incorrectly reports pointer:coarse).
         // max-width:900px excludes touch-capable laptops and desktop monitors —
-        // those should use keyboard layout and keyboard control hints regardless
-        // of whether the screen technically supports touch.
-        return window.matchMedia('(pointer: coarse) and (max-width: 900px)').matches;
+        //   those should use keyboard layout regardless of touch capability.
+        return window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 900px)').matches;
     }
 
     function applyInputMode(touchCapable) {

@@ -54,7 +54,7 @@ Lose:
 - Narrative: modal checkpoints with pause-time compensation; BGM ducks to 5% on open.
 - Difficulty modes: story / organize (default) / resist — scalars on wall interval, threshold, obstacle speed, spawn density.
 - Pause: Escape key toggles; all active timers compensated on resume.
-- PWA: manifest.json + sw.js service worker (cache name class-ram-v3).
+- PWA: manifest.json + sw.js service worker (cache name class-ram-v4).
 - Attempt counter and totalAlliesGathered shown on You Lose screen.
 - Win screen: fireworks, bouncing disco balls, per-phase ally stats (labeled by year/level), all-time machine total. "Play Again?" restarts with same difficulty.
 - Info modals: HOW TO PLAY (keyboard + touchscreen controls, objective); ABOUT (Dr. Kris Norman quote, HTG history links, Inspired By: Frogger + Robot Unicorn Attack).

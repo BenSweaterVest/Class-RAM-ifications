@@ -29,6 +29,11 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 - [ ] Toggle bright/dark mode and confirm the UI shell updates cleanly
 - [ ] Change difficulty selector and confirm it takes effect after next restart
 
+## Desktop / Browser Parity
+
+- [ ] On macOS Safari, confirm the desktop experience loads (not mobile swipe UI)
+- [ ] On a phone or tablet (no keyboard), confirm the mobile swipe UI loads
+
 ## Mobile Touch Controls
 
 - [ ] Swipe up/down and confirm lane changes
@@ -75,6 +80,7 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 ## Sprite Wiring
 
 - [ ] Confirm player, follower, obstacle, and wall entities render via image sprites
+- [ ] Confirm suit obstacles appear grayscale/desaturated (not full color) — check on iOS Safari specifically
 - [ ] Temporarily break one sprite path and confirm fallback geometry remains playable
 
 ## Local Startup

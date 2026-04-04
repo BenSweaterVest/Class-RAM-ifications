@@ -77,7 +77,7 @@ Decision:
 Implementation:
 
 - Responsive legend and narrative layouts remain in `index.html`.
-- `isLikelyTouchDevice()` requires both pointer:coarse AND max-width:900px; `touch-ui` class applied to body only on genuine small touch devices.
+- `isLikelyTouchDevice()` requires pointer:coarse AND hover:none AND max-width:900px; `touch-ui` class applied to body only on genuine small touch devices. The `hover:none` guard was added to prevent Safari on macOS from incorrectly triggering touch-ui when it misreports `pointer:coarse`.
 - Touch-capable devices get swipe/tap runner controls, a touch-specific hint, and mobile HUD/layout adjustments.
 - Mobile info cards use the bottom-sheet pattern and pause gameplay while open.
 - `gameEndedAt` cooldown (1.5s) prevents accidental tap restart on the lose screen.
@@ -148,7 +148,7 @@ The following items were pending as of March 25–26, 2026 and are now resolved:
 - Phase thresholds: confirmed as 3/4/5/6 (not 3/5/7/9) — corrected in all docs.
 - Pause key: Escape — implemented with full applyPauseCompensation() coverage.
 - BGM ducking during narrative: yes — ducks to 5% on popup open, restores to 24% on close.
-- PWA: yes — manifest.json + sw.js service worker (cache name class-ram-v3) + favicon set in assets/favicon/.
+- PWA: yes — manifest.json + sw.js service worker (cache name class-ram-v4) + favicon set in assets/favicon/.
 - Debug shortcut set: F2 for overlay, Alt+0 for force-lose, Alt+1–5 for force-narrative — implemented, not player-facing.
 - Win screen: popup 5 (phase4Victory) is the win moment; a separate win overlay with fireworks, disco balls, per-phase ally stats, and all-time machine total renders after it closes.
 

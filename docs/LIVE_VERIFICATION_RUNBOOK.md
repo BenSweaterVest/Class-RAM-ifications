@@ -43,7 +43,7 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 - Inspect console for repeated sprite load errors.
 - On a phone-sized viewport, confirm tapping a runner info card opens a bottom sheet and pauses gameplay.
 - Confirm manifest.json is served correctly (PWA installability prompt in Chrome/Edge).
-- Confirm sw.js registers without console errors (cache name: class-ram-v3).
+- Confirm sw.js registers without console errors (cache name: class-ram-v4).
 
 ## 5. Audio Validation
 

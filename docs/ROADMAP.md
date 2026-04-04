@@ -15,12 +15,13 @@ Last updated: March 28, 2026
 - Escape pause with full applyPauseCompensation() coverage.
 - Barrier-clear effects: white flash, rainbow sparkles, 3-second invulnerability glow arc.
 - Win screen: fireworks (multi-direction, multi-color), disco balls, per-phase stats, all-time total.
-- PWA: manifest.json, sw.js (class-ram-v3), favicon set, OG/Twitter meta tags.
+- PWA: manifest.json, sw.js (class-ram-v4), favicon set, OG/Twitter meta tags.
 - Attempt counter and totalAlliesGathered shown on You Lose screen.
 - All legacy/retired assets removed; repo pruned; source mirror folder removed.
 - Verification bundle green (March 28): syntax, runner contract, smoke contract.
 - Real-device testing complete. Balance accepted.
 - HOW TO PLAY / ABOUT modal buttons: keyboard + touchscreen controls, objective, historical quote, HTG links, Inspired By grid.
+- Post-testing bug fixes: Safari macOS touch-ui (`hover: none` guard in isLikelyTouchDevice), Safari iOS suit grayscale (ImageData pre-processing; ctx.filter removed), SW bumped to class-ram-v4.
 
 ## Pending (Owner Action Only)
 

@@ -12,7 +12,7 @@ All implementation work is complete. The only remaining tasks are owner actions.
 
 ## Remaining — Owner Actions Only
 
-- [x] Run `node scripts/run_all_checks.js` — **PASSED March 28, 2026**
+- [ ] Re-run `node scripts/run_all_checks.js` — code updated after March 28 pass (mode-loader.js, runner_mode.js changed)
 - [ ] Push to main → Cloudflare Pages deploys automatically to https://class-ram-ifications.pages.dev/
 - [ ] Follow `docs/LIVE_VERIFICATION_RUNBOOK.md` on the live URL
 - [ ] Fill in `docs/GO_NO_GO_TEMPLATE.md` and sign off
@@ -34,10 +34,13 @@ All implementation work is complete. The only remaining tasks are owner actions.
 - [x] Win screen: fireworks (multi-direction, multi-color), disco balls, per-phase stats by year/level, all-time machine total, "Play Again?".
 - [x] You Lose screen: allies gathered this run + attempt counter.
 - [x] Debug shortcuts: F2, Alt+0–6 (dev only, not player-facing).
-- [x] PWA: manifest.json, sw.js (class-ram-v3), favicon set, OG/Twitter meta.
+- [x] PWA: manifest.json, sw.js (class-ram-v4), favicon set, OG/Twitter meta.
 - [x] Legacy tower-defense mode retired and fully removed.
 - [x] Repo pruned: duplicate source asset folder, generation metadata, GitHub Actions workflow, stale scripts and docs removed.
 - [x] All docs synchronized with current implementation.
 - [x] Real-device testing complete. Balance accepted. Narrative copy locked.
 - [x] Verification bundle green: `node scripts/run_all_checks.js` passed March 28, 2026.
 - [x] HOW TO PLAY and ABOUT modal buttons added to mode-banner (far left): keyboard + touchscreen controls, objective, Dr. Kris Norman quote, historical links, Inspired By grid (Frogger + Robot Unicorn Attack).
+- [x] Safari macOS touch-ui bug fixed: `hover: none` added to `isLikelyTouchDevice()` guard in mode-loader.js.
+- [x] Safari iOS suit grayscale bug fixed: grayscale+contrast baked into ImageData at load time in runner_mode.js; `ctx.filter` removed (unsupported on Safari iOS < 18).
+- [x] Service worker bumped to class-ram-v4 to force re-cache of updated scripts.

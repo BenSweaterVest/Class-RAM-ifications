@@ -1,6 +1,6 @@
 // Service Worker — Class RAM-ifications
 // Bump CACHE_NAME whenever static assets change to force a refresh on existing installs.
-const CACHE_NAME = 'class-ram-v3';
+const CACHE_NAME = 'class-ram-v4';
 
 const STATIC_ASSETS = [
     './',

@@ -51,6 +51,16 @@ Escape key toggles pause when the game is active (not during a narrative popup o
 
 The HUD renders "PAUSED" text while paused. On touch devices, a guard in `handleTouchGestureEnd` prevents a tap on the paused canvas from resuming the game accidentally.
 
+## Sprite Grayscale Processing
+
+`applyRunnerChromaKey(source, applyGrayscale)` accepts an optional second argument. When `true`, after chroma-key removal, each non-transparent pixel is converted to grayscale and contrast-boosted (equivalent to CSS `grayscale(1) contrast(1.1)`). This is used for suit sprites:
+
+```javascript
+runnerSpriteAssets[key] = applyRunnerChromaKey(img, key === 'suit');
+```
+
+This approach is used instead of `ctx.filter` because the Canvas 2D filter property is not supported on Safari iOS < 18 and silently no-ops on those versions. Baking the effect into the ImageData at load time works across all browsers.
+
 ## Barrier-Clear Flow
 
 On successful shielded barrier contact:
@@ -113,7 +123,7 @@ All debug shortcuts are handled in `runner_mode.js` keyboard handler. They are n
   - display: standalone
   - orientation: landscape
 - `sw.js` service worker at repo root:
-  - Cache name: `class-ram-v3`
+  - Cache name: `class-ram-v4`
   - Strategy: cache-first for assets, network-first for navigation requests.
 - Favicon set in `assets/favicon/`: favicon.ico, favicon-32x32.png, favicon-16x16.png, apple-touch-icon.png.
 - Linked from `<head>` in `index.html`.
