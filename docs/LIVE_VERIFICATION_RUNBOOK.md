@@ -17,8 +17,9 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
   - `ArrowLeft` / `A` move left
   - `ArrowRight` / `D` move right
   - `Space` Solidarity (near active barrier, chain meets phase threshold)
-  - `Escape` pause / unpause
-  - `R` restart
+  - `Escape` pause / unpause (movement and Space ignored while paused; TIME holds)
+  - `M` mute / unmute (button label follows)
+  - `R` restart at any time; `Enter` restart after the run ends
 - Validate shell utilities:
   - mute toggle
   - bright/dark mode toggle
@@ -27,6 +28,7 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 - Validate narrative checkpoints block and continue as expected.
 - Confirm BGM ducks during popup open and restores on close.
 - Confirm Escape key pauses and unpauses; HUD shows "PAUSED".
+- Open HOW TO PLAY mid-run; confirm PAUSED; close it; confirm play resumes.
 
 ## 3. Gameplay Flow Validation
 
@@ -34,6 +36,7 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 - Confirm obstacle-specific effects (suit chain shred, cabinet slowdown, bot lane lock).
 - Confirm barrier warning SFX and active collision behavior.
 - Confirm solidarity pass-through and precedent increment.
+- Confirm the TIME readout counts down and the lose screen names the reason (lives, barrier, or time).
 - Confirm win screen appears after phase4Victory is dismissed: fireworks, disco balls, per-phase ally stats, all-time machine total.
 - Confirm "Play Again?" restarts with same difficulty.
 
@@ -43,11 +46,13 @@ Use this after a Cloudflare Pages deployment to validate release readiness quick
 - Inspect console for repeated sprite load errors.
 - On a phone-sized viewport, confirm tapping a runner info card opens a bottom sheet and pauses gameplay.
 - Confirm manifest.json is served correctly (PWA installability prompt in Chrome/Edge).
-- Confirm sw.js registers without console errors (cache name: class-ram-v4).
+- Confirm sw.js registers without console errors (cache name: class-ram-v5).
+- Reload once, set DevTools Network to Offline, reload again; the game must boot from cache.
+- If a 120 Hz display is available, confirm obstacle speed matches 60 Hz.
 
 ## 5. Audio Validation
 
-- Confirm SFX initialize on first user interaction.
+- Confirm the first user interaction produces a single normal sound, not a stacked burst.
 - Confirm mute toggle behavior works for both SFX and BGM.
 - If BGM starts, confirm autoplay policy-safe start and mute behavior.
 - If BGM does not start, confirm that is treated as non-blocking.

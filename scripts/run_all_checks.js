@@ -25,6 +25,11 @@ const checks = [
     label: 'Check: smoke contract',
     cmd: 'node',
     args: ['scripts/check_smoke_contract.js']
+  },
+  {
+    label: 'Check: service worker precache list',
+    cmd: 'node',
+    args: ['scripts/check_sw_assets.js']
   }
 ];
 

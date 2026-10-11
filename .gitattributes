@@ -1,0 +1,7 @@
+# Store every text file with LF line endings, whatever the committer's
+# core.autocrlf setting. Binary assets are left untouched.
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.mp3 binary
+*.ogg binary

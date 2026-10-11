@@ -2,7 +2,7 @@
     "name": "Class RAM-ifications",
     "short_name": "Class RAM",
     "description": "A browser runner game about the 11-year legal fight for LGBTQ+ security clearance rights.",
-    "start_url": "/?mode=runner",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#0a0a0a",
     "theme_color": "#0a0a0a",

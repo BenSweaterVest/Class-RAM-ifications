@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class RAM-ifications</title>
     <meta name="theme-color" content="#0a0a0a">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Class RAM-ifications">
@@ -13,14 +14,17 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
     <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png">
+    <meta name="description" content="A browser runner game about the 11-year legal fight for LGBTQ+ security clearance rights.">
+    <!-- Link previews need absolute image URLs; scrapers do not resolve relative paths. -->
     <meta property="og:title" content="Class RAM-ifications">
     <meta property="og:description" content="A browser runner game about the 11-year legal fight for LGBTQ+ security clearance rights.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="assets/favicon/android-chrome-512x512.png">
+    <meta property="og:url" content="https://class-ram-ifications.pages.dev/">
+    <meta property="og:image" content="https://class-ram-ifications.pages.dev/assets/favicon/android-chrome-512x512.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Class RAM-ifications">
     <meta name="twitter:description" content="A browser runner game about the 11-year legal fight for LGBTQ+ security clearance rights.">
-    <meta name="twitter:image" content="assets/favicon/android-chrome-512x512.png">
+    <meta name="twitter:image" content="https://class-ram-ifications.pages.dev/assets/favicon/android-chrome-512x512.png">
     <style>
         body {
             background: #0a0a0a;
@@ -817,10 +821,11 @@
     <h1>CLASS <span class="rainbow-text">RAM-IFICATIONS</span></h1>
     <div id="mode-banner"><span id="banner-left" style="display:flex;gap:8px;margin-right:auto;"><button id="how-to-play-btn" class="tower-btn" type="button">HOW TO PLAY</button><button id="about-btn" class="tower-btn" type="button">ABOUT</button></span><span id="mode-label" style="display:none;"></span><button id="audio-mute-toggle" class="tower-btn" type="button">MUTE: OFF</button><button id="theme-toggle" class="tower-btn" type="button">BRIGHT MODE</button><select id="difficulty-select" title="Difficulty (takes effect on next restart)"><option value="story">STORY (EASY)</option><option value="organize" selected>ORGANIZE (MEDIUM)</option><option value="resist">RESIST (HARD)</option></select><button id="restart-toggle" class="tower-btn" type="button">RESTART</button><button id="compact-ui-toggle" class="tower-btn" type="button">COMPACT UI: OFF</button></div>
     <div id="ui-layer">
-        <div><span id="precedent-val">100</span></div>
+        <div><span id="precedent-val">0/3 chain | 0 cleared</span></div>
         <div>LIVES: <span id="lives-val">3</span></div>
-        <div>STATUS: <span id="status-val">DISTRICT COURT</span></div>
+        <div>STATUS: <span id="status-val">CLEARANCE PATH</span></div>
         <div>YEAR: <span id="year-val">1984</span></div>
+        <div>TIME: <span id="time-val">3:00</span></div>
     </div>
 
     <div id="game-container">
@@ -871,20 +876,24 @@
                     <li><strong>↑ / ↓</strong> &nbsp;Move up / down a lane</li>
                     <li><strong>Space</strong> &nbsp;Activate Solidarity (when chain is ready &amp; near a barrier)</li>
                     <li><strong>Escape</strong> &nbsp;Pause / unpause</li>
-                    <li><strong>R / Enter</strong> &nbsp;Restart after game over</li>
+                    <li><strong>M</strong> &nbsp;Mute / unmute</li>
+                    <li><strong>R</strong> &nbsp;Restart at any time</li>
+                    <li><strong>Enter</strong> &nbsp;Restart after game over</li>
                 </ul>
                 <h3>TOUCHSCREEN CONTROLS</h3>
                 <ul>
                     <li><strong>Swipe left / right</strong> &nbsp;Move left / right</li>
                     <li><strong>Swipe up / down</strong> &nbsp;Move up / down a lane</li>
                     <li><strong>Tap</strong> &nbsp;Activate Solidarity (when chain is ready &amp; near a barrier)</li>
+                    <li><strong>Tap while paused</strong> &nbsp;Resume (the game pauses itself when you switch apps)</li>
                     <li><strong>Tap after game over</strong> &nbsp;Restart (brief cooldown prevents accidental restart)</li>
                 </ul>
                 <h3>OBJECTIVE</h3>
                 <ul>
-                    <li>Collect all 8 HTG members to build your chain.</li>
-                    <li>Activate Solidarity to clear barriers (precedents). Clear 4 to win.</li>
+                    <li>Collect HTG members to build your chain. Each barrier needs a longer chain than the last.</li>
+                    <li>Activate Solidarity as a barrier approaches to clear it. Clear 4 barriers within the 3-minute run to win.</li>
                     <li>Avoid suits (break your chain), cabinets (slow you down), and bots (lock a lane).</li>
+                    <li>Opening this window pauses the run. Close it to pick up where you left off.</li>
                 </ul>
             </div>
         </div>
@@ -910,11 +919,11 @@
                 <h3>INSPIRED BY</h3>
                 <div class="info-inspired-grid">
                     <a class="info-inspired-link" href="https://archive.org/details/frogger_202405" target="_blank" rel="noopener">
-                        <img src="https://archive.org/services/img/frogger_202405" alt="Frogger" width="110" height="82">
+                        <img src="https://archive.org/services/img/frogger_202405" alt="Frogger" width="110" height="82" loading="lazy">
                         Frogger
                     </a>
                     <a class="info-inspired-link" href="https://archive.org/details/robotunicornattack_flash" target="_blank" rel="noopener">
-                        <img src="https://archive.org/services/img/robotunicornattack_flash" alt="Robot Unicorn Attack" width="110" height="82">
+                        <img src="https://archive.org/services/img/robotunicornattack_flash" alt="Robot Unicorn Attack" width="110" height="82" loading="lazy">
                         Robot Unicorn Attack
                     </a>
                 </div>
@@ -933,12 +942,25 @@
 
         // Info modals: How to Play / About
         (function () {
+            // The run pauses while a modal is open. pausedByModal records whether
+            // the modal introduced that pause, so a pause the player set with
+            // Escape beforehand stays in place after the modal closes.
+            var pausedByModal = false;
             function openModal(modal) {
+                var controls = window.runnerControls;
+                if (!isAnyModalOpen() && controls && typeof controls.pause === 'function') {
+                    pausedByModal = controls.pause();
+                }
                 modal.classList.add('is-open');
                 modal.querySelector('.info-modal-close').focus();
             }
             function closeModal(modal) {
                 modal.classList.remove('is-open');
+                if (!isAnyModalOpen() && pausedByModal) {
+                    pausedByModal = false;
+                    var controls = window.runnerControls;
+                    if (controls && typeof controls.resume === 'function') controls.resume();
+                }
             }
             function isAnyModalOpen() {
                 return !!document.querySelector('.info-modal.is-open');
@@ -965,15 +987,18 @@
                 });
             });
 
-            // Escape key: close modal first, don't propagate to game pause
+            // Capture phase, so this runs before the game's own key handler.
+            // While a modal is open, Escape closes it and every other game key
+            // is swallowed; Tab still moves focus between the modal's controls.
             document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && isAnyModalOpen()) {
-                    e.stopImmediatePropagation();
+                if (!isAnyModalOpen()) return;
+                if (e.key === 'Escape') {
                     document.querySelectorAll('.info-modal.is-open').forEach(function (m) {
                         closeModal(m);
                     });
                 }
-            }, true); // capture phase so it fires before the game's Escape handler
+                if (e.key !== 'Tab') e.stopImmediatePropagation();
+            }, true);
         }());
     </script>
 </body>

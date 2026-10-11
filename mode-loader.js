@@ -1,3 +1,5 @@
+// Page shell: input mode detection, top-bar toggles, background music, and
+// loading the game script. Game input itself lives in runner_mode.js.
 (function () {
     const compactUiToggle = document.getElementById('compact-ui-toggle');
     const audioMuteToggle = document.getElementById('audio-mute-toggle');
@@ -11,6 +13,7 @@
     setupThemeToggle();
     setupRestartToggle();
     setupCompactUiMode(touchCapable);
+    setupDifficultySelect();
 
     document.body.dataset.mode = 'runner';
     if (runnerNarrative) runnerNarrative.style.display = 'none';
@@ -22,7 +25,6 @@
         ]);
         window.bgm.armAutoplay();
     }
-    bindRunnerKeyboardFallback();
     loadScript('runner_mode.js');
 
     function isLikelyTouchDevice() {
@@ -76,6 +78,8 @@
             syncMuteLabel();
         };
 
+        // The M key toggles mute from runner_mode.js; audio.js announces every change.
+        window.addEventListener('sfx-mute-changed', syncMuteLabel);
         syncMuteLabel();
     }
 
@@ -112,6 +116,14 @@
         };
     }
 
+    function setupDifficultySelect() {
+        const difficultySelect = document.getElementById('difficulty-select');
+        if (!difficultySelect) return;
+        // Hand focus back to the game after a choice so the arrow keys move
+        // the player again instead of changing the selection.
+        difficultySelect.addEventListener('change', () => difficultySelect.blur());
+    }
+
     function applyCompactState(compact) {
         document.body.classList.toggle('compact-ui', compact);
         if (compactUiToggle) {
@@ -119,60 +131,12 @@
         }
     }
 
-    function bindRunnerKeyboardFallback() {
-        window.addEventListener('keydown', e => {
-            const controls = window.runnerControls;
-            if (!controls) return;
-
-            const key = e.key;
-            const code = e.code;
-
-            if (key === 'r' || key === 'R') {
-                e.preventDefault();
-                controls.restart();
-                return;
-            }
-            if (key === 'ArrowLeft') {
-                e.preventDefault();
-                controls.slow();
-                return;
-            }
-            if (key === 'a' || key === 'A') {
-                e.preventDefault();
-                controls.slow();
-                return;
-            }
-            if (key === 'ArrowUp') {
-                e.preventDefault();
-                controls.up();
-                return;
-            }
-            if (key === 'ArrowRight') {
-                e.preventDefault();
-                controls.dash();
-                return;
-            }
-            if (key === 'ArrowDown') {
-                e.preventDefault();
-                controls.down();
-                return;
-            }
-            if (key === 'd' || key === 'D') {
-                e.preventDefault();
-                controls.dash();
-                return;
-            }
-            if (key === ' ' || code === 'Space') {
-                e.preventDefault();
-                controls.solidarity();
-            }
-        });
-    }
-
+    // No cache-busting query string: the service worker caches runner_mode.js
+    // by URL, and a unique URL per load would miss the cache every time and
+    // break offline play. Bump CACHE_NAME in sw.js to ship a new build.
     function loadScript(src) {
         const script = document.createElement('script');
-        script.src = `${src}?v=${Date.now()}`;
-        script.defer = true;
+        script.src = src;
         document.body.appendChild(script);
     }
 })();

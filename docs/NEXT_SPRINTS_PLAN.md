@@ -1,10 +1,10 @@
 # Next Sprints Plan
 
-Last updated: March 28, 2026
+Last updated: September 11, 2026
 
 ## Status: All Implementation Sprints Complete
 
-The project is feature-complete, verified, and real-device tested. The only remaining work is deploy and live sign-off — both owner actions.
+The project is feature-complete, verified, and real-device tested. A review pass on September 11, 2026 fixed the remaining functional bugs. The only remaining work is deploy and live sign-off, both owner actions.
 
 ## What Shipped (All Sprints)
 
@@ -18,6 +18,8 @@ The project is feature-complete, verified, and real-device tested. The only rema
 
 **Sprint 5 — Win Screen and Closeout:** Win screen (fireworks, disco balls, per-phase stats, all-time total), narrative SFX looping, AudioContext fix, narrative SFX volumes boosted, legacy mode retired, repo pruned (duplicate source folder, generation metadata, GitHub Actions workflow, stale scripts/docs removed), HOW TO PLAY / ABOUT modal buttons added to mode-banner.
 
+**Sprint 6 (September 11, 2026), Review Fixes:** frame-rate-independent movement, offline-capable service worker (class-ram-v5), single keyboard handler, audio unlock gate, modal and hidden-tab pause with one shared pause clock, run countdown and loss reasons, debug gating behind `?debug`, service worker precache check, npm test / serve / smoke scripts, deterministic smoke liveness check, doc sync.
+
 ## Locked Decisions
 
 - Public title: `Class RAM-ifications`
@@ -30,7 +32,7 @@ The project is feature-complete, verified, and real-device tested. The only rema
 
 ## Deploy (Remaining Owner Actions)
 
-1. Run `node scripts/run_all_checks.js` → confirm green ✓ (passed March 28)
-2. Push to main → Cloudflare Pages deploys automatically
+1. Run `npm test` and `npm run smoke` (both passed September 11, 2026)
+2. Commit, push to main; Cloudflare Pages deploys automatically
 3. Follow `docs/LIVE_VERIFICATION_RUNBOOK.md`
 4. Fill in `docs/GO_NO_GO_TEMPLATE.md` and sign off

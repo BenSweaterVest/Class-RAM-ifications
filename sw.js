@@ -1,6 +1,7 @@
-// Service Worker — Class RAM-ifications
-// Bump CACHE_NAME whenever static assets change to force a refresh on existing installs.
-const CACHE_NAME = 'class-ram-v4';
+// Service worker for Class RAM-ifications.
+// Bump CACHE_NAME whenever any cached file changes. The activate step drops
+// every older cache, so existing installs pick up the new build on next load.
+const CACHE_NAME = 'class-ram-v5';
 
 const STATIC_ASSETS = [
     './',
@@ -74,6 +75,17 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
+function isSameOriginOk(response, url) {
+    return response.status === 200 && url.origin === self.location.origin;
+}
+
+// The ABOUT modal's "Inspired By" thumbnails come from archive.org. The
+// response is opaque (a no-cors image request), which the Cache API accepts,
+// so after one online view they still show when the game is opened offline.
+function isInspiredByThumbnail(url) {
+    return url.hostname === 'archive.org' && url.pathname.startsWith('/services/img/');
+}
+
 // Fetch: cache-first for assets, network-first for navigation
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
@@ -86,12 +98,14 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // Everything else: serve from cache if available, otherwise fetch and cache
+    // Everything else: serve from cache if available, otherwise fetch and cache.
+    // ignoreSearch keeps a query string on a cached URL from becoming a cache
+    // miss, which would make the page depend on the network again.
     event.respondWith(
-        caches.match(event.request).then(cached => {
+        caches.match(event.request, { ignoreSearch: true }).then(cached => {
             if (cached) return cached;
             return fetch(event.request).then(response => {
-                if (response && response.status === 200 && url.origin === self.location.origin) {
+                if (response && (isSameOriginOk(response, url) || isInspiredByThumbnail(url))) {
                     const clone = response.clone();
                     caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
                 }

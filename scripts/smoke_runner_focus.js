@@ -230,17 +230,20 @@ function fail(msg) {
       const canvas = document.getElementById('gameCanvas');
       if (!canvas) return { ok: false, reason: 'canvas missing' };
       const ctx = canvas.getContext('2d');
+      // Hash the whole frame and sample several times. The background is
+      // static, so a small corner can legitimately stay identical for a second.
       function hashFrame() {
-        const d = ctx.getImageData(0, 0, Math.min(canvas.width, 200), Math.min(canvas.height, 100)).data;
+        const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
         let h = 0;
         for (let i = 0; i < d.length; i += 16) h = (h * 31 + d[i] + d[i + 1] + d[i + 2]) | 0;
         return h;
       }
       const before = hashFrame();
-      await new Promise(r => setTimeout(r, 1000));
-      const after = hashFrame();
-      if (before === after) return { ok: false, reason: 'canvas unchanged after 1s — game loop may not be running' };
-      return { ok: true };
+      for (let attempt = 0; attempt < 6; attempt++) {
+        await new Promise(r => setTimeout(r, 400));
+        if (hashFrame() !== before) return { ok: true };
+      }
+      return { ok: false, reason: 'canvas unchanged after 2.4s; game loop may not be running' };
     });
 
     if (!liveness.ok) {
@@ -257,7 +260,8 @@ function fail(msg) {
     await mobilePage.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await mobilePage.waitForTimeout(600);
     await mobilePage.waitForSelector('#runner-narrative', { state: 'visible', timeout: 10000 });
-    await mobilePage.keyboard.press('Enter');
+    // A touch tap on the continue button is the mobile path through the story card.
+    await mobilePage.tap('#runner-narrative-next');
     await mobilePage.waitForSelector('#runner-narrative', { state: 'hidden', timeout: 10000 });
     await mobilePage.waitForTimeout(500);
 

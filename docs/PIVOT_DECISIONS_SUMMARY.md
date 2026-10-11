@@ -1,6 +1,6 @@
 # Pivot Decisions Summary
 
-Last updated: March 28, 2026
+Last updated: September 11, 2026
 Scope: implementation decisions already reflected in repository code/docs.
 
 ## 1. Runtime Strategy
@@ -81,8 +81,8 @@ Implementation:
 - Touch-capable devices get swipe/tap runner controls, a touch-specific hint, and mobile HUD/layout adjustments.
 - Mobile info cards use the bottom-sheet pattern and pause gameplay while open.
 - `gameEndedAt` cooldown (1.5s) prevents accidental tap restart on the lose screen.
-- Win/restart hint text adapts: "Tap to restart" on touch, "Press R or Enter to restart" on desktop.
-- Keyboard control and restart/mute/theme flows remain active in `runner_mode.js` and `mode-loader.js`.
+- Lose-screen restart hint adapts: "Tap to try again." on touch, "Press R or Enter to try again." on desktop. A tap also resumes a paused run on touch.
+- Keyboard game input lives only in `runner_mode.js`; `mode-loader.js` owns the top-bar toggles and registers no game key handler.
 - The earlier hidden touch-control shell was removed during closeout cleanup.
 
 Rationale:
@@ -146,12 +146,31 @@ The following items were pending as of March 25–26, 2026 and are now resolved:
 - Mobile parity: swipe/tap gestures, bottom sheet for info cards, dark mode default — fully implemented.
 - Rounds 3 and 4 difficulty: initial easing pass complete — accepted by owner after real-device testing (March 28, 2026).
 - Phase thresholds: confirmed as 3/4/5/6 (not 3/5/7/9) — corrected in all docs.
-- Pause key: Escape — implemented with full applyPauseCompensation() coverage.
+- Pause key: Escape; one shared pause clock also covers story cards, info cards, info modals, and hidden tabs; input blocked while paused.
 - BGM ducking during narrative: yes — ducks to 5% on popup open, restores to 24% on close.
-- PWA: yes — manifest.json + sw.js service worker (cache name class-ram-v4) + favicon set in assets/favicon/.
-- Debug shortcut set: F2 for overlay, Alt+0 for force-lose, Alt+1–5 for force-narrative — implemented, not player-facing.
+- PWA: yes — manifest.json + sw.js service worker (cache name class-ram-v5) + favicon set in assets/favicon/; offline play verified.
+- Debug shortcut set: F2 for overlay, Alt+0 for force-lose, Alt+1–5 for force-narrative, Alt+6 for force-win; enabled only with `?debug` in the URL.
 - Win screen: popup 5 (phase4Victory) is the win moment; a separate win overlay with fireworks, disco balls, per-phase ally stats, and all-time machine total renders after it closes.
 
 Still open:
 
 - Manual live deploy sign-off once hosted build is verified.
+
+## 10. Review Pass (September 11, 2026)
+
+Decision:
+
+- Fix every functional finding from the code review before deploy rather than deferring any to a later release.
+
+Implementation:
+
+- Motion scales by measured frame interval (`frameScale`), so pace no longer depends on refresh rate.
+- One input owner (`runner_mode.js`), one pause clock, one place a run ends (`endRun`).
+- Audio is gated on the first user gesture; the game script is cached under a stable URL so the PWA works offline.
+- Debug shortcuts require `?debug`.
+- Contract checks guard the regressions that mattered most: no second keydown handler, no cache-busting query, precache list matches disk.
+- A full-run smoke (scripts/smoke_full_run.js) covers the win path end to end through a `?debug`-only state hook.
+
+Rationale:
+
+- The findings affected real players on common hardware (high-refresh monitors, phones, offline installs), and each fix was small.

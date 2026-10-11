@@ -84,4 +84,5 @@ The following sprites were removed from both mirrored asset folders:
 
 1. Add or replace the PNG in `assets/processed/`.
 2. Update this catalog when active usage or archive status changes.
-3. Run `node scripts/run_all_checks.js`.
+3. Add the file to `STATIC_ASSETS` in `sw.js` and bump `CACHE_NAME`.
+4. Run `npm test`; the precache check fails if the sprite and the service worker list disagree.

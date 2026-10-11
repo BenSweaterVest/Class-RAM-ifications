@@ -1,11 +1,15 @@
 /**
  * Procedural SFX via Web Audio API. No asset files; 8-bit style beeps.
- * Context starts on first user gesture (click/key).
+ *
+ * Nothing is scheduled until the first user gesture. A context created before
+ * a gesture stays suspended with currentTime stuck at 0, and every beep queued
+ * in that state would play at the same instant when the context resumes.
  *
  * Also exposes a simple BGM hook (file-based, no default track).
  */
 (function () {
     let ctx = null;
+    let unlocked = false;
     let muted = false;
     let bgmAudio = null;
     let bgmArmed = false;
@@ -19,8 +23,20 @@
         return ctx;
     }
 
+    function unlockAudio() {
+        unlocked = true;
+        const ac = getContext();
+        if (ac && ac.state === 'suspended') ac.resume().catch(() => {});
+    }
+
+    // Any pointer or key press counts as the gesture. Capture phase, so this
+    // runs before game handlers that play a sound in the same event.
+    ['pointerdown', 'touchstart', 'keydown'].forEach(type => {
+        window.addEventListener(type, unlockAudio, { capture: true, passive: true });
+    });
+
     function beep(freq, duration, type, volume = 0.15) {
-        if (muted) return;
+        if (muted || !unlocked) return;
         const ac = getContext();
         if (!ac) return;
         const now = ac.currentTime;
@@ -101,8 +117,7 @@
 
     window.sfx = {
         init() {
-            const ac = getContext();
-            if (ac && ac.state === 'suspended') ac.resume();
+            unlockAudio();
         },
         isMuted() {
             return muted;
@@ -113,21 +128,10 @@
                 if (muted) bgmAudio.pause();
                 else playBgmIfAllowed();
             }
-        },
-        placeTower() {
-            beep(440, 0.08, 'square', 0.12);
+            window.dispatchEvent(new CustomEvent('sfx-mute-changed', { detail: { muted } }));
         },
         fileCleared() {
             beep(880, 0.06, 'square', 0.1);
-        },
-        fileDenied() {
-            beep(220, 0.15, 'sawtooth', 0.12);
-        },
-        auditorHit() {
-            beep(330, 0.04, 'square', 0.08);
-        },
-        auditorKilled() {
-            beep(660, 0.1, 'square', 0.1);
         },
         gameOver() {
             beep(200, 0.3, 'sawtooth', 0.15);

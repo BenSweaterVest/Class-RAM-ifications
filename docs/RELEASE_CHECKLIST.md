@@ -1,6 +1,6 @@
 # First Release Checklist
 
-Last updated: March 28, 2026
+Last updated: September 11, 2026
 
 Use this checklist before calling the first public build ready.
 
@@ -10,7 +10,8 @@ Companion references:
 
 ## Pre-Deploy Gate
 
-- [x] `node scripts/run_all_checks.js` passes — **PASSED March 28, 2026** (modals are inline HTML/JS in index.html; not in checked scripts)
+- [x] `npm test` passes (**PASSED September 11, 2026**; includes the service worker precache check)
+- [x] `npm run smoke` passes (**PASSED September 11, 2026**; runner smoke 3 of 3 runs; full four-barrier run in 123 s)
 
 ## Product Readiness
 
@@ -32,9 +33,11 @@ Companion references:
 - [x] Post-barrier invulnerability window (3 seconds) is functional
 - [x] Precedent shield behavior is visually and mechanically clear
 - [x] Historical finale messaging and Executive Order transition are correct
-- [x] Escape key pauses and unpauses correctly; "PAUSED" shown in HUD
-- [x] Touch devices: tap on paused canvas does nothing (no accidental resume)
-- [x] HOW TO PLAY and ABOUT modal buttons implemented in mode-banner (keyboard + touch controls, historical context and attribution; Escape closes without triggering pause)
+- [x] Escape key pauses and unpauses correctly; "PAUSED" shown in HUD; input ignored and TIME holds while paused
+- [x] Touch devices: a tap on the paused canvas resumes (a phone has no Escape key)
+- [x] HOW TO PLAY and ABOUT modal buttons implemented in mode-banner (keyboard + touch controls, historical context and attribution); opening a modal pauses the run and closing it resumes
+- [x] Movement is frame-rate independent (frameScale in the main loop)
+- [x] Run countdown shown in the HUD; lose screen names the reason
 
 ## Audio Readiness
 
@@ -45,6 +48,8 @@ Companion references:
 - [x] barrierWarning cancels cleanly on quick restart (generation counter)
 - [x] narrativeSomber is a sine wave tone, distinct from game-over sound
 - [x] BGM ducks to 5% on narrative popup open; restores to 24% on close
+- [x] No sound is scheduled before the first user gesture (no stacked burst on unlock)
+- [x] M key and MUTE button stay in sync
 - [ ] BGM startup and mute behavior verified in the live build
 
 ## SFX Audit
@@ -58,16 +63,17 @@ Companion references:
 
 ## Debug Shortcuts
 
-- [x] Debug shortcuts (F2, Alt+0–6) are functional for development use
-- [x] Debug shortcuts are not accessible or visible from any player-facing UI surface
+- [x] Debug shortcuts (F2, Alt+0–6) work with `?debug` in the URL
+- [x] Debug shortcuts do nothing without `?debug` and appear on no player-facing UI surface
 
 ## PWA Readiness
 
 - [x] manifest.json present at root with correct name, short_name, display, and orientation
-- [x] sw.js service worker present; cache name class-ram-v4; strategies correct
+- [x] sw.js service worker present; cache name class-ram-v5; game script cached under a stable URL; ignoreSearch on match
+- [x] Offline reload verified locally with the server stopped (September 11, 2026)
 - [x] Favicon set complete in assets/favicon/ (ico, 32x32, 16x16, apple-touch-icon)
 - [x] Favicon links in index.html head are correct
-- [x] Open Graph and Twitter Card meta tags present in index.html
+- [x] Open Graph and Twitter Card meta tags present in index.html with absolute image URLs, og:url, and a meta description
 - [x] theme-color meta present (#0a0a0a)
 - [ ] PWA installability verified in Chrome/Edge on desktop and mobile
 

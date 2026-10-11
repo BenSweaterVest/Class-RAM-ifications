@@ -4,11 +4,8 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 
 ## Scripted Preflight (Fast Regression Check)
 
-- [ ] Run `node scripts/check_runner_contract.js`
-- [ ] Run `node scripts/check_smoke_contract.js`
-- [ ] Run `node scripts/run_all_checks.js`
-- [ ] With a local server running, run `node scripts/smoke_runner_focus.js`
-- [ ] With a local server running, run `node scripts/smoke_mode_shell.js`
+- [ ] Run `npm test` (syntax, contract checks, service worker precache list)
+- [ ] Start `npm run serve`, then run `npm run smoke` in a second terminal (about three minutes; includes a full four-barrier run)
 
 ## Runner Startup
 
@@ -23,11 +20,14 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 - [ ] Press `ArrowLeft` / `A` to move left
 - [ ] Press `ArrowRight` / `D` to move right
 - [ ] Press `Space` near a barrier when chain threshold is met and confirm Solidarity activation
-- [ ] Press `Escape` and confirm game pauses (HUD shows "PAUSED"); press again to unpause
-- [ ] Press `R` to restart run after fail or success
+- [ ] Press `Escape` and confirm game pauses (HUD shows "PAUSED", TIME holds, arrows and Space do nothing); press again to unpause
+- [ ] Confirm the TIME readout counts down from 3:00 during play
+- [ ] Press `R` to restart (works mid-run too); press `Enter` on the lose screen and confirm it restarts
+- [ ] Press `M` and confirm the MUTE button label changes with it
 - [ ] Toggle mute and confirm BGM and SFX both respond
 - [ ] Toggle bright/dark mode and confirm the UI shell updates cleanly
 - [ ] Change difficulty selector and confirm it takes effect after next restart
+- [ ] Tab to the difficulty dropdown, change it with the arrow keys, and confirm the arrows then move the player again
 
 ## Desktop / Browser Parity
 
@@ -42,6 +42,7 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 - [ ] Confirm the touch hint shows initially and dismisses after first gesture
 - [ ] Confirm the top-bar restart button works on touch layouts
 - [ ] On mobile-sized layout, confirm tapping a legend card opens a bottom sheet and pauses gameplay
+- [ ] Switch to another app mid-run, come back, and confirm the game is paused and a tap resumes it
 
 ## Info Modals (HOW TO PLAY / ABOUT)
 
@@ -49,7 +50,10 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 - [ ] Click ABOUT — confirm modal opens with Dr. Kris Norman quote, HTG links, and Inspired By grid with images
 - [ ] Click ✕ CLOSE — confirm modal closes
 - [ ] Click backdrop area outside panel — confirm modal closes
-- [ ] Press Escape while modal is open — confirm modal closes without triggering game pause
+- [ ] Open a modal mid-run: HUD reads PAUSED and TIME holds; close it and confirm play resumes
+- [ ] Pause with Escape first, open and close a modal, and confirm the game stays paused
+- [ ] Press Escape while a modal is open and confirm only the modal closes
+- [ ] Press arrows or Space while a modal is open and confirm the game ignores them
 - [ ] Confirm modals render correctly in both dark and light mode
 
 ## Narrative Checkpoints
@@ -60,8 +64,8 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 - [ ] Confirm phase3Clear narrative card appears after third successful barrier pass
 - [ ] Confirm phase4Victory (EO 12968 victory card) appears after fourth barrier pass
 - [ ] Confirm win screen appears after dismissing phase4Victory: fireworks, disco balls, per-phase stats, all-time total
-- [ ] Confirm `Enter` and the continue button advance narrative cards
-- [ ] Confirm `Space` does not dismiss narrative cards
+- [ ] Confirm `Enter` and the continue button advance narrative cards, one card per press or click
+- [ ] Confirm `Space` and `R` do nothing while a narrative card is open
 - [ ] Confirm BGM ducks during popup and restores on close
 
 ## Core Flow
@@ -73,9 +77,11 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 - [ ] Confirm cabinet collisions apply temporary slowdown
 - [ ] Confirm bot interactions apply lane-lock timing pressure
 - [ ] Confirm systemic wall appears on schedule
-- [ ] Confirm wall is fatal without active solidarity
+- [ ] Confirm wall is fatal without active solidarity and the lose screen says the barrier closed
+- [ ] Let the clock run out and confirm the lose screen says time ran out
+- [ ] Switch browser tabs mid-run, return, and confirm the game is paused rather than flooded with obstacles
 - [ ] Confirm solidarity bypass consumes chain and allows wall pass-through
-- [ ] Confirm info cards pause gameplay when open
+- [ ] Confirm info cards pause gameplay when open, and that Escape closes the card
 
 ## Sprite Wiring
 
@@ -91,11 +97,29 @@ Use this checklist after gameplay, UI, asset, audio, or deployment-related chang
 
 ## Audio
 
-- [ ] Confirm SFX initialize on first click or key press
+- [ ] Confirm the first click or key press produces one normal sound, not a stacked burst
 - [ ] Confirm mute toggle affects both SFX and BGM
 - [ ] Confirm barrier warning pulses and cancels cleanly on restart
 - [ ] Confirm narrative SFX plays and loops while popup is open
 
+## Offline / PWA
+
+- [ ] Load the page once, stop the local server (or set DevTools Network to Offline), reload, and confirm the game boots
+- [ ] Confirm DevTools > Application > Cache Storage shows `class-ram-v5` only, with a single `runner_mode.js` entry after several reloads
+- [ ] Open ABOUT once online, go offline, reopen ABOUT, and confirm the two thumbnails still show
+
+## Reduced Motion
+
+- [ ] With the OS reduced-motion setting on, clear a barrier and confirm there is no white flash (sparkles still play)
+
+## Frame Rate
+
+- [ ] If a 120 Hz display is available, confirm obstacle and wall speed match a 60 Hz display
+
+## Debug Gating
+
+- [ ] Confirm F2 and Alt+digit do nothing on a normal URL and work with `?debug`
+
 ## Deploy Verification
 
-- [ ] After deploy, repeat the startup, controls, and core flow checks on the live URL
+- [ ] After deploy, repeat the startup, controls, core flow, and offline checks on the live URL

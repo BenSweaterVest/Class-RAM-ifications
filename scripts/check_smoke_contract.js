@@ -31,7 +31,6 @@ function main() {
 
   // Loader is runner-only
   expectContains(loader, "loadScript('runner_mode.js')", 'runner loader path', failures);
-  expectContains(loader, 'bindRunnerKeyboardFallback()', 'loader keyboard fallback', failures);
 
   // Runner controls and recovery checks
   expectContains(runner, "if (key === 'ArrowUp')", 'runner ArrowUp handler', failures);

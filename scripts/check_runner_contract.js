@@ -13,12 +13,19 @@ function expectContains(content, needle, label, failures) {
   }
 }
 
+function expectNotContains(content, needle, label, failures) {
+  if (content.includes(needle)) {
+    failures.push(`Unexpected ${label}: ${needle}`);
+  }
+}
+
 function main() {
   const failures = [];
 
   const indexHtml = read('index.html');
   const loader = read('mode-loader.js');
   const runner = read('runner_mode.js');
+  const serviceWorker = read('sw.js');
 
   // Core UI elements
   expectContains(indexHtml, 'id="runner-narrative"', 'narrative modal', failures);
@@ -32,8 +39,21 @@ function main() {
   expectContains(indexHtml, 'id="runner-legend-sheet"', 'mobile legend bottom sheet', failures);
   expectContains(indexHtml, 'id="runner-touch-hint"', 'touch hint overlay', failures);
 
-  // Loader
-  expectContains(loader, 'bindRunnerKeyboardFallback()', 'loader keyboard fallback', failures);
+  // Loader: loads the game and must not register its own game key handler.
+  // runner_mode.js owns keyboard input; a second handler double-fires Space.
+  expectContains(loader, "loadScript('runner_mode.js')", 'runner loader path', failures);
+  expectNotContains(loader, "addEventListener('keydown'", 'duplicate loader keydown handler', failures);
+  expectNotContains(loader, 'Date.now()', 'cache-busting query on the game script', failures);
+
+  // Pause system and run timer
+  expectContains(runner, 'function setGamePaused', 'pause state setter', failures);
+  expectContains(runner, 'function syncPauseClock', 'shared pause clock', failures);
+  expectContains(runner, 'pause: () => setGamePaused(true)', 'runnerControls.pause', failures);
+  expectContains(indexHtml, 'id="time-val"', 'run timer readout', failures);
+  expectContains(indexHtml, 'controls.pause()', 'info modal pause hook', failures);
+
+  // Service worker must tolerate query strings on cached URLs
+  expectContains(serviceWorker, 'ignoreSearch: true', 'query-insensitive cache match', failures);
 
   // Runner core functions
   expectContains(runner, 'function attemptSolidarityActivation', 'solidarity attempt handler', failures);

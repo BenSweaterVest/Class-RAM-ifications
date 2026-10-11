@@ -7,6 +7,7 @@ const uiPrecedent = document.getElementById('precedent-val');
 const uiLives = document.getElementById('lives-val');
 const uiStatus = document.getElementById('status-val');
 const uiYear = document.getElementById('year-val');
+const uiTime = document.getElementById('time-val');
 const runnerNarrativePanel = document.getElementById('runner-narrative');
 const runnerNarrativeTitle = document.getElementById('runner-narrative-title');
 const runnerNarrativeBody = document.getElementById('runner-narrative-body');
@@ -29,14 +30,28 @@ const SOLIDARITY_RANGE_PX = 140;
 const PRECEDENT_TARGET = 4;
 const WITHIN_ROUND_RAMP = 0.4;
 
+// Speeds and per-frame steps throughout this file are tuned for 60 Hz. The
+// main loop measures the real frame interval and scales every movement step
+// by it, so 30 Hz and 120 Hz displays play the same as 60 Hz. The scale is
+// capped so a tab that was hidden does not jump the world forward.
+const REFERENCE_FRAME_MS = 1000 / 60;
+const MAX_FRAME_SCALE = 3;
+
+// Debug shortcuts (F2, Alt+digit) and window.runnerDebug only exist when the
+// page is opened with ?debug.
+const DEBUG_ENABLED = new URLSearchParams(window.location.search).has('debug');
+
+// Players who ask for reduced motion skip the full-screen barrier flash.
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 // Per-round profiles (normal difficulty). Index = precedentEstablished (barriers cleared so far).
 // barrier demand = chainThreshold * memberSpawnMs / wallIntervalMs
 // R0: 22%  R1: 30%  R2: 38%  R3: 47%  — gradual, coherent escalation each round.
 const ROUND_PROFILES = [
-    { wallIntervalMs: 26000, chainThreshold: 3, memberSpawnMs: 1800, obstacleBase: 1.00, solidarityRangePx: SOLIDARITY_RANGE_PX,      tooLateBufferPx: -30, shieldDurationMs: 1800 },
-    { wallIntervalMs: 23000, chainThreshold: 4, memberSpawnMs: 1700, obstacleBase: 1.15, solidarityRangePx: SOLIDARITY_RANGE_PX + 10,  tooLateBufferPx: -34, shieldDurationMs: 1900 },
-    { wallIntervalMs: 21000, chainThreshold: 5, memberSpawnMs: 1600, obstacleBase: 1.30, solidarityRangePx: SOLIDARITY_RANGE_PX + 20,  tooLateBufferPx: -38, shieldDurationMs: 2050 },
-    { wallIntervalMs: 19000, chainThreshold: 6, memberSpawnMs: 1500, obstacleBase: 1.50, solidarityRangePx: SOLIDARITY_RANGE_PX + 28,  tooLateBufferPx: -44, shieldDurationMs: 2200 },
+    { wallIntervalMs: 26000, chainThreshold: 3, memberSpawnMs: 1800, obstacleBase: 1.00, solidarityRangePx: SOLIDARITY_RANGE_PX,     shieldDurationMs: 1800 },
+    { wallIntervalMs: 23000, chainThreshold: 4, memberSpawnMs: 1700, obstacleBase: 1.15, solidarityRangePx: SOLIDARITY_RANGE_PX + 10, shieldDurationMs: 1900 },
+    { wallIntervalMs: 21000, chainThreshold: 5, memberSpawnMs: 1600, obstacleBase: 1.30, solidarityRangePx: SOLIDARITY_RANGE_PX + 20, shieldDurationMs: 2050 },
+    { wallIntervalMs: 19000, chainThreshold: 6, memberSpawnMs: 1500, obstacleBase: 1.50, solidarityRangePx: SOLIDARITY_RANGE_PX + 28, shieldDurationMs: 2200 },
 ];
 
 // Difficulty mode scalars applied on top of the round profile.
@@ -87,15 +102,15 @@ let laneLockFeedbackUntil = 0;
 let narrativePaused = false;
 let legendPaused = false;
 let narrativeQueue = [];
-let narrativePauseStartedAt = 0;
 let narrativeSfxLoopTimer = null;
 let phaseAllyCounts = [0, 0, 0, 0];
 let fireworkParticles = [];
 let discoBalls = [];
 let nextFireworkAt = 0;
-let legendPauseStartedAt = 0;
 const shownNarrativeKeys = new Set();
 let debugOverlayEnabled = false;
+let debugInvulnerable = false;
+let touchInputSeen = false;
 let collectedMembers = [];
 let legendExpandedCardId = '';
 let legendRosterRotationIndex = 0;
@@ -104,7 +119,13 @@ let activeTouchGesture = null;
 let touchHintDismissed = false;
 let touchGestureCooldownUntil = 0;
 let gamePaused = false;
-let gamePauseStartedAt = 0;
+// One clock for every kind of pause (story card, info card, Escape, hidden
+// tab). Set when the first pause begins, cleared when the last one ends.
+let simulationPausedSince = 0;
+let runEndReason = '';
+let lastFrameAt = 0;
+let trailAccumulator = 0;
+let uiTimeText = '';
 let phaseFlashUntil = 0;
 let postBarrierInvulnerabilityUntil = 0;
 let totalAlliesGathered = 0;
@@ -306,7 +327,7 @@ function applyRunnerChromaKey(source, applyGrayscale) {
     }
 }
 
-function drawRunnerSprite(key, x, y, fallbackDraw, sizeOverride, drawOptions) {
+function drawRunnerSprite(key, x, y, fallbackDraw, sizeOverride) {
     const img = getRunnerSprite(key);
     if (!img) {
         fallbackDraw();
@@ -314,13 +335,6 @@ function drawRunnerSprite(key, x, y, fallbackDraw, sizeOverride, drawOptions) {
     }
 
     const spec = sizeOverride || RUNNER_SPRITE_SPECS[key] || { w: 24, h: 24 };
-    if (drawOptions && drawOptions.filter) {
-        ctx.save();
-        ctx.filter = drawOptions.filter;
-        ctx.drawImage(img, x - spec.w / 2, y - spec.h / 2, spec.w, spec.h);
-        ctx.restore();
-        return;
-    }
     ctx.drawImage(img, x - spec.w / 2, y - spec.h / 2, spec.w, spec.h);
 }
 
@@ -386,15 +400,17 @@ function resetGame() {
     nextFireworkAt = 0;
     if (runnerWinScreen) runnerWinScreen.style.display = 'none';
     clearCollectedMembers();
+    collapseLegendCards();
     narrativePaused = false;
     legendPaused = false;
     narrativeQueue = [];
     shownNarrativeKeys.clear();
     legendExpandedCardId = '';
-    legendPauseStartedAt = 0;
     touchGestureCooldownUntil = 0;
     gamePaused = false;
-    gamePauseStartedAt = 0;
+    simulationPausedSince = 0;
+    runEndReason = '';
+    trailAccumulator = 0;
     phaseFlashUntil = 0;
     postBarrierInvulnerabilityUntil = 0;
     totalAlliesGathered = 0;
@@ -419,6 +435,7 @@ function resetGame() {
     showNextNarrative();
 
     updateUI();
+    updateTimeDisplay(performance.now());
 }
 
 function updateTouchHintVisibility() {
@@ -433,8 +450,18 @@ function dismissTouchHint() {
     updateTouchHintVisibility();
 }
 
+function isTouchUi() {
+    return Boolean(document.body && document.body.classList.contains('touch-ui'));
+}
+
 function isMobileLegendSheetMode() {
-    return Boolean(document.body && document.body.classList.contains('touch-ui') && window.innerWidth <= 680);
+    return isTouchUi() && window.innerWidth <= 680;
+}
+
+// Hint text follows the input the player actually has. An iPad in landscape is
+// wider than the touch-ui layout cutoff but still has no keyboard.
+function prefersTouchHints() {
+    return isTouchUi() || touchInputSeen || window.matchMedia('(pointer: coarse) and (hover: none)').matches;
 }
 
 function escapeHtml(value) {
@@ -629,7 +656,7 @@ function explodeFirework(rocket, now) {
     }
 }
 
-function updateWinEffects(now) {
+function updateWinEffects(now, frameScale) {
     if (now >= nextFireworkAt) {
         spawnFirework(now);
         nextFireworkAt = now + 150 + Math.random() * 320;
@@ -639,27 +666,27 @@ function updateWinEffects(now) {
     fireworkParticles = fireworkParticles.filter(p => {
         if (p.life <= now) return false;
         if (p.kind === 'rocket') {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.15;
+            p.x += p.vx * frameScale;
+            p.y += p.vy * frameScale;
+            p.vy += 0.15 * frameScale;
             if (p.vy >= 0 || p.y <= p.peakY || p.x < -30 || p.x > canvas.width + 30) {
                 toExplode.push(p);
                 return false;
             }
         } else {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.13;
-            p.vx *= 0.97;
+            p.x += p.vx * frameScale;
+            p.y += p.vy * frameScale;
+            p.vy += 0.13 * frameScale;
+            p.vx *= Math.pow(0.97, frameScale);
         }
         return true;
     });
     for (const rocket of toExplode) explodeFirework(rocket, now);
 
     for (const b of discoBalls) {
-        b.x += b.vx;
-        b.y += b.vy;
-        b.hue = (b.hue + 1.8) % 360;
+        b.x += b.vx * frameScale;
+        b.y += b.vy * frameScale;
+        b.hue = (b.hue + 1.8 * frameScale) % 360;
         if (b.x - b.r < 0 || b.x + b.r > canvas.width) b.vx = -b.vx;
         if (b.y - b.r < 0 || b.y + b.r > canvas.height) b.vy = -b.vy;
     }
@@ -750,7 +777,7 @@ function showNextNarrative() {
     const toneClass = `runner-narrative-theme-${tone}`;
 
     narrativePaused = true;
-    narrativePauseStartedAt = performance.now();
+    syncPauseClock();
     if (window.bgm) window.bgm.setVolume(0.05);
     if (runnerNarrativePanel) {
         runnerNarrativePanel.classList.remove(
@@ -777,12 +804,10 @@ function showNextNarrative() {
 }
 
 function advanceNarrative() {
+    // The same continue action can arrive through more than one event (Enter
+    // on the focused button fires both the key handler and a click).
+    if (!narrativePaused) return;
     stopNarrativeSfxLoop();
-    const now = performance.now();
-    if (narrativePauseStartedAt > 0) {
-        applyPauseCompensation(Math.max(0, now - narrativePauseStartedAt));
-        narrativePauseStartedAt = 0;
-    }
 
     if (runnerNarrativePanel) runnerNarrativePanel.style.display = 'none';
     if (narrativeQueue.length) {
@@ -790,14 +815,16 @@ function advanceNarrative() {
         return;
     }
     narrativePaused = false;
+    syncPauseClock();
     if (window.bgm) window.bgm.setVolume(0.24);
-    touchGestureCooldownUntil = now + 240;
+    touchGestureCooldownUntil = performance.now() + 240;
 
     if (pendingVictoryAfterNarrative) {
         pendingVictoryAfterNarrative = false;
         gameActive = false;
         gameWon = true;
         gameEndedAt = performance.now();
+        playSfx('win');
         initDiscoBalls();
         showWinScreen();
     }
@@ -807,20 +834,8 @@ function advanceNarrative() {
 
 function setLegendPaused(paused) {
     if (legendPaused === paused) return;
-
-    const now = performance.now();
-    if (paused) {
-        legendPaused = true;
-        legendPauseStartedAt = now;
-        updateUI();
-        return;
-    }
-
-    if (legendPauseStartedAt > 0) {
-        applyPauseCompensation(Math.max(0, now - legendPauseStartedAt));
-        legendPauseStartedAt = 0;
-    }
-    legendPaused = false;
+    legendPaused = paused;
+    syncPauseClock();
     updateUI();
 }
 
@@ -890,7 +905,6 @@ function getRoundProfile() {
         memberSpawnMs:     Math.round(base.memberSpawnMs * diff.memberMult),
         obstacleBase:      base.obstacleBase * diff.obstacleMult,
         solidarityRangePx: base.solidarityRangePx,
-        tooLateBufferPx:   base.tooLateBufferPx,
         shieldDurationMs:  base.shieldDurationMs,
         speedMult:         diff.speedMult,
     };
@@ -917,7 +931,7 @@ function handleBarrierClear() {
     precedentEstablished += 1;
     score += 100;
     courtroomFinaleActive = precedentEstablished >= 3;
-    phaseFlashUntil = clearNow + 600;
+    phaseFlashUntil = REDUCED_MOTION ? 0 : clearNow + 600;
     postBarrierInvulnerabilityUntil = clearNow + 3000;
     spawnRainbowSparkles(clearNow);
 
@@ -953,8 +967,10 @@ function applyPauseCompensation(deltaMs) {
     player.slowUntil = shiftTimer(player.slowUntil, deltaMs);
     player.laneCooldownUntil = shiftTimer(player.laneCooldownUntil, deltaMs);
     player.horizontalCooldownUntil = shiftTimer(player.horizontalCooldownUntil, deltaMs);
+    player.hitFlashUntil = shiftTimer(player.hitFlashUntil, deltaMs);
 
     laneLockFeedbackUntil = shiftTimer(laneLockFeedbackUntil, deltaMs);
+    solidarityFeedbackUntil = shiftTimer(solidarityFeedbackUntil, deltaMs);
     phaseFlashUntil = shiftTimer(phaseFlashUntil, deltaMs);
     postBarrierInvulnerabilityUntil = shiftTimer(postBarrierInvulnerabilityUntil, deltaMs);
 
@@ -963,9 +979,72 @@ function applyPauseCompensation(deltaMs) {
         wall.activeUntil = shiftTimer(wall.activeUntil, deltaMs);
     }
 
+    obstacles.forEach(o => {
+        o.telegraphUntil = shiftTimer(o.telegraphUntil, deltaMs);
+    });
+    particles.forEach(p => {
+        p.life = shiftTimer(p.life, deltaMs);
+    });
     pendingSpawns.forEach(spawn => {
         spawn.at += deltaMs;
     });
+}
+
+function isSimulationPaused() {
+    return narrativePaused || legendPaused || gamePaused;
+}
+
+// Call after any pause flag changes. Overlapping pauses share one clock, so
+// timers are shifted once by the total time the simulation stood still rather
+// than once per overlapping pause.
+function syncPauseClock() {
+    const now = performance.now();
+    if (isSimulationPaused()) {
+        if (!simulationPausedSince) simulationPausedSince = now;
+        return;
+    }
+    if (simulationPausedSince) {
+        applyPauseCompensation(Math.max(0, now - simulationPausedSince));
+        simulationPausedSince = 0;
+    }
+}
+
+// Escape, info modal, and hidden-tab pause. Returns true when the state changed.
+function setGamePaused(paused) {
+    if (gamePaused === paused) return false;
+    if (paused && (!gameActive || narrativePaused || legendPaused)) return false;
+    gamePaused = paused;
+    syncPauseClock();
+    updateUI();
+    return true;
+}
+
+function endRun(reason) {
+    gameActive = false;
+    gameWon = false;
+    runEndReason = reason;
+    gameEndedAt = performance.now();
+    playSfx('gameOver');
+    updateUI();
+}
+
+function getRunEndReasonText() {
+    if (runEndReason === 'timeout') return 'Time ran out before the last precedent.';
+    if (runEndReason === 'barrier') return 'The barrier closed before Solidarity was ready.';
+    if (runEndReason === 'lives') return 'The investigators wore you down.';
+    return 'The run ended early.';
+}
+
+function updateTimeDisplay(now) {
+    if (!uiTime || !gameActive) return;
+    const reference = simulationPausedSince || now;
+    const remainingMs = Math.max(0, RUN_DURATION_MS - (reference - runStart));
+    const totalSeconds = Math.ceil(remainingMs / 1000);
+    const text = `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, '0')}`;
+    if (text !== uiTimeText) {
+        uiTimeText = text;
+        uiTime.textContent = text;
+    }
 }
 
 function handleNarrativeContinue(e) {
@@ -1001,9 +1080,11 @@ function handleTouchGestureStart(e) {
     if (!e || e.pointerType !== 'touch' || e.isPrimary === false) return;
     if (!canvas || !gameContainer) return;
     if (runnerNarrativePanel && runnerNarrativePanel.contains(e.target)) return;
+    if (runnerWinScreen && runnerWinScreen.contains(e.target)) return;
     if (legendPaused || narrativePaused) return;
 
     if (window.sfx) window.sfx.init();
+    touchInputSeen = true;
 
     activeTouchGesture = {
         pointerId: e.pointerId,
@@ -1034,7 +1115,12 @@ function handleTouchGestureEnd(e) {
     if (typeof e.preventDefault === 'function') e.preventDefault();
 
     if (narrativePaused || legendPaused) return;
-    if (gamePaused) return;
+    if (gamePaused) {
+        // Touch devices have no Escape key, so a tap is the way back from a
+        // pause, including the automatic pause when the tab was hidden.
+        if (absX <= TOUCH_TAP_MAX_DISTANCE && absY <= TOUCH_TAP_MAX_DISTANCE) setGamePaused(false);
+        return;
+    }
     if (now < touchGestureCooldownUntil) return;
 
     if (absX <= TOUCH_TAP_MAX_DISTANCE && absY <= TOUCH_TAP_MAX_DISTANCE) {
@@ -1333,6 +1419,15 @@ function getSolidarityState(now) {
     if (!wall) {
         return { ready: false, reason: 'No barrier to activate against' };
     }
+    if (wall.passed) {
+        return { ready: false, reason: 'Barrier cleared' };
+    }
+    if (wall.activeUntil > now) {
+        return { ready: false, reason: 'Active' };
+    }
+    if (isSimulationPaused()) {
+        return { ready: false, reason: 'Paused' };
+    }
     const profile = getRoundProfile();
     if (chainCount < profile.chainThreshold) {
         return {
@@ -1341,12 +1436,11 @@ function getSolidarityState(now) {
         };
     }
 
+    // The window closes on contact: an unshielded wall that reaches the player
+    // ends the run in the same frame, so there is no separate "too late" state.
     const distanceToWall = wall.x - player.x;
     if (distanceToWall > profile.solidarityRangePx) {
         return { ready: false, reason: 'Too early, wait for barrier' };
-    }
-    if (distanceToWall < profile.tooLateBufferPx) {
-        return { ready: false, reason: 'Too late, barrier passed' };
     }
 
     return { ready: true, reason: 'Ready' };
@@ -1432,26 +1526,20 @@ function applyObstacleEffect(obstacle, now) {
         return;
     }
     if (obstacle.type === 'suit') {
+        // update() has already spent one member to absorb the hit. A suit that
+        // reaches the player takes a second one; tail contact only costs one.
         if (trimCollectedMembers(1)) {
             setSolidarityFeedback('HIT: SUIT SHREDS EXTRA CHAIN');
         }
     }
 }
 
-function update(now) {
+function update(now, frameScale) {
     if (!gameActive) return;
-    if (narrativePaused) return;
-    if (legendPaused) return;
-    if (gamePaused) return;
+    if (isSimulationPaused()) return;
 
-    const elapsed = now - runStart;
-    if (elapsed >= RUN_DURATION_MS && !gameWon) {
-        gameActive = false;
-        gameWon = precedentEstablished >= PRECEDENT_TARGET;
-        gameEndedAt = performance.now();
-        if (gameWon) playSfx('win');
-        else playSfx('gameOver');
-        updateUI();
+    if (now - runStart >= RUN_DURATION_MS) {
+        endRun('timeout');
         return;
     }
 
@@ -1464,7 +1552,7 @@ function update(now) {
 
     if (player.targetX !== player.x) {
         const dx = player.targetX - player.x;
-        const xStep = isSlowed ? 4 : 8;
+        const xStep = (isSlowed ? 4 : 8) * frameScale;
         if (Math.abs(dx) <= xStep) {
             player.x = player.targetX;
         } else {
@@ -1475,7 +1563,7 @@ function update(now) {
     if (player.targetLane !== player.lane) {
         const targetY = LANES[player.targetLane];
         const dy = targetY - player.y;
-        const laneStep = isSlowed ? 4 : 6;
+        const laneStep = (isSlowed ? 4 : 6) * frameScale;
         if (Math.abs(dy) < laneStep) {
             player.y = targetY;
             player.lane = player.targetLane;
@@ -1484,21 +1572,26 @@ function update(now) {
         }
     }
 
-    // Record the runner's current position; follower spacing comes from historical sampling.
-    player.trail.push({ x: player.x - 20, y: player.y });
-    if (player.trail.length > 60) player.trail.shift();
+    // Follower spacing comes from sampling the runner's position at a fixed
+    // 60 Hz cadence, independent of the display refresh rate.
+    trailAccumulator += frameScale;
+    while (trailAccumulator >= 1) {
+        player.trail.push({ x: player.x - 20, y: player.y });
+        trailAccumulator -= 1;
+    }
+    if (player.trail.length > 60) player.trail.splice(0, player.trail.length - 60);
 
     obstacles.forEach(o => {
-        o.x -= o.speed;
+        o.x -= o.speed * frameScale;
     });
     obstacles = obstacles.filter(o => o.x + o.w > -20);
 
-    members.forEach(m => { m.x -= m.speed; });
+    members.forEach(m => { m.x -= m.speed * frameScale; });
     members = members.filter(m => m.x + m.w > -20);
 
     if (wall) {
         if (now > wall.warningUntil) {
-            wall.x -= wall.speed;
+            wall.x -= wall.speed * frameScale;
         }
         if (wall.x + wall.w < -20) wall = null;
     }
@@ -1508,7 +1601,7 @@ function update(now) {
 
     for (const o of obstacles) {
         if (o.telegraphUntil > now) continue;
-        if (now < postBarrierInvulnerabilityUntil) continue;
+        if (now < postBarrierInvulnerabilityUntil || debugInvulnerable) continue;
 
         let consumedByChain = false;
         for (const follower of followerHitboxes) {
@@ -1526,11 +1619,7 @@ function update(now) {
                 lives -= 1;
                 player.hitFlashUntil = now + 200;
                 playSfx('lifeLost');
-                if (lives <= 0) {
-                    gameActive = false;
-                    gameEndedAt = performance.now();
-                    playSfx('gameOver');
-                }
+                if (lives <= 0) endRun('lives');
             }
             applyObstacleEffect(o, now);
             o.x = -999;
@@ -1554,10 +1643,7 @@ function update(now) {
         const shieldActive = wall.activeUntil > now;
         const wallLive = now > wall.warningUntil;
         if (wallHit && wallLive && !shieldActive && now >= postBarrierInvulnerabilityUntil) {
-            gameActive = false;
-            gameEndedAt = performance.now();
-            playSfx('gameOver');
-            updateUI();
+            endRun('barrier');
         }
         if (wallHit && wallLive && shieldActive && !wall.passed) {
             wall.passed = true;
@@ -1568,8 +1654,8 @@ function update(now) {
 
     particles = particles.filter(p => p.life > now);
     particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
+        p.x += p.vx * frameScale;
+        p.y += p.vy * frameScale;
     });
 }
 
@@ -1763,7 +1849,7 @@ function draw() {
         ctx.font = '22px Courier New';
         ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2 - 10);
         ctx.font = '12px Courier New';
-        ctx.fillText('Press Escape to resume', canvas.width / 2, canvas.height / 2 + 16);
+        ctx.fillText(prefersTouchHints() ? 'Tap or press Escape to resume' : 'Press Escape to resume', canvas.width / 2, canvas.height / 2 + 16);
         ctx.restore();
     }
 
@@ -1773,18 +1859,19 @@ function draw() {
         ctx.save();
         ctx.textAlign = 'center';
         ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-            ctx.fillRect(canvas.width / 2 - 230, canvas.height / 2 - 46, 460, 126);
-            ctx.fillStyle = '#00ff00';
-            ctx.font = '20px Courier New';
-            ctx.fillText('You Lose', canvas.width / 2, canvas.height / 2 - 28);
-            ctx.font = '14px Courier New';
-            ctx.fillText('The real fight took eleven years.', canvas.width / 2, canvas.height / 2 - 2);
-            ctx.fillText("You've got another few minutes.", canvas.width / 2, canvas.height / 2 + 18);
-            ctx.font = '12px Courier New';
-            ctx.fillText('Press R to try again.', canvas.width / 2, canvas.height / 2 + 42);
-            ctx.font = '11px Courier New';
-            ctx.fillStyle = '#aaffaa';
-            ctx.fillText(`Allies gathered: ${totalAlliesGathered}  ·  Attempt: ${currentAttemptNumber}`, canvas.width / 2, canvas.height / 2 + 62);
+        ctx.fillRect(canvas.width / 2 - 230, canvas.height / 2 - 50, 460, 150);
+        ctx.fillStyle = '#00ff00';
+        ctx.font = '20px Courier New';
+        ctx.fillText('You Lose', canvas.width / 2, canvas.height / 2 - 30);
+        ctx.font = '14px Courier New';
+        ctx.fillText(getRunEndReasonText(), canvas.width / 2, canvas.height / 2 - 8);
+        ctx.fillText('The real fight took eleven years.', canvas.width / 2, canvas.height / 2 + 12);
+        ctx.fillText("You've got another few minutes.", canvas.width / 2, canvas.height / 2 + 32);
+        ctx.font = '12px Courier New';
+        ctx.fillText(prefersTouchHints() ? 'Tap to try again.' : 'Press R or Enter to try again.', canvas.width / 2, canvas.height / 2 + 56);
+        ctx.font = '11px Courier New';
+        ctx.fillStyle = '#aaffaa';
+        ctx.fillText(`Allies gathered: ${totalAlliesGathered}  ·  Attempt: ${currentAttemptNumber}`, canvas.width / 2, canvas.height / 2 + 76);
         ctx.restore();
     }
 
@@ -1824,15 +1911,21 @@ function drawDebugOverlay() {
 }
 
 function loop(now) {
-    update(now);
-    if (gameWon && !gameActive) updateWinEffects(now);
+    const frameScale = lastFrameAt
+        ? Math.min(MAX_FRAME_SCALE, (now - lastFrameAt) / REFERENCE_FRAME_MS)
+        : 1;
+    lastFrameAt = now;
+    update(now, frameScale);
+    if (gameWon && !gameActive) updateWinEffects(now, frameScale);
+    updateTimeDisplay(now);
     draw();
     requestAnimationFrame(loop);
 }
 
 function tryMoveLane(direction) {
     const now = performance.now();
-    if (now <= player.laneCooldownUntil || now <= laneLockedUntil || !gameActive) return;
+    if (!gameActive || isSimulationPaused()) return;
+    if (now <= player.laneCooldownUntil || now <= laneLockedUntil) return;
     player.targetLane = Math.max(0, Math.min(LANES.length - 1, player.targetLane + direction));
     player.laneCooldownUntil = now + 100;
 }
@@ -1843,7 +1936,8 @@ function clampPlayerX(value) {
 
 function tryMoveHorizontal(direction) {
     const now = performance.now();
-    if (now <= player.horizontalCooldownUntil || !gameActive) return;
+    if (!gameActive || isSimulationPaused()) return;
+    if (now <= player.horizontalCooldownUntil) return;
     const step = now < player.slowUntil ? 18 : 30;
     player.targetX = clampPlayerX(player.targetX + direction * step);
     player.horizontalCooldownUntil = now + 80;
@@ -1860,6 +1954,10 @@ function triggerSlow() {
 function handleRunnerKeydown(e) {
     if (window.sfx) window.sfx.init();
 
+    // A focused <select> (the difficulty dropdown) keeps its native keyboard
+    // handling; the loader blurs it after a choice so play can continue.
+    if (e.target && e.target.tagName === 'SELECT') return;
+
     const key = e.key;
     const code = e.code;
 
@@ -1867,6 +1965,10 @@ function handleRunnerKeydown(e) {
         if (key === 'Enter') {
             e.preventDefault();
             advanceNarrative();
+        } else if (key === ' ' || code === 'Space') {
+            // Space is the Solidarity key. Swallow it so a press that lands as a
+            // story card opens does not activate the focused continue button.
+            e.preventDefault();
         }
         return;
     }
@@ -1883,7 +1985,7 @@ function handleRunnerKeydown(e) {
         return;
     }
 
-    if (key === 'F2') {
+    if (DEBUG_ENABLED && key === 'F2') {
         e.preventDefault();
         debugOverlayEnabled = !debugOverlayEnabled;
         return;
@@ -1891,22 +1993,19 @@ function handleRunnerKeydown(e) {
 
     if (key === 'Escape') {
         e.preventDefault();
-        if (!gameActive || narrativePaused || legendPaused) return;
-        const now = performance.now();
-        if (gamePaused) {
-            applyPauseCompensation(Math.max(0, now - gamePauseStartedAt));
-            gamePauseStartedAt = 0;
-            gamePaused = false;
-        } else {
-            gamePaused = true;
-            gamePauseStartedAt = now;
+        if (legendPaused) {
+            collapseLegendCards();
+            return;
         }
-        updateUI();
+        setGamePaused(!gamePaused);
         return;
     }
 
-    // Debug scene shortcuts — Alt+1..5 = force-show narrative cards, Alt+0 = you-lose
-    if (e.altKey) {
+    // Movement and Solidarity wait for the run to resume.
+    if (gamePaused) return;
+
+    // Debug scene shortcuts: Alt+1..5 force-show narrative cards, Alt+0 you-lose, Alt+6 you-win.
+    if (DEBUG_ENABLED && e.altKey) {
         const debugNarrativeMap = {
             '1': 'intro',
             '2': 'phase1Clear',
@@ -1921,10 +2020,7 @@ function handleRunnerKeydown(e) {
         }
         if (key === '0') {
             e.preventDefault();
-            gameActive = false;
-            gameWon = false;
-            gameEndedAt = performance.now();
-            updateUI();
+            endRun('lives');
             return;
         }
         if (key === '6') {
@@ -2005,20 +2101,8 @@ function handleRunnerKeydown(e) {
 window.addEventListener('keydown', handleRunnerKeydown);
 
 if (runnerNarrativeNextButton) {
-    runnerNarrativeNextButton.addEventListener('pointerdown', handleNarrativeContinue);
+    // click covers mouse, touch tap, and Enter on the focused button.
     runnerNarrativeNextButton.addEventListener('click', handleNarrativeContinue);
-    runnerNarrativeNextButton.addEventListener('touchstart', handleNarrativeContinue, { passive: false });
-    runnerNarrativeNextButton.onclick = handleNarrativeContinue;
-}
-
-if (runnerNarrativePanel) {
-    runnerNarrativePanel.addEventListener('click', e => {
-        if (!narrativePaused) return;
-        const target = e.target;
-        if (target && target.id === 'runner-narrative-next') {
-            handleNarrativeContinue(e);
-        }
-    });
 }
 
 if (runnerLegend) {
@@ -2063,72 +2147,39 @@ window.addEventListener('resize', () => {
     }
 });
 
+// Movement controls restart the run once it has ended. Solidarity does not,
+// so a Space press cannot bounce the player past the fail screen.
+function restartOrRun(action) {
+    return () => {
+        if (!gameActive) {
+            resetGame();
+            return;
+        }
+        action();
+    };
+}
+
 window.runnerControls = {
-    slow: () => {
-        if (!gameActive) {
-            resetGame();
-            return;
-        }
-        tryMoveHorizontal(-1);
-    },
-    left: () => {
-        if (!gameActive) {
-            resetGame();
-            return;
-        }
-        tryMoveHorizontal(-1);
-    },
-    right: () => {
-        if (!gameActive) {
-            resetGame();
-            return;
-        }
-        tryMoveHorizontal(1);
-    },
-    up: () => {
-        if (!gameActive) {
-            resetGame();
-            return;
-        }
-        tryMoveLane(-1);
-    },
-    down: () => {
-        if (!gameActive) {
-            resetGame();
-            return;
-        }
-        tryMoveLane(1);
-    },
-    laneUp: () => {
-        if (!gameActive) {
-            resetGame();
-            return;
-        }
-        tryMoveLane(-1);
-    },
-    laneDown: () => {
-        if (!gameActive) {
-            resetGame();
-            return;
-        }
-        tryMoveLane(1);
-    },
-    dash: () => {
-        if (!gameActive) {
-            resetGame();
-            return;
-        }
-        tryMoveHorizontal(1);
-    },
+    slow: restartOrRun(() => tryMoveHorizontal(-1)),
+    left: restartOrRun(() => tryMoveHorizontal(-1)),
+    right: restartOrRun(() => tryMoveHorizontal(1)),
+    dash: restartOrRun(() => tryMoveHorizontal(1)),
+    up: restartOrRun(() => tryMoveLane(-1)),
+    laneUp: restartOrRun(() => tryMoveLane(-1)),
+    down: restartOrRun(() => tryMoveLane(1)),
+    laneDown: restartOrRun(() => tryMoveLane(1)),
     solidarity: () => {
-        // Space/solidarity intentionally does NOT restart — use Enter, R, or the
-        // Restart button so players aren't accidentally bounced past the fail screen.
         if (!gameActive) return;
         attemptSolidarityActivation(performance.now());
     },
     restart: () => {
         resetGame();
-    }
+    },
+    // pause() returns true only when it changed the state, so a caller such as
+    // the info modal can resume exactly the pause it introduced.
+    pause: () => setGamePaused(true),
+    resume: () => setGamePaused(false),
+    isPaused: () => gamePaused
 };
 
 if (canvas) {
@@ -2155,6 +2206,12 @@ if (runnerWinRestart) {
     runnerWinRestart.addEventListener('click', () => { resetGame(); });
 }
 
+// A hidden tab stops requestAnimationFrame but not the millisecond timers, so
+// pause the run instead of letting spawns pile up for the return.
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) setGamePaused(true);
+});
+
 if (document.body) {
     document.body.tabIndex = -1;
     window.addEventListener('load', () => {
@@ -2166,3 +2223,36 @@ loadRunnerSprites();
 renderRunnerLegend();
 resetGame();
 requestAnimationFrame(loop);
+
+if (DEBUG_ENABLED) {
+    // Read-only state snapshot plus an obstacle-immunity switch. Used by
+    // scripts/smoke_full_run.js to steer a complete run through all four
+    // barriers without random spawns deciding the outcome.
+    window.runnerDebug = {
+        snapshot() {
+            const now = performance.now();
+            return {
+                gameActive,
+                gameWon,
+                narrativePaused,
+                gamePaused,
+                lives,
+                chainCount,
+                threshold: getCurrentThreshold(),
+                precedentEstablished,
+                runEndReason,
+                playerX: player.x,
+                playerLane: player.lane,
+                targetLane: player.targetLane,
+                wall: wall
+                    ? { x: wall.x, live: now > wall.warningUntil, shielded: wall.activeUntil > now, passed: wall.passed }
+                    : null,
+                members: members.map(m => ({ x: m.x, lane: m.lane })),
+                solidarity: getSolidarityState(now)
+            };
+        },
+        setInvulnerable(value) {
+            debugInvulnerable = Boolean(value);
+        }
+    };
+}
